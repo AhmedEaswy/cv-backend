@@ -1,0 +1,32 @@
+{
+    "User": {
+        "id": "integer",
+        "fisrt_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "password": "string",
+        "skills": "array",
+        "created_at": "date",
+        "updated_at": "date",
+    },
+    "Templates": {
+        "id": "integer",
+        "name": "string",
+        "preview": "string",
+        "description": "string",
+        "created_at": "date",
+        "updated_at": "date"
+    },
+    "Profile": {
+        "id": "integer",
+        "user_id": "integer", // relationship with User as one to many (user can have multiple profiles)
+        "interests": "array",
+        "languages": "json array of objects", // [{"language": "string", "level": "string"}]
+        "info": "json object", // { address, phone, email, website, summary, bio, portfolio, military_status, ready_to_relocate }
+        "experiences": "array", // json object [ { name(optional), location(optional), position, description(optional), from(data|optional), to(data|optional), currentlyWorkingHere(boolean) } ]
+        "projects": "array", // json object [ { name, description(optional), url(optional), from(data|optional), to(data|optional) } ]
+        "educations": "array", // json object [ { institution, degree, fieldOfStudy, description(optional), from(data|optional), to(data|optional) } ]
+        "created_at": "date",
+        "updated_at": "date"
+    }
+}

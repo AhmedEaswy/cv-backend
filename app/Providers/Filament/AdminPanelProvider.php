@@ -13,6 +13,9 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Filament\Navigation\NavigationItem;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,6 +35,8 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->renderHook('panels::body.end', fn (): string => '<script>document.documentElement.dir = "' . session("direction", "ltr") . '";</script>')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -41,6 +46,18 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+            ])
+            ->navigationItems([
+                NavigationItem::make()
+                    ->label('🇺🇸 English')
+                    ->icon('heroicon-o-globe-alt')
+                    ->url('/admin/switch-language/en')
+                    ->sort(100),
+                NavigationItem::make()
+                    ->label('🇸🇦 العربية')
+                    ->icon('heroicon-o-globe-alt')
+                    ->url('/admin/switch-language/ar')
+                    ->sort(101),
             ])
             ->middleware([
                 EncryptCookies::class,

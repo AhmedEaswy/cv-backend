@@ -1,0 +1,32 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* RTL Support */
+[dir="rtl"] {
+    direction: rtl;
+}
+
+[dir="rtl"] .fi-sidebar {
+    right: 0;
+    left: auto;
+}
+
+[dir="rtl"] .fi-topbar {
+    right: 0;
+    left: auto;
+}
+
+[dir="rtl"] .fi-sidebar-nav {
+    text-align: right;
+}
+
+[dir="rtl"] .fi-sidebar-nav-item {
+    text-align: right;
+}
+
+/* Arabic Font Support */
+[dir="rtl"] body {
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
