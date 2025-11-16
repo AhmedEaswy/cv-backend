@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Profiles\Schemas;
 
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,37 +21,16 @@ class ProfileForm
                     ->relationship('user', 'name')
                     ->required(),
 
-                // Personal Information Fields
-                TextInput::make('info.address')
-                    ->label('Address'),
-                TextInput::make('info.phone')
-                    ->label('Phone')
-                    ->tel(),
-                TextInput::make('info.email')
-                    ->label('Email')
-                    ->email(),
-                TextInput::make('info.website')
-                    ->label('Website')
-                    ->url(),
-                Textarea::make('info.summary')
-                    ->label('Summary')
-                    ->rows(3),
-                Textarea::make('info.bio')
-                    ->label('Bio')
-                    ->rows(4),
-                TextInput::make('info.portfolio')
-                    ->label('Portfolio')
-                    ->url(),
-                Select::make('info.military_status')
-                    ->label('Military Status')
-                    ->options([
-                        'exempted' => 'Exempted',
-                        'completed' => 'Completed',
-                        'postponed' => 'Postponed',
-                        'not_applicable' => 'Not Applicable',
-                    ]),
-                Checkbox::make('info.ready_to_relocate')
-                    ->label('Ready to Relocate'),
+                // Personal Information - Key-Value Fields
+                KeyValue::make('info')
+                    ->label('Personal Information')
+                    ->addActionLabel('Add Property')
+                    ->reorderable()
+                    ->keyLabel('Property')
+                    ->valueLabel('Value')
+                    ->keyPlaceholder('e.g., address, phone, email')
+                    ->valuePlaceholder('Enter value here')
+                    ->columnSpanFull(),
 
                 // Interests Repeater
                 Repeater::make('interests')

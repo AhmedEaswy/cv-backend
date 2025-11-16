@@ -18,18 +18,28 @@ class ProfilesTable
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')
+                TextColumn::make('id')
+                    ->label('Profile ID')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('user.name')
+                    ->label('User Name')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('created_at')
+                    ->label('Created At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Updated At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
+                    ->label('Deleted At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -28,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'password',
         'type',
+        'active',
     ];
 
     /**
@@ -51,6 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'type' => UserType::class,
+            'active' => 'boolean',
         ];
     }
 
@@ -68,6 +70,14 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->type === UserType::USER;
+    }
+
+    /**
+     * Check if the user is active
+     */
+    public function isActive(): bool
+    {
+        return $this->active === true;
     }
 
     /**
