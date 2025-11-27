@@ -22,5 +22,6 @@ return [
     'cv_updated' => 'CV updated successfully.',
     'cv_deleted' => 'CV deleted successfully.',
     'cv_not_found' => 'CV not found or you do not have permission to access it.',
+    'date_range_invalid' => 'The end date must be after or equal to the start date.',
 ];
 

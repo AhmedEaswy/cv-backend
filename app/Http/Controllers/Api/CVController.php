@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Api\StoreCVRequest;
+use App\Http\Requests\Api\UpdateCVRequest;
 use App\Models\Profile;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class CVController extends BaseApiController
 {
@@ -32,95 +33,9 @@ class CVController extends BaseApiController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCVRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'language' => 'sometimes|string|max:10|in:en,ar,tr',
-            'sections_order' => 'sometimes|array',
-            'sections_order.*' => 'string',
-            'user_id' => 'sometimes|nullable|exists:users,id',
-            'user_data' => 'sometimes|array',
-            'user_data.firstName' => 'sometimes|string|max:255',
-            'user_data.lastName' => 'sometimes|string|max:255',
-            'user_data.jobTitle' => 'sometimes|string|max:255',
-            'user_data.email' => 'sometimes|email|max:255',
-            'user_data.address' => 'sometimes|nullable|string|max:500',
-            'user_data.portfolioUrl' => 'sometimes|nullable|url|max:500',
-            'user_data.phone' => 'sometimes|nullable|string|max:50',
-            'user_data.summary' => 'sometimes|nullable|string',
-            'user_data.birthdate' => 'sometimes|nullable|date',
-            'user_data.skills' => 'sometimes|array',
-            'user_data.skills.*.name' => 'required_with:user_data.skills|string|max:255',
-            'user_data.educations' => 'sometimes|array',
-            'user_data.educations.*.institution' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.degree' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.fieldOfStudy' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.educations.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences' => 'sometimes|array',
-            'user_data.experiences.*.position' => 'required_with:user_data.experiences|string|max:255',
-            'user_data.experiences.*.company' => 'sometimes|nullable|string|max:255',
-            'user_data.experiences.*.description' => 'sometimes|nullable|string',
-            'user_data.experiences.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences.*.current' => 'sometimes|boolean',
-            'user_data.projects' => 'sometimes|array',
-            'user_data.projects.*.title' => 'required_with:user_data.projects|string|max:255',
-            'user_data.projects.*.description' => 'sometimes|nullable|string',
-            'user_data.projects.*.technologies' => 'sometimes|nullable|string|max:500',
-            'user_data.projects.*.url' => 'sometimes|nullable|url|max:500',
-            'user_data.projects.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.projects.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.projects.*.current' => 'sometimes|boolean',
-            'user_data.languages' => 'sometimes|array',
-            'user_data.languages.*.name' => 'required_with:user_data.languages|string|max:255',
-            'user_data.languages.*.proficiencyLevel' => 'required_with:user_data.languages|integer|min:1|max:5',
-            'user_data.interests' => 'sometimes|array',
-            'user_data.interests.*.name' => 'required_with:user_data.interests|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->errorResponse(__('messages.validation_failed'), 422, $validator->errors());
-        }
-
-        // Custom validation: Check date ranges for educations, experiences, and projects
-        $errors = [];
-        $userData = $request->input('user_data', []);
-
-        if (isset($userData['educations']) && is_array($userData['educations'])) {
-            foreach ($userData['educations'] as $index => $education) {
-                if (isset($education['from']) && isset($education['to'])) {
-                    if (strtotime($education['from']) > strtotime($education['to'])) {
-                        $errors["user_data.educations.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (isset($userData['experiences']) && is_array($userData['experiences'])) {
-            foreach ($userData['experiences'] as $index => $experience) {
-                if (isset($experience['from']) && isset($experience['to']) && !($experience['current'] ?? false)) {
-                    if (strtotime($experience['from']) > strtotime($experience['to'])) {
-                        $errors["user_data.experiences.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (isset($userData['projects']) && is_array($userData['projects'])) {
-            foreach ($userData['projects'] as $index => $project) {
-                if (isset($project['from']) && isset($project['to']) && !($project['current'] ?? false)) {
-                    if (strtotime($project['from']) > strtotime($project['to'])) {
-                        $errors["user_data.projects.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            return $this->errorResponse(__('messages.validation_failed'), 422, $errors);
-        }
+        $validated = $request->validated();
 
         // Get user_id from authenticated user or request
         $userId = null;
@@ -131,13 +46,14 @@ class CVController extends BaseApiController
         }
 
         // Map user_data to Profile structure
+        $userData = $request->input('user_data', []);
         $mappedData = $this->mapUserDataToProfile($userData);
 
         $profile = Profile::create([
             'user_id' => $userId,
-            'name' => $request->input('name'),
-            'language' => $request->input('language', 'en'),
-            'sections_order' => $request->input('sections_order'),
+            'name' => $validated['name'],
+            'language' => $validated['language'] ?? 'en',
+            'sections_order' => $validated['sections_order'] ?? null,
             'info' => $mappedData['info'] ?? null,
             'interests' => $mappedData['interests'] ?? null,
             'languages' => $mappedData['languages'] ?? null,
@@ -175,7 +91,7 @@ class CVController extends BaseApiController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCVRequest $request, string $id)
     {
         $user = $request->user();
 
@@ -187,105 +103,20 @@ class CVController extends BaseApiController
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
-        // Same validation as store, but all fields optional
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'language' => 'sometimes|string|max:10|in:en,ar,tr',
-            'sections_order' => 'sometimes|array',
-            'sections_order.*' => 'string',
-            'user_data' => 'sometimes|array',
-            'user_data.firstName' => 'sometimes|string|max:255',
-            'user_data.lastName' => 'sometimes|string|max:255',
-            'user_data.jobTitle' => 'sometimes|string|max:255',
-            'user_data.email' => 'sometimes|email|max:255',
-            'user_data.address' => 'sometimes|nullable|string|max:500',
-            'user_data.portfolioUrl' => 'sometimes|nullable|url|max:500',
-            'user_data.phone' => 'sometimes|nullable|string|max:50',
-            'user_data.summary' => 'sometimes|nullable|string',
-            'user_data.birthdate' => 'sometimes|nullable|date',
-            'user_data.skills' => 'sometimes|array',
-            'user_data.skills.*.name' => 'required_with:user_data.skills|string|max:255',
-            'user_data.educations' => 'sometimes|array',
-            'user_data.educations.*.institution' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.degree' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.fieldOfStudy' => 'required_with:user_data.educations|string|max:255',
-            'user_data.educations.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.educations.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences' => 'sometimes|array',
-            'user_data.experiences.*.position' => 'required_with:user_data.experiences|string|max:255',
-            'user_data.experiences.*.company' => 'sometimes|nullable|string|max:255',
-            'user_data.experiences.*.description' => 'sometimes|nullable|string',
-            'user_data.experiences.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.experiences.*.current' => 'sometimes|boolean',
-            'user_data.projects' => 'sometimes|array',
-            'user_data.projects.*.title' => 'required_with:user_data.projects|string|max:255',
-            'user_data.projects.*.description' => 'sometimes|nullable|string',
-            'user_data.projects.*.technologies' => 'sometimes|nullable|string|max:500',
-            'user_data.projects.*.url' => 'sometimes|nullable|url|max:500',
-            'user_data.projects.*.from' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.projects.*.to' => 'sometimes|nullable|date_format:Y-m',
-            'user_data.projects.*.current' => 'sometimes|boolean',
-            'user_data.languages' => 'sometimes|array',
-            'user_data.languages.*.name' => 'required_with:user_data.languages|string|max:255',
-            'user_data.languages.*.proficiencyLevel' => 'required_with:user_data.languages|integer|min:1|max:5',
-            'user_data.interests' => 'sometimes|array',
-            'user_data.interests.*.name' => 'required_with:user_data.interests|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->errorResponse(__('messages.validation_failed'), 422, $validator->errors());
-        }
-
-        // Custom validation: Check date ranges
-        $errors = [];
-        $userData = $request->input('user_data', []);
-
-        if (isset($userData['educations']) && is_array($userData['educations'])) {
-            foreach ($userData['educations'] as $index => $education) {
-                if (isset($education['from']) && isset($education['to'])) {
-                    if (strtotime($education['from']) > strtotime($education['to'])) {
-                        $errors["user_data.educations.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (isset($userData['experiences']) && is_array($userData['experiences'])) {
-            foreach ($userData['experiences'] as $index => $experience) {
-                if (isset($experience['from']) && isset($experience['to']) && !($experience['current'] ?? false)) {
-                    if (strtotime($experience['from']) > strtotime($experience['to'])) {
-                        $errors["user_data.experiences.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (isset($userData['projects']) && is_array($userData['projects'])) {
-            foreach ($userData['projects'] as $index => $project) {
-                if (isset($project['from']) && isset($project['to']) && !($project['current'] ?? false)) {
-                    if (strtotime($project['from']) > strtotime($project['to'])) {
-                        $errors["user_data.projects.{$index}.to"] = ['The end date must be after or equal to the start date.'];
-                    }
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            return $this->errorResponse(__('messages.validation_failed'), 422, $errors);
-        }
+        $validated = $request->validated();
 
         // Update only provided fields
-        if ($request->has('name')) {
-            $profile->name = $request->input('name');
+        if (isset($validated['name'])) {
+            $profile->name = $validated['name'];
         }
-        if ($request->has('language')) {
-            $profile->language = $request->input('language');
+        if (isset($validated['language'])) {
+            $profile->language = $validated['language'];
         }
-        if ($request->has('sections_order')) {
-            $profile->sections_order = $request->input('sections_order');
+        if (isset($validated['sections_order'])) {
+            $profile->sections_order = $validated['sections_order'];
         }
-        if ($request->has('user_data')) {
+        if (isset($validated['user_data'])) {
+            $userData = $validated['user_data'];
             $mappedData = $this->mapUserDataToProfile($userData);
             if (isset($mappedData['info'])) {
                 $profile->info = $mappedData['info'];
