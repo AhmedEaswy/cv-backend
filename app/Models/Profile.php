@@ -13,6 +13,9 @@ class Profile extends Model
 
     protected $fillable = [
         'user_id',
+        'name',
+        'language',
+        'sections_order',
         'interests',
         'languages',
         'info',
@@ -24,6 +27,7 @@ class Profile extends Model
     protected function casts(): array
     {
         return [
+            'sections_order' => 'array',
             'interests' => 'array',
             'languages' => 'array',
             'info' => 'array',
