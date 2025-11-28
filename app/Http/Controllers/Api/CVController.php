@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Api\PrintCVRequest;
 use App\Http\Requests\Api\StoreCVRequest;
 use App\Http\Requests\Api\UpdateCVRequest;
 use App\Models\Profile;
+use App\Models\Template;
 use Illuminate\Http\Request;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class CVController extends BaseApiController
 {
@@ -36,6 +39,11 @@ class CVController extends BaseApiController
     public function store(StoreCVRequest $request)
     {
         $validated = $request->validated();
+
+        // If unauthenticated user provides template_id, generate PDF instead of creating profile
+        if (!$request->user() && $request->has('template_id')) {
+            return $this->generatePdfFromRequest($request);
+        }
 
         // Get user_id from authenticated user or request
         $userId = null;
@@ -343,6 +351,130 @@ class CVController extends BaseApiController
         return $userData;
     }
 
+    /**
+     * Generate PDF from CV data.
+     */
+    public function print(PrintCVRequest $request)
+    {
+        $templateId = $request->input('template_id');
+        $profileId = $request->input('profile_id');
+
+        // Load existing profile or create temporary one
+        if ($profileId) {
+            $user = $request->user();
+            $profile = Profile::where('id', $profileId);
+
+            if ($user) {
+                $profile->where('user_id', $user->id);
+            }
+
+            $profile = $profile->first();
+
+            if (!$profile) {
+                return $this->errorResponse(__('messages.cv_not_found'), 404);
+            }
+        } else {
+            // Create temporary profile from user_data
+            $userData = $request->input('user_data', []);
+            $mappedData = $this->mapUserDataToProfile($userData);
+
+            $profile = new Profile([
+                'user_id' => $request->user()?->id,
+                'name' => $request->input('name', 'CV'),
+                'language' => $request->input('language', 'en'),
+                'sections_order' => $request->input('sections_order'),
+                'info' => $mappedData['info'] ?? null,
+                'interests' => $mappedData['interests'] ?? null,
+                'languages' => $mappedData['languages'] ?? null,
+                'experiences' => $mappedData['experiences'] ?? null,
+                'projects' => $mappedData['projects'] ?? null,
+                'educations' => $mappedData['educations'] ?? null,
+            ]);
+        }
+
+        // Load template
+        $template = Template::where('id', $templateId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$template) {
+            return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
+        }
+
+        // Convert template name to view name (kebab-case)
+        $viewName = strtolower(str_replace(' ', '-', $template->name));
+        $viewPath = "templates.cv.{$viewName}";
+
+        // Format profile data for view
+        $cvData = $this->formatProfileResponse($profile);
+
+        // Generate PDF
+        try {
+            $pdf = Pdf::view($viewPath, ['cv' => $cvData])
+                ->format('a4')
+                ->margins(10, 10, 10, 10);
+
+            $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
+
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Generate PDF from request data (used in store method for unauthenticated users).
+     */
+    private function generatePdfFromRequest(Request $request)
+    {
+        $templateId = $request->input('template_id');
+        $userData = $request->input('user_data', []);
+        $mappedData = $this->mapUserDataToProfile($userData);
+
+        // Create temporary profile
+        $profile = new Profile([
+            'user_id' => null,
+            'name' => $request->input('name', 'CV'),
+            'language' => $request->input('language', 'en'),
+            'sections_order' => $request->input('sections_order'),
+            'info' => $mappedData['info'] ?? null,
+            'interests' => $mappedData['interests'] ?? null,
+            'languages' => $mappedData['languages'] ?? null,
+            'experiences' => $mappedData['experiences'] ?? null,
+            'projects' => $mappedData['projects'] ?? null,
+            'educations' => $mappedData['educations'] ?? null,
+        ]);
+
+        // Load template
+        $template = Template::where('id', $templateId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$template) {
+            return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
+        }
+
+        // Convert template name to view name (kebab-case)
+        $viewName = strtolower(str_replace(' ', '-', $template->name));
+        $viewPath = "templates.cv.{$viewName}";
+
+        // Format profile data for view
+        $cvData = $this->formatProfileResponse($profile);
+
+        // Generate PDF
+        try {
+            $pdf = Pdf::view($viewPath, ['cv' => $cvData])
+                ->format('a4')
+                ->margins(10, 10, 10, 10);
+
+            $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
+
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
+        }
+    }
+
     private function formatProfileResponse(Profile $profile): array
     {
         return [
@@ -352,8 +484,8 @@ class CVController extends BaseApiController
             'language' => $profile->language,
             'sections_order' => $profile->sections_order,
             'user_data' => $this->mapProfileToUserData($profile),
-            'created_at' => $profile->created_at->toIso8601String(),
-            'updated_at' => $profile->updated_at->toIso8601String(),
+            'created_at' => $profile->created_at?->toIso8601String(),
+            'updated_at' => $profile->updated_at?->toIso8601String(),
         ];
     }
 }

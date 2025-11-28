@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Profiles;
 use App\Filament\Resources\Profiles\Pages\CreateProfile;
 use App\Filament\Resources\Profiles\Pages\EditProfile;
 use App\Filament\Resources\Profiles\Pages\ListProfiles;
+use App\Filament\Resources\Profiles\Pages\PrintProfile;
 use App\Filament\Resources\Profiles\Pages\ViewProfile;
 use App\Filament\Resources\Profiles\Schemas\ProfileForm;
 use App\Filament\Resources\Profiles\Schemas\ProfileInfolist;
@@ -61,6 +62,7 @@ class ProfileResource extends Resource
             'create' => CreateProfile::route('/create'),
             'view' => ViewProfile::route('/{record}'),
             'edit' => EditProfile::route('/{record}/edit'),
+            'print' => PrintProfile::route('/{record}/print'),
         ];
     }
 

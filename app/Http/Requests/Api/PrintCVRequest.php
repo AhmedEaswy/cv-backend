@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Contracts\Validation\Validator;
 
-class StoreCVRequest extends BaseFormRequest
+class PrintCVRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,15 +20,12 @@ class StoreCVRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'language' => 'sometimes|string|max:10|in:en,ar,tr',
-            'sections_order' => 'sometimes|array',
-            'sections_order.*' => 'string',
-            'user_id' => 'sometimes|nullable|exists:users,id',
-            'template_id' => 'sometimes|nullable|exists:templates,id',
-            'user_data' => 'sometimes|array',
-            'user_data.firstName' => 'sometimes|string|max:255',
-            'user_data.lastName' => 'sometimes|string|max:255',
+            'profile_id' => 'sometimes|nullable|exists:profiles,id',
+            'template_id' => 'required|exists:templates,id',
+            // If no profile_id, require user_data to create temporary profile
+            'user_data' => 'required_without:profile_id|array',
+            'user_data.firstName' => 'required_with:user_data|string|max:255',
+            'user_data.lastName' => 'required_with:user_data|string|max:255',
             'user_data.jobTitle' => 'sometimes|string|max:255',
             'user_data.email' => 'sometimes|email|max:255',
             'user_data.address' => 'sometimes|nullable|string|max:500',
@@ -75,13 +72,22 @@ class StoreCVRequest extends BaseFormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
-            // Validate template exists and is active when provided
+            // Validate template exists and is active
             if ($this->has('template_id')) {
                 $template = \App\Models\Template::find($this->input('template_id'));
                 if (!$template || !$template->is_active) {
                     $validator->errors()->add('template_id', __('messages.template_not_found_or_inactive'));
                 }
             }
+
+            // If profile_id provided, ensure user owns it (if authenticated)
+            if ($this->has('profile_id') && $this->user()) {
+                $profile = \App\Models\Profile::find($this->input('profile_id'));
+                if ($profile && $profile->user_id !== $this->user()->id) {
+                    $validator->errors()->add('profile_id', __('messages.cv_not_found'));
+                }
+            }
+
             $userData = $this->input('user_data', []);
 
             // Validate date ranges for educations
@@ -128,3 +134,4 @@ class StoreCVRequest extends BaseFormRequest
         });
     }
 }
+

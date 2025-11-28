@@ -14,11 +14,13 @@ class Template extends Model
         'name',
         'preview',
         'description',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
+            'is_active' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',

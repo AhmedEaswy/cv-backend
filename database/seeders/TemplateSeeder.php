@@ -15,30 +15,35 @@ class TemplateSeeder extends Seeder
     {
         $templates = [
             [
-                'name' => 'Modern Professional',
-                'preview' => 'modern-professional.jpg',
+                'name' => 'modern-professional',
+                'preview' => 'templates/previews/modern-professional.jpg',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
+                'is_active' => true,
             ],
-            [
-                'name' => 'Creative Designer',
-                'preview' => 'creative-designer.jpg',
-                'description' => 'A colorful and creative template ideal for designers and artists.',
-            ],
-            [
-                'name' => 'Executive Corporate',
-                'preview' => 'executive-corporate.jpg',
-                'description' => 'A formal and professional template for executives and business leaders.',
-            ],
-            [
-                'name' => 'Minimalist Clean',
-                'preview' => 'minimalist-clean.jpg',
-                'description' => 'A simple and elegant template focusing on content and readability.',
-            ],
-            [
-                'name' => 'Academic Scholar',
-                'preview' => 'academic-scholar.jpg',
-                'description' => 'A traditional template perfect for academics and researchers.',
-            ],
+            // [
+            //     'name' => 'creative-designer',
+            //     'preview' => 'templates/previews/creative-designer.jpg',
+            //     'description' => 'A colorful and creative template ideal for designers and artists.',
+            //     'is_active' => false,
+            // ],
+            // [
+            //     'name' => 'executive-corporate',
+            //     'preview' => 'templates/previews/executive-corporate.jpg',
+            //     'description' => 'A formal and professional template for executives and business leaders.',
+            //     'is_active' => false,
+            // ],
+            // [
+            //     'name' => 'minimalist-clean',
+            //     'preview' => 'templates/previews/minimalist-clean.jpg',
+            //     'description' => 'A simple and elegant template focusing on content and readability.',
+            //     'is_active' => false,
+            // ],
+            // [
+            //     'name' => 'academic-scholar',
+            //     'preview' => 'templates/previews/academic-scholar.jpg',
+            //     'description' => 'A traditional template perfect for academics and researchers.',
+            //     'is_active' => false,
+            // ],
         ];
 
         foreach ($templates as $template) {

@@ -272,7 +272,7 @@
 			"name": "CVs",
 			"item": [
 				{
-					"name": "Create CV (Public)",
+					"name": "Create CV (Full Example)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -287,7 +287,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"user_id\": null,\n  \"sections_order\": [\n    \"Personal Information\",\n    \"Skills\",\n    \"Education\",\n    \"Experience\",\n    \"Projects\",\n    \"Languages\",\n    \"Interests\"\n  ],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise in mobile app development. Passionate about creating beautiful, performant, and user-friendly applications. Strong background in cross-platform development, UI/UX design, and Agile methodologies.\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      {\n        \"name\": \"Flutter\"\n      },\n      {\n        \"name\": \"Dart\"\n      },\n      {\n        \"name\": \"Laravel\"\n      },\n      {\n        \"name\": \"PHP\"\n      },\n      {\n        \"name\": \"JavaScript\"\n      },\n      {\n        \"name\": \"React\"\n      },\n      {\n        \"name\": \"Firebase\"\n      },\n      {\n        \"name\": \"SQL\"\n      },\n      {\n        \"name\": \"Git\"\n      },\n      {\n        \"name\": \"RESTful API\"\n      }\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"description\": \"Graduated magna cum laude. Specialized in software engineering and mobile application development. Relevant coursework included Data Structures, Algorithms, Database Systems, and Software Engineering Principles.\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      },\n      {\n        \"institution\": \"Stanford Continuing Studies\",\n        \"degree\": \"Certificate\",\n        \"fieldOfStudy\": \"Mobile App Development\",\n        \"description\": \"Advanced course covering modern mobile development practices, architecture patterns, and performance optimization.\",\n        \"from\": \"2018-01\",\n        \"to\": \"2018-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications serving 100K+ users. Architected scalable solutions, mentored junior developers, and collaborated with cross-functional teams. Improved app performance by 40% through code optimization and caching strategies.\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      },\n      {\n        \"position\": \"Flutter Developer\",\n        \"company\": \"StartupXYZ\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Developed and maintained multiple Flutter applications from scratch. Implemented clean architecture patterns, RESTful API integration, and real-time features using Firebase. Delivered 3 major app releases on time.\",\n        \"from\": \"2019-06\",\n        \"to\": \"2021-02\",\n        \"current\": false\n      },\n      {\n        \"position\": \"Junior Mobile Developer\",\n        \"company\": \"Digital Solutions LLC\",\n        \"location\": \"Oakland, CA\",\n        \"description\": \"Built native and cross-platform mobile applications. Worked with React Native and later transitioned to Flutter. Collaborated with designers and backend developers to implement user-facing features.\",\n        \"from\": \"2017-08\",\n        \"to\": \"2019-05\",\n        \"current\": false\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application built with Flutter. Features include user authentication, product catalog, shopping cart, payment integration (Stripe), order tracking, and push notifications. Used Firebase for backend services and state management with Provider.\",\n        \"technologies\": \"Flutter, Dart, Firebase, Stripe API, Provider, SQLite\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Task Management App\",\n        \"description\": \"Cross-platform task management application with team collaboration features. Implemented real-time synchronization, offline mode, and intuitive UI/UX. The app supports multiple workspaces, task assignments, due dates, and notifications.\",\n        \"technologies\": \"Flutter, Dart, Firebase Firestore, BLoC Pattern, Local Storage\",\n        \"url\": \"https://github.com/johndoe/task-manager\",\n        \"from\": \"2021-06\",\n        \"to\": \"2021-11\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Weather Forecast App\",\n        \"description\": \"Beautiful weather application with location-based forecasts, detailed weather maps, and weather alerts. Features include 7-day forecast, hourly updates, and beautiful animations. Integrated with OpenWeatherMap API.\",\n        \"technologies\": \"Flutter, Dart, OpenWeatherMap API, Location Services, Animations\",\n        \"url\": \"https://github.com/johndoe/weather-app\",\n        \"from\": \"2020-09\",\n        \"to\": \"2020-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      {\n        \"name\": \"English\",\n        \"proficiencyLevel\": 5\n      },\n      {\n        \"name\": \"Spanish\",\n        \"proficiencyLevel\": 3\n      },\n      {\n        \"name\": \"French\",\n        \"proficiencyLevel\": 2\n      }\n    ],\n    \"interests\": [\n      {\n        \"name\": \"Open Source Contributions\"\n      },\n      {\n        \"name\": \"Mobile UI/UX Design\"\n      },\n      {\n        \"name\": \"Reading Tech Blogs\"\n      },\n      {\n        \"name\": \"Photography\"\n      },\n      {\n        \"name\": \"Traveling\"\n      },\n      {\n        \"name\": \"Cooking\"\n      }\n    ]\n  }\n}"
+							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"user_id\": null,\n  \"template_id\": null,\n  \"sections_order\": [\n    \"Personal Information\",\n    \"Skills\",\n    \"Education\",\n    \"Experience\",\n    \"Projects\",\n    \"Languages\",\n    \"Interests\"\n  ],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise in mobile app development. Passionate about creating beautiful, performant, and user-friendly applications. Strong background in cross-platform development, UI/UX design, and Agile methodologies.\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      {\n        \"name\": \"Flutter\"\n      },\n      {\n        \"name\": \"Dart\"\n      },\n      {\n        \"name\": \"Laravel\"\n      },\n      {\n        \"name\": \"PHP\"\n      },\n      {\n        \"name\": \"JavaScript\"\n      },\n      {\n        \"name\": \"React\"\n      },\n      {\n        \"name\": \"Firebase\"\n      },\n      {\n        \"name\": \"SQL\"\n      },\n      {\n        \"name\": \"Git\"\n      },\n      {\n        \"name\": \"RESTful API\"\n      }\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"description\": \"Graduated magna cum laude. Specialized in software engineering and mobile application development. Relevant coursework included Data Structures, Algorithms, Database Systems, and Software Engineering Principles.\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      },\n      {\n        \"institution\": \"Stanford Continuing Studies\",\n        \"degree\": \"Certificate\",\n        \"fieldOfStudy\": \"Mobile App Development\",\n        \"description\": \"Advanced course covering modern mobile development practices, architecture patterns, and performance optimization.\",\n        \"from\": \"2018-01\",\n        \"to\": \"2018-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications serving 100K+ users. Architected scalable solutions, mentored junior developers, and collaborated with cross-functional teams. Improved app performance by 40% through code optimization and caching strategies.\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      },\n      {\n        \"position\": \"Flutter Developer\",\n        \"company\": \"StartupXYZ\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Developed and maintained multiple Flutter applications from scratch. Implemented clean architecture patterns, RESTful API integration, and real-time features using Firebase. Delivered 3 major app releases on time.\",\n        \"from\": \"2019-06\",\n        \"to\": \"2021-02\",\n        \"current\": false\n      },\n      {\n        \"position\": \"Junior Mobile Developer\",\n        \"company\": \"Digital Solutions LLC\",\n        \"location\": \"Oakland, CA\",\n        \"description\": \"Built native and cross-platform mobile applications. Worked with React Native and later transitioned to Flutter. Collaborated with designers and backend developers to implement user-facing features.\",\n        \"from\": \"2017-08\",\n        \"to\": \"2019-05\",\n        \"current\": false\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application built with Flutter. Features include user authentication, product catalog, shopping cart, payment integration (Stripe), order tracking, and push notifications. Used Firebase for backend services and state management with Provider.\",\n        \"technologies\": \"Flutter, Dart, Firebase, Stripe API, Provider, SQLite\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Task Management App\",\n        \"description\": \"Cross-platform task management application with team collaboration features. Implemented real-time synchronization, offline mode, and intuitive UI/UX. The app supports multiple workspaces, task assignments, due dates, and notifications.\",\n        \"technologies\": \"Flutter, Dart, Firebase Firestore, BLoC Pattern, Local Storage\",\n        \"url\": \"https://github.com/johndoe/task-manager\",\n        \"from\": \"2021-06\",\n        \"to\": \"2021-11\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Weather Forecast App\",\n        \"description\": \"Beautiful weather application with location-based forecasts, detailed weather maps, and weather alerts. Features include 7-day forecast, hourly updates, and beautiful animations. Integrated with OpenWeatherMap API.\",\n        \"technologies\": \"Flutter, Dart, OpenWeatherMap API, Location Services, Animations\",\n        \"url\": \"https://github.com/johndoe/weather-app\",\n        \"from\": \"2020-09\",\n        \"to\": \"2020-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      {\n        \"name\": \"English\",\n        \"proficiencyLevel\": 5\n      },\n      {\n        \"name\": \"Spanish\",\n        \"proficiencyLevel\": 3\n      },\n      {\n        \"name\": \"French\",\n        \"proficiencyLevel\": 2\n      }\n    ],\n    \"interests\": [\n      {\n        \"name\": \"Open Source Contributions\"\n      },\n      {\n        \"name\": \"Mobile UI/UX Design\"\n      },\n      {\n        \"name\": \"Reading Tech Blogs\"\n      },\n      {\n        \"name\": \"Photography\"\n      },\n      {\n        \"name\": \"Traveling\"\n      },\n      {\n        \"name\": \"Cooking\"\n      }\n    ]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs",
@@ -300,7 +300,40 @@
 								"cvs"
 							]
 						},
-						"description": "Public endpoint. Auth token is optional; provide `user_id` if you want to associate an existing user."
+						"description": "Public endpoint with complete example data. Auth token is optional; provide `user_id` if you want to associate an existing user. This example includes all possible fields: personal info, skills, education, experience, projects, languages, and interests.\n\nIMPORTANT: If you are unauthenticated and provide `template_id`, this endpoint will return a PDF file instead of creating a profile. To create a profile AND get PDF, use authenticated requests."
+					},
+					"response": []
+				},
+				{
+					"name": "Create CV (Returns PDF - Unauthenticated)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"template_id\": 1,\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-1234\",\n    \"summary\": \"Experienced developer with 5+ years in software development.\",\n    \"skills\": [\n      {\"name\": \"Laravel\"},\n      {\"name\": \"PHP\"},\n      {\"name\": \"JavaScript\"}\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"cvs"
+							]
+						},
+						"description": "For unauthenticated users: Provides template_id to get PDF directly without creating a profile. Note: Set Accept header to 'application/pdf' to receive PDF response."
 					},
 					"response": []
 				},
@@ -333,7 +366,7 @@
 								"cvs"
 							]
 						},
-						"description": "Smallest payload allowed."
+						"description": "Smallest payload allowed. Creates a profile without user_data."
 					},
 					"response": []
 				},
@@ -467,6 +500,105 @@
 							]
 						},
 						"description": "Soft delete a CV you own."
+					},
+					"response": []
+				},
+				{
+					"name": "Print CV",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template_id\": 1,\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise in mobile app development. Passionate about creating beautiful, performant, and user-friendly applications. Strong background in cross-platform development, UI/UX design, and Agile methodologies.\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      {\"name\": \"Flutter\"},\n      {\"name\": \"Dart\"},\n      {\"name\": \"Laravel\"},\n      {\"name\": \"PHP\"},\n      {\"name\": \"JavaScript\"}\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"description\": \"Graduated magna cum laude. Specialized in software engineering and mobile application development.\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications serving 100K+ users. Improved app performance by 40%.\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application built with Flutter.\",\n        \"technologies\": \"Flutter, Dart, Firebase\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      {\"name\": \"English\", \"proficiencyLevel\": 5},\n      {\"name\": \"Spanish\", \"proficiencyLevel\": 3}\n    ],\n    \"interests\": [\n      {\"name\": \"Open Source\"},\n      {\"name\": \"Mobile UI/UX Design\"}\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs/print",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"cvs",
+								"print"
+							]
+						},
+						"description": "Generate PDF from CV data. Public endpoint. You can either provide profile_id (for existing profile) or user_data (to create temporary CV). Template ID is required. Response will be a PDF file."
+					},
+					"response": []
+				},
+				{
+					"name": "Print CV (From Profile ID)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile_id\": 1,\n  \"template_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs/print",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"cvs",
+								"print"
+							]
+						},
+						"description": "Generate PDF from an existing profile. Requires authentication if profile belongs to a user. Provide profile_id and template_id."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shares",
+			"item": [
+				{
+					"name": "Get Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/shares/templates",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"shares",
+								"templates"
+							]
+						},
+						"description": "Public endpoint to retrieve all active templates. No authentication required."
 					},
 					"response": []
 				}

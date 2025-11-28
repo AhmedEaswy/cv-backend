@@ -35,5 +35,10 @@ class DatabaseSeeder extends Seeder
             'type' => UserType::USER,
             'password' => bcrypt('123456789'),
         ]);
+
+        $this->call([
+            TemplateSeeder::class,
+            ProfileSeeder::class,
+        ]);
     }
 }

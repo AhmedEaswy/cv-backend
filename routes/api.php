@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CVController;
+use App\Http\Controllers\Api\ShareController;
 
 Route::prefix('v1')->group(function () {
     // Public auth routes
@@ -18,8 +19,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
     });
 
-    // Public CV route (create only)
+    // Public shares routes
+    Route::get('/shares/templates', [ShareController::class, 'templates']);
+
+    // Public CV routes
     Route::post('/cvs', [CVController::class, 'store']);
+    Route::post('/cvs/print', [CVController::class, 'print']);
 
     // Protected CV routes (authenticated users only)
     Route::middleware('auth:sanctum')->group(function () {

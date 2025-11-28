@@ -8,7 +8,10 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -20,8 +23,19 @@ class TemplatesTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('preview')
-                    ->searchable(),
+                ImageColumn::make('preview')
+                    ->label('Preview')
+                    ->disk('public')
+                    ->circular()
+                    ->defaultImageUrl(url('/placeholder-image.png')),
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -37,6 +51,8 @@ class TemplatesTable
             ])
             ->filters([
                 TrashedFilter::make(),
+                TernaryFilter::make('is_active')
+                    ->label('Active Status'),
             ])
             ->recordActions([
                 ViewAction::make(),
