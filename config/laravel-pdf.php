@@ -12,7 +12,7 @@ return [
          * Leave null to use system defaults or Browsershot's auto-detection.
          */
         'node_binary' => env('LARAVEL_PDF_NODE_BINARY'),
-        'npm_binary' => env('LARAVEL_PDF_NPM_BINARY'),
+        'npm_binary' => null,
         'include_path' => env('LARAVEL_PDF_INCLUDE_PATH'),
         'chrome_path' => env('LARAVEL_PDF_CHROME_PATH'),
         'node_modules_path' => env('LARAVEL_PDF_NODE_MODULES_PATH'),
