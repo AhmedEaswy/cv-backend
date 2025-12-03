@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Enums\UserType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -44,10 +45,21 @@ class UsersTable
                 TextColumn::make('type')
                     ->label('User Type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'admin' => 'danger',
-                        'user' => 'info',
-                        default => 'gray',
+                    ->formatStateUsing(fn (?UserType $state): ?string => $state?->label())
+                    ->color(function ($state) {
+                        if ($state instanceof UserType) {
+                            return match ($state) {
+                                UserType::ADMIN => 'danger',
+                                UserType::USER => 'info',
+                                default => 'gray',
+                            };
+                        }
+                        // Fallback if state is already formatted string
+                        return match ($state) {
+                            'Admin', 'admin' => 'danger',
+                            'User', 'user' => 'info',
+                            default => 'gray',
+                        };
                     })
                     ->sortable(),
                 TextColumn::make('first_name')
