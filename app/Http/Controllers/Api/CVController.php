@@ -405,6 +405,19 @@ class CVController extends BaseApiController
         $viewName = strtolower(str_replace(' ', '-', $template->name));
         $viewPath = "templates.cv.{$viewName}";
 
+        // Check if view exists
+        if (!view()->exists($viewPath)) {
+            \Log::error('PDF Generation: View not found', [
+                'view_path' => $viewPath,
+                'template_id' => $templateId,
+                'template_name' => $template->name ?? 'N/A',
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': Template view not found. Please check server configuration.',
+                500
+            );
+        }
+
         // Format profile data for view
         $cvData = $this->formatProfileResponse($profile);
 
@@ -417,8 +430,42 @@ class CVController extends BaseApiController
             $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
 
             return $pdf->download($filename);
+        } catch (\Illuminate\View\ViewException $e) {
+            \Log::error('PDF Generation: View Exception', [
+                'message' => $e->getMessage(),
+                'view_path' => $viewPath,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': View error - ' . $e->getMessage(),
+                500
+            );
+        } catch (\Symfony\Component\Process\Exception\ProcessFailedException $e) {
+            \Log::error('PDF Generation: Process Failed', [
+                'message' => $e->getMessage(),
+                'command' => method_exists($e->getProcess(), 'getCommandLine') ? $e->getProcess()->getCommandLine() : 'N/A',
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': PDF generation process failed. Please ensure Chrome/Chromium and Node.js are installed on the server.',
+                500
+            );
         } catch (\Exception $e) {
-            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
+            \Log::error('PDF Generation: General Exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'class' => get_class($e),
+            ]);
+
+            $errorMessage = __('messages.pdf_generation_failed');
+            if (app()->environment('production')) {
+                $errorMessage .= '. Please contact support if this issue persists.';
+            } else {
+                $errorMessage .= ': ' . $e->getMessage();
+            }
+
+            return $this->errorResponse($errorMessage, 500);
         }
     }
 
@@ -427,42 +474,56 @@ class CVController extends BaseApiController
      */
     private function generatePdfFromRequest(Request $request)
     {
-        $templateId = $request->input('template_id');
-        $userData = $request->input('user_data', []);
-        $mappedData = $this->mapUserDataToProfile($userData);
-
-        // Create temporary profile
-        $profile = new Profile([
-            'user_id' => null,
-            'name' => $request->input('name', 'CV'),
-            'language' => $request->input('language', 'en'),
-            'sections_order' => $request->input('sections_order'),
-            'info' => $mappedData['info'] ?? null,
-            'interests' => $mappedData['interests'] ?? null,
-            'languages' => $mappedData['languages'] ?? null,
-            'experiences' => $mappedData['experiences'] ?? null,
-            'projects' => $mappedData['projects'] ?? null,
-            'educations' => $mappedData['educations'] ?? null,
-        ]);
-
-        // Load template
-        $template = Template::where('id', $templateId)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$template) {
-            return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
-        }
-
-        // Convert template name to view name (kebab-case)
-        $viewName = strtolower(str_replace(' ', '-', $template->name));
-        $viewPath = "templates.cv.{$viewName}";
-
-        // Format profile data for view
-        $cvData = $this->formatProfileResponse($profile);
-
-        // Generate PDF
         try {
+            $templateId = $request->input('template_id');
+            $userData = $request->input('user_data', []);
+            $mappedData = $this->mapUserDataToProfile($userData);
+
+            // Create temporary profile
+            $profile = new Profile([
+                'user_id' => null,
+                'name' => $request->input('name', 'CV'),
+                'language' => $request->input('language', 'en'),
+                'sections_order' => $request->input('sections_order'),
+                'info' => $mappedData['info'] ?? null,
+                'interests' => $mappedData['interests'] ?? null,
+                'languages' => $mappedData['languages'] ?? null,
+                'experiences' => $mappedData['experiences'] ?? null,
+                'projects' => $mappedData['projects'] ?? null,
+                'educations' => $mappedData['educations'] ?? null,
+            ]);
+
+            // Load template
+            $template = Template::where('id', $templateId)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$template) {
+                return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
+            }
+
+            // Convert template name to view name (kebab-case)
+            $viewName = strtolower(str_replace(' ', '-', $template->name));
+            $viewPath = "templates.cv.{$viewName}";
+
+            // Check if view exists
+            if (!view()->exists($viewPath)) {
+                \Log::error('PDF Generation: View not found', [
+                    'view_path' => $viewPath,
+                    'template_id' => $templateId,
+                    'template_name' => $template->name,
+                    'view_name' => $viewName,
+                ]);
+                return $this->errorResponse(
+                    __('messages.pdf_generation_failed') . ': Template view not found. Please check server configuration.',
+                    500
+                );
+            }
+
+            // Format profile data for view
+            $cvData = $this->formatProfileResponse($profile);
+
+            // Generate PDF
             $pdf = Pdf::view($viewPath, ['cv' => $cvData])
                 ->format('a4')
                 ->margins(10, 10, 10, 10);
@@ -470,8 +531,54 @@ class CVController extends BaseApiController
             $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
 
             return $pdf->download($filename);
+        } catch (\Illuminate\View\ViewException $e) {
+            \Log::error('PDF Generation: View Exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': View error - ' . $e->getMessage(),
+                500
+            );
+        } catch (\Spatie\Pdf\Exceptions\InvalidFormat $e) {
+            \Log::error('PDF Generation: Invalid Format', [
+                'message' => $e->getMessage(),
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': Invalid PDF format - ' . $e->getMessage(),
+                500
+            );
+        } catch (\Symfony\Component\Process\Exception\ProcessFailedException $e) {
+            \Log::error('PDF Generation: Process Failed', [
+                'message' => $e->getMessage(),
+                'command' => method_exists($e->getProcess(), 'getCommandLine') ? $e->getProcess()->getCommandLine() : 'N/A',
+            ]);
+            return $this->errorResponse(
+                __('messages.pdf_generation_failed') . ': PDF generation process failed. Please ensure Chrome/Chromium and Node.js are installed on the server.',
+                500
+            );
         } catch (\Exception $e) {
-            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
+            \Log::error('PDF Generation: General Exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'class' => get_class($e),
+            ]);
+
+            // Provide user-friendly error message
+            $errorMessage = __('messages.pdf_generation_failed');
+            if (app()->environment('production')) {
+                // In production, don't expose full error details
+                $errorMessage .= '. Please contact support if this issue persists.';
+            } else {
+                // In development, show detailed error
+                $errorMessage .= ': ' . $e->getMessage();
+            }
+
+            return $this->errorResponse($errorMessage, 500);
         }
     }
 
