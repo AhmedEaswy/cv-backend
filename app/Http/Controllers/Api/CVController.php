@@ -427,9 +427,12 @@ class CVController extends BaseApiController
                 ->format('a4')
                 ->margins(10, 10, 10, 10)
                 ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
+                    // --no-sandbox is automatically added by LARAVEL_PDF_NO_SANDBOX config
                     $browsershot->setOption('args', [
-                        '--no-sandbox',
                         '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-setuid-sandbox',
+                        '--disable-software-rasterizer',
                     ]);
                 });
 
@@ -534,9 +537,12 @@ class CVController extends BaseApiController
                 ->format('a4')
                 ->margins(10, 10, 10, 10)
                 ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
+                    // --no-sandbox is automatically added by LARAVEL_PDF_NO_SANDBOX config
                     $browsershot->setOption('args', [
-                        '--no-sandbox',
                         '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-setuid-sandbox',
+                        '--disable-software-rasterizer',
                     ]);
                 });
 
