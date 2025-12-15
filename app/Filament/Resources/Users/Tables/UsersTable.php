@@ -58,7 +58,7 @@ class UsersTable
                         return match ($state) {
                             'Admin', 'admin' => 'danger',
                             'User', 'user' => 'info',
-                            default => 'gray',
+                        default => 'gray',
                         };
                     })
                     ->sortable(),

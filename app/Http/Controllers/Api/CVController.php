@@ -425,7 +425,13 @@ class CVController extends BaseApiController
         try {
             $pdf = Pdf::view($viewPath, ['cv' => $cvData])
                 ->format('a4')
-                ->margins(10, 10, 10, 10);
+                ->margins(10, 10, 10, 10)
+                ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
+                    $browsershot->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                    ]);
+                });
 
             $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
 
@@ -526,7 +532,13 @@ class CVController extends BaseApiController
             // Generate PDF
             $pdf = Pdf::view($viewPath, ['cv' => $cvData])
                 ->format('a4')
-                ->margins(10, 10, 10, 10);
+                ->margins(10, 10, 10, 10)
+                ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
+                    $browsershot->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                    ]);
+                });
 
             $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
 
