@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Profiles\Pages;
 use App\Filament\Resources\Profiles\ProfileResource;
 use App\Models\Profile;
 use App\Models\Template;
+use App\Services\CVPDFService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -14,8 +15,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Schema;
-use Illuminate\Http\Response;
-use Spatie\LaravelPdf\Facades\Pdf;
 
 class PrintProfile extends Page implements HasForms
 {
@@ -80,12 +79,13 @@ class PrintProfile extends Page implements HasForms
         $templateId = $data['template_id'] ?? null;
         $profile = $this->getRecord();
 
-        if (!$templateId) {
+        if (! $templateId) {
             Notification::make()
                 ->title('Template Required')
                 ->body('Please select a template before generating the PDF.')
                 ->danger()
                 ->send();
+
             return redirect()->back();
         }
 
@@ -93,32 +93,31 @@ class PrintProfile extends Page implements HasForms
             ->where('is_active', true)
             ->first();
 
-        if (!$template) {
+        if (! $template) {
             Notification::make()
                 ->title('Template Not Found')
                 ->body('The selected template is not available.')
                 ->danger()
                 ->send();
+
             return redirect()->back();
         }
 
-        // Convert template name to view name (kebab-case)
-        $viewName = strtolower(str_replace(' ', '-', $template->name));
-        $viewPath = "templates.cv.{$viewName}";
-
-        // Format profile data for view (using same logic as CVController)
-        $cvData = $this->formatProfileResponse($profile);
+        /** @var CVPDFService $pdfService */
+        $pdfService = app(CVPDFService::class);
 
         try {
-            $filename = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume') . '.pdf';
+            // Always generate URL for Filament dashboard and redirect to it
+            $url = $pdfService->generatePdf($profile, $template, true);
 
-            return Pdf::view($viewPath, ['cv' => $cvData])
-                ->format('a4')
-                ->margins(10, 10, 10, 10)
-                ->name($filename)
-                ->download();
+            Notification::make()
+                ->title('PDF Generated')
+                ->body('The CV PDF has been generated successfully.')
+                ->success()
+                ->send();
 
-        } catch (\Exception $e) {
+            return redirect()->away($url);
+        } catch (\Throwable $e) {
             Notification::make()
                 ->title('PDF Generation Failed')
                 ->body('An error occurred while generating the PDF: ' . $e->getMessage())
