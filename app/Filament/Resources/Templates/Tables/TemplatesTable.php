@@ -36,6 +36,14 @@ class TemplatesTable
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->sortable(),
+                IconColumn::make('is_default')
+                    ->label('Default')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-star')
+                    ->trueColor('warning')
+                    ->falseColor('gray')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -53,6 +61,8 @@ class TemplatesTable
                 TrashedFilter::make(),
                 TernaryFilter::make('is_active')
                     ->label('Active Status'),
+                TernaryFilter::make('is_default')
+                    ->label('Default Template'),
             ])
             ->recordActions([
                 ViewAction::make(),

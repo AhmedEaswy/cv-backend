@@ -15,6 +15,8 @@ class Profile extends Model
         'user_id',
         'name',
         'language',
+        'is_public',
+        'template_id',
         'sections_order',
         'interests',
         'languages',
@@ -27,6 +29,7 @@ class Profile extends Model
     protected function casts(): array
     {
         return [
+            'is_public' => 'boolean',
             'sections_order' => 'array',
             'interests' => 'array',
             'languages' => 'array',
@@ -46,5 +49,13 @@ class Profile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the template associated with the profile.
+     */
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(Template::class);
     }
 }

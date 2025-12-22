@@ -20,6 +20,28 @@ class ProfileForm
                 Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required(),
+                Select::make('template_id')
+                    ->relationship('template', 'name')
+                    ->label('Template')
+                    ->helperText('Select a template for this profile. If not set, the default template will be used.')
+                    ->searchable()
+                    ->preload(),
+                Checkbox::make('is_public')
+                    ->label('Public')
+                    ->helperText('Make this profile publicly accessible')
+                    ->default(false),
+                TextInput::make('name')
+                    ->label('CV Name')
+                    ->required(),
+                Select::make('language')
+                    ->label('Language')
+                    ->options([
+                        'en' => 'English',
+                        'ar' => 'Arabic',
+                        'tr' => 'Turkish',
+                    ])
+                    ->default('en')
+                    ->required(),
 
                 // Personal Information - Key-Value Fields
                 KeyValue::make('info')

@@ -19,6 +19,14 @@ class TemplateSeeder extends Seeder
                 'preview' => 'images/templates/modern-professional.png',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
                 'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'name' => 'office-manager',
+                'preview' => 'images/templates/office-manager.png',
+                'description' => 'A template for office managers and administrators.',
+                'is_active' => true,
+                'is_default' => false,
             ],
             // [
             //     'name' => 'creative-designer',

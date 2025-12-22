@@ -29,6 +29,20 @@ class TemplateForm
                 Checkbox::make('is_active')
                     ->label('Active')
                     ->default(true),
+                Checkbox::make('is_default')
+                    ->label('Default Template')
+                    ->helperText('Only one template should be set as default. Setting this will unset other default templates.')
+                    ->default(false)
+                    ->afterStateUpdated(function ($state, $set, $get, $record) {
+                        if ($state) {
+                            // Unset other default templates
+                            $query = \App\Models\Template::where('is_default', true);
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+                            $query->update(['is_default' => false]);
+                        }
+                    }),
             ]);
     }
 }

@@ -6,6 +6,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/office-manager-template', function () {
+    return view('templates.cv.office-manager');
+});
+
 Route::get('/test-locale', function () {
     $currentLocale = app()->getLocale();
     $direction = session('direction', 'ltr');
@@ -42,3 +46,6 @@ Route::get('/admin/switch-language/{locale}', function ($locale) {
 
     return redirect()->back();
 })->middleware(['auth', 'web', \App\Http\Middleware\SetLocale::class]);
+
+Route::get('/profile/{id}', [\App\Http\Controllers\ProfilePreviewController::class, 'preview'])
+    ->name('profile.preview');
