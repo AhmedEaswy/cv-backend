@@ -16,7 +16,7 @@ class TemplateSeeder extends Seeder
         $templates = [
             [
                 'name' => 'modern-professional',
-                'preview' => asset('images/templates/modern-professional.png'),
+                'preview' => 'images/templates/modern-professional.png',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
                 'is_active' => true,
             ],

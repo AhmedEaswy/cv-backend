@@ -185,7 +185,8 @@ class CVController extends BaseApiController
      */
     public function print(PrintCVRequest $request)
     {
-        $shouldReturnUrl = $request->boolean('return_url');
+        // $shouldReturnUrl = $request->boolean('return_url');
+        $shouldReturnUrl = true;
         $templateId = $request->input('template_id');
         $profileId = $request->input('profile_id');
 
@@ -251,7 +252,8 @@ class CVController extends BaseApiController
      */
     private function generatePdfFromRequest(Request $request)
     {
-        $shouldReturnUrl = $request->boolean('return_url');
+        // $shouldReturnUrl = $request->boolean('return_url');
+        $shouldReturnUrl = true;
         $templateId = $request->input('template_id');
 
         // Load template
