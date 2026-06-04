@@ -8,6 +8,7 @@ use App\Http\Requests\Api\UpdateCVRequest;
 use App\Repositories\CVRepositoryInterface;
 use App\Services\CVDataMapper;
 use App\Services\CVPDFService;
+use App\Services\TrackingService;
 use Illuminate\Http\Request;
 
 class CVController extends BaseApiController
@@ -15,7 +16,8 @@ class CVController extends BaseApiController
     public function __construct(
         private CVRepositoryInterface $cvRepository,
         private CVDataMapper $dataMapper,
-        private CVPDFService $pdfService
+        private CVPDFService $pdfService,
+        private TrackingService $trackingService
     ) {
     }
 
@@ -55,7 +57,9 @@ class CVController extends BaseApiController
         $userData = $request->input('user_data', []);
         $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
-        $profile = $this->cvRepository->create([
+        $tracking = $this->trackingService->capture($request);
+
+        $profile = $this->cvRepository->create(array_merge([
             'user_id' => $userId,
             'name' => $validated['name'],
             'language' => $validated['language'] ?? 'en',
@@ -66,7 +70,7 @@ class CVController extends BaseApiController
             'experiences' => $mappedData['experiences'] ?? null,
             'projects' => $mappedData['projects'] ?? null,
             'educations' => $mappedData['educations'] ?? null,
-        ]);
+        ], $tracking));
 
         return $this->successResponse(
             $this->dataMapper->formatProfileResponse($profile),
@@ -110,7 +114,7 @@ class CVController extends BaseApiController
         $validated = $request->validated();
 
         // Build update data
-        $updateData = [];
+        $updateData = $this->trackingService->capture($request);
 
         if (isset($validated['name'])) {
             $updateData['name'] = $validated['name'];
@@ -175,6 +179,7 @@ class CVController extends BaseApiController
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
+        $this->cvRepository->update($profile, $this->trackingService->capture($request));
         $this->cvRepository->delete($profile);
 
         return $this->successResponse(null, __('messages.cv_deleted'));
@@ -210,8 +215,9 @@ class CVController extends BaseApiController
             if (!$profile) {
                 return $this->errorResponse(__('messages.cv_not_found'), 404);
             }
+
+            $this->cvRepository->update($profile, $this->trackingService->capture($request));
         } else {
-            // Create temporary profile from user_data
             $profile = $this->pdfService->createTemporaryProfile(
                 $request->input('user_data', []),
                 $request->user()?->id,
@@ -219,6 +225,11 @@ class CVController extends BaseApiController
                 $request->input('language', 'en'),
                 $request->input('sections_order')
             );
+
+            if (! $profile->exists) {
+                $profile->save();
+                $profile->fill($this->trackingService->capture($request))->save();
+            }
         }
 
         // Generate PDF using the service
@@ -238,7 +249,7 @@ class CVController extends BaseApiController
         } catch (\Exception $e) {
             $errorMessage = __('messages.pdf_generation_failed');
             if (app()->environment('production')) {
-                $errorMessage .= '. Please contact support if this issue persists.';
+                $errorMessage .= ' ' . __('messages.contact_support');
             } else {
                 $errorMessage .= ': ' . $e->getMessage();
             }
@@ -272,6 +283,10 @@ class CVController extends BaseApiController
             $request->input('sections_order')
         );
 
+        // Save profile to database with tracking data
+        $profile->save();
+        $profile->fill($this->trackingService->capture($request))->save();
+
         // Generate PDF using the service
         try {
             if ($shouldReturnUrl) {
@@ -289,7 +304,7 @@ class CVController extends BaseApiController
         } catch (\Exception $e) {
             $errorMessage = __('messages.pdf_generation_failed');
             if (app()->environment('production')) {
-                $errorMessage .= '. Please contact support if this issue persists.';
+                $errorMessage .= ' ' . __('messages.contact_support');
             } else {
                 $errorMessage .= ': ' . $e->getMessage();
             }

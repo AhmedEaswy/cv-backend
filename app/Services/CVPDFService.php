@@ -43,7 +43,7 @@ class CVPDFService
                 'template_name' => $template->name,
             ]);
 
-            throw new \RuntimeException('Template view not found. Please check server configuration.');
+            throw new \RuntimeException(__('messages.template_view_not_found'));
         }
 
         // Format profile data for view
@@ -89,18 +89,18 @@ class CVPDFService
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            throw new \RuntimeException('View error - ' . $e->getMessage(), 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed') . ' - ' . $e->getMessage(), 0, $e);
         } catch (InvalidFormat $e) {
             Log::error('PDF Generation (URL): Invalid Format', [
                 'message' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Invalid PDF format - ' . $e->getMessage(), 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed') . ' - ' . $e->getMessage(), 0, $e);
         } catch (ProcessFailedException $e) {
             Log::error('PDF Generation (URL): Process Failed', [
                 'message' => $e->getMessage(),
                 'command' => method_exists($e->getProcess(), 'getCommandLine') ? $e->getProcess()->getCommandLine() : 'N/A',
             ]);
-            throw new \RuntimeException('PDF generation process failed. Please ensure Chrome/Chromium and Node.js are installed on the server.', 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed') . '. Please ensure Chrome/Chromium and Node.js are installed on the server.', 0, $e);
         } catch (\Exception $e) {
             Log::error('PDF Generation (URL): General Exception', [
                 'message' => $e->getMessage(),

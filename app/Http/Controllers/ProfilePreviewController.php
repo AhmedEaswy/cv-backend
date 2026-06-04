@@ -28,7 +28,7 @@ class ProfilePreviewController extends Controller
         $profile = Profile::find($id);
 
         if (!$profile) {
-            abort(404, 'Profile not found');
+            abort(404, __('messages.profile_not_found'));
         }
 
         // Get template_id priority: query parameter > profile template_id > default template
@@ -41,7 +41,7 @@ class ProfilePreviewController extends Controller
                 ->first();
 
             if (!$template) {
-                abort(404, 'Template not found or inactive');
+                abort(404, __('messages.template_not_found_or_inactive'));
             }
         } else {
             // Find the default active template
@@ -54,7 +54,7 @@ class ProfilePreviewController extends Controller
                 $template = Template::where('is_active', true)->first();
 
                 if (!$template) {
-                    abort(404, 'No template available');
+                    abort(404, __('messages.no_template_available'));
                 }
             }
         }
@@ -65,7 +65,7 @@ class ProfilePreviewController extends Controller
 
         // Check if view exists
         if (!view()->exists($viewPath)) {
-            abort(404, "Template view '{$viewPath}' not found");
+            abort(404, __('messages.template_view_not_found'));
         }
 
         // Format profile data for view (same format as PDF generation)

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Profiles\Tables;
 
+use App\Models\Profile;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -10,9 +12,11 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProfilesTable
 {
@@ -83,14 +87,50 @@ class ProfilesTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('ip_address')
+                    ->label('IP Address')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('country')
+                    ->label('Country')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('device')
+                    ->label('Device')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->limit(30),
             ])
             ->filters([
                 TrashedFilter::make(),
                 TernaryFilter::make('is_public')
                     ->label('Public Status'),
+                Filter::make('all')
+                    ->label('All')
+                    ->query(fn (Builder $query): Builder => $query),
+                Filter::make('user')
+                    ->label('User')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('user_id')),
+                Filter::make('anonymous')
+                    ->label('Anonymous')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('user_id')),
             ])
             ->recordActions([
                 ViewAction::make(),
+                Action::make('preview')
+                    ->label(__('Preview'))
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(function (Profile $record): string {
+                        $url = route('profile.preview', ['id' => $record->id]);
+
+                        if ($record->template_id) {
+                            $url .= '?template_id='.$record->template_id;
+                        }
+
+                        return $url;
+                    })
+                    ->openUrlInNewTab(),
                 EditAction::make(),
             ])
             ->toolbarActions([

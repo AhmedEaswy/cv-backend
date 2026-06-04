@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="{{ $cv['language'] ?? 'en' }}" dir="{{ in_array($cv['language'] ?? 'en', ['ar']) ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ($cv['user_data']['firstName'] ?? '') . ' ' . ($cv['user_data']['lastName'] ?? '') }} - CV</title>
+<x-template-layout :cv="$cv" class="bg-background-light text-gray-900 font-body antialiased">
+    @slot('head')
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
@@ -92,27 +88,26 @@
             page-break-inside: avoid;
             break-inside: avoid;
         }
-    </style>
-</head>
-<body class="bg-background-light text-gray-900 font-body antialiased">
-    <div class="page">
-        @php
-            $userData = $cv['user_data'] ?? [];
-            $fullName = trim(($userData['firstName'] ?? '') . ' ' . ($userData['lastName'] ?? ''));
-            $jobTitle = $userData['jobTitle'] ?? '';
-            $summary = $userData['summary'] ?? '';
-            $skills = $userData['skills'] ?? [];
-            $experiences = $userData['experiences'] ?? [];
-            $educations = $userData['educations'] ?? [];
-            $projects = $userData['projects'] ?? [];
-            $languages = $userData['languages'] ?? [];
-            $interests = $userData['interests'] ?? [];
-            $email = $userData['email'] ?? '';
-            $phone = $userData['phone'] ?? '';
-            $portfolioUrl = $userData['portfolioUrl'] ?? '';
-        @endphp
+        </style>
+    @endslot
 
-        <!-- Header Section -->
+    @php
+        $userData = $cv['user_data'] ?? [];
+        $fullName = trim(($userData['firstName'] ?? '') . ' ' . ($userData['lastName'] ?? ''));
+        $jobTitle = $userData['jobTitle'] ?? '';
+        $summary = $userData['summary'] ?? '';
+        $skills = $userData['skills'] ?? [];
+        $experiences = $userData['experiences'] ?? [];
+        $educations = $userData['educations'] ?? [];
+        $projects = $userData['projects'] ?? [];
+        $languages = $userData['languages'] ?? [];
+        $interests = $userData['interests'] ?? [];
+        $email = $userData['email'] ?? '';
+        $phone = $userData['phone'] ?? '';
+        $portfolioUrl = $userData['portfolioUrl'] ?? '';
+    @endphp
+
+    <!-- Header Section -->
         <header class="header-section mb-10 text-left">
             <h1 class="text-5xl md:text-6xl font-display font-black tracking-tight text-gray-900 mb-3 leading-tight">
                 @if(!empty($userData['firstName']))
@@ -131,24 +126,24 @@
                 <div class="border-t border-b border-gray-300 py-4 flex flex-col md:flex-row md:justify-between gap-4 text-sm">
                     @if($email)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="mailto:{{ $email }}">
-                            <span class="material-icons text-lg text-gray-400">email</span>
+                            <span class="material-icons text-lg text-gray-400">{{ __('email') }}</span>
                             <span>{{ $email }}</span>
                         </a>
                     @endif
                     @if($phone)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="tel:{{ $phone }}">
-                            <span class="material-icons text-lg text-gray-400">phone</span>
+                            <span class="material-icons text-lg text-gray-400">{{ __('phone') }}</span>
                             <span>{{ $phone }}</span>
                         </a>
                     @endif
                     @if($portfolioUrl)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="{{ $portfolioUrl }}" target="_blank">
                             <span class="material-icons text-lg text-gray-400">link</span>
-                            <span>{{ $userData['address'] ?? 'Portfolio' }}</span>
+                                            <span>{{ $userData['address'] ?? __('Portfolio') }}</span>
                         </a>
                     @elseif(!empty($userData['address']))
                         <div class="flex items-center gap-2 text-gray-700">
-                            <span class="material-icons text-lg text-gray-400">location_on</span>
+                            <span class="material-icons text-lg text-gray-400">{{ __('location') }}</span>
                             <span>{{ $userData['address'] }}</span>
                         </div>
                     @endif
@@ -160,7 +155,7 @@
         @if($summary)
             <section class="section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Summary
+                    {{ __('Summary') }}
                 </h2>
                 <p class="text-gray-600 leading-relaxed text-sm">{{ $summary }}</p>
             </section>
@@ -170,7 +165,7 @@
         @if(!empty($experiences))
             <section class="major-section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Experience
+                    {{ __('Experience') }}
                 </h2>
                 @foreach($experiences as $index => $exp)
                     <div class="experience-item mb-8 relative pl-4 border-l-2 border-gray-200 {{ !$loop->last ? '' : 'border-transparent' }}">
@@ -186,7 +181,7 @@
                                     <span> - </span>
                                 @endif
                                 @if($exp['current'] ?? false)
-                                    <span>Current</span>
+                                    <span>{{ __('Current') }}</span>
                                 @elseif(!empty($exp['to']))
                                     {{ date('M Y', strtotime($exp['to'] . '-01')) }}
                                 @endif
@@ -210,7 +205,7 @@
         @if(!empty($educations))
             <section class="major-section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Education
+                    {{ __('Education') }}
                 </h2>
                 @foreach($educations as $edu)
                     <div class="education-item flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 mb-4">
@@ -245,7 +240,7 @@
         @if(!empty($skills))
             <section class="section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Skills
+                    {{ __('Skills') }}
                 </h2>
                 @php
                     $skillsPerColumn = ceil(count($skills) / 3);
@@ -270,7 +265,7 @@
         @if(!empty($projects))
             <section class="major-section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Projects
+                    {{ __('Projects') }}
                 </h2>
                 @foreach($projects as $project)
                     <div class="experience-item mb-8 relative pl-4 border-l-2 border-gray-200">
@@ -291,7 +286,7 @@
                                         <span> - </span>
                                     @endif
                                     @if($project['current'] ?? false)
-                                        <span>Current</span>
+                                        <span>{{ __('Current') }}</span>
                                     @elseif(!empty($project['to']))
                                         {{ date('M Y', strtotime($project['to'] . '-01')) }}
                                     @endif
@@ -302,7 +297,7 @@
                             <p class="text-gray-600 leading-relaxed text-sm">{{ $project['description'] }}</p>
                         @endif
                         @if(!empty($project['technologies']))
-                            <p class="text-sm text-gray-500 mt-2 italic">Technologies: {{ $project['technologies'] }}</p>
+                            <p class="text-sm text-gray-500 mt-2 italic">{{ __('Technologies') }}: {{ $project['technologies'] }}</p>
                         @endif
                     </div>
                 @endforeach
@@ -313,7 +308,7 @@
         @if(!empty($languages))
             <section class="section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Languages
+                    {{ __('Languages') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                     @foreach($languages as $lang)
@@ -321,9 +316,9 @@
                             <span class="font-medium text-gray-900">{{ $lang['name'] ?? '' }}</span>
                             @php
                                 $level = $lang['proficiencyLevel'] ?? 1;
-                                $levelNames = [1 => 'Beginner', 2 => 'Intermediate', 3 => 'Advanced', 4 => 'Fluent', 5 => 'Native'];
+                                $levelNames = [1 => __('Beginner'), 2 => __('Intermediate'), 3 => __('Advanced'), 4 => __('Fluent'), 5 => __('Native')];
                             @endphp
-                            <span class="text-sm text-gray-600">{{ $levelNames[$level] ?? 'Beginner' }}</span>
+                            <span class="text-sm text-gray-600">{{ $levelNames[$level] ?? __('Beginner') }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -334,7 +329,7 @@
         @if(!empty($interests))
             <section class="section mb-12">
                 <h2 class="text-lg font-bold uppercase tracking-widest border-b-2 border-gray-200 pb-2 mb-6 font-display text-gray-900">
-                    Interests
+                    {{ __('Interests') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8">
                     @foreach($interests as $interest)
@@ -346,7 +341,4 @@
                 </div>
             </section>
         @endif
-    </div>
-</body>
-</html>
-
+</x-template-layout>

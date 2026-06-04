@@ -18,12 +18,17 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class ProfileResource extends Resource
 {
     protected static ?string $model = Profile::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
+    protected static string|UnitEnum|null $navigationGroup = 'CV Builder';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'user.name';
 

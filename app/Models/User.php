@@ -88,4 +88,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Profile::class);
     }
+
+    /**
+     * Get the social accounts for the user.
+     */
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
 }

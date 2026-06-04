@@ -6,6 +6,7 @@ use App\Filament\Resources\Profiles\ProfileResource;
 use App\Models\Profile;
 use App\Models\Template;
 use App\Services\CVPDFService;
+use App\Services\TrackingService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -81,8 +82,8 @@ class PrintProfile extends Page implements HasForms
 
         if (! $templateId) {
             Notification::make()
-                ->title('Template Required')
-                ->body('Please select a template before generating the PDF.')
+                ->title(__('Template Required'))
+                ->body(__('Please select a template before generating the PDF.'))
                 ->danger()
                 ->send();
 
@@ -95,8 +96,8 @@ class PrintProfile extends Page implements HasForms
 
         if (! $template) {
             Notification::make()
-                ->title('Template Not Found')
-                ->body('The selected template is not available.')
+                ->title(__('Template Not Found'))
+                ->body(__('The selected template is not available.'))
                 ->danger()
                 ->send();
 
@@ -107,20 +108,23 @@ class PrintProfile extends Page implements HasForms
         $pdfService = app(CVPDFService::class);
 
         try {
-            // Always generate URL for Filament dashboard and redirect to it
+            $tracking = app(TrackingService::class)->capture(request());
+            $profile->fill($tracking);
+            $profile->save();
+
             $url = $pdfService->generatePdf($profile, $template, true);
 
             Notification::make()
-                ->title('PDF Generated')
-                ->body('The CV PDF has been generated successfully.')
+                ->title(__('PDF Generated'))
+                ->body(__('The CV PDF has been generated successfully.'))
                 ->success()
                 ->send();
 
             return redirect()->away($url);
         } catch (\Throwable $e) {
             Notification::make()
-                ->title('PDF Generation Failed')
-                ->body('An error occurred while generating the PDF: ' . $e->getMessage())
+                ->title(__('PDF Generation Failed'))
+                ->body(__('An error occurred while generating the PDF: :message', ['message' => $e->getMessage()]))
                 ->danger()
                 ->send();
 

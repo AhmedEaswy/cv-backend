@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="{{ $cv['language'] ?? 'en' }}" dir="{{ in_array($cv['language'] ?? 'en', ['ar']) ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ($cv['user_data']['firstName'] ?? '') . ' ' . ($cv['user_data']['lastName'] ?? '') }} - CV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+<x-template-layout :cv="$cv">
+    @slot('head')
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
         @page {
             margin: 0;
             size: A4;
@@ -64,29 +60,28 @@
             page-break-inside: avoid;
             break-inside: avoid;
         }
-    </style>
-</head>
-<body>
-    <div class="page">
-        @php
-            $userData = $cv['user_data'] ?? [];
-            $fullName = trim(($userData['firstName'] ?? '') . ' ' . ($userData['lastName'] ?? ''));
-            $jobTitle = $userData['jobTitle'] ?? '';
-            $summary = $userData['summary'] ?? '';
-            $skills = $userData['skills'] ?? [];
-            $experiences = $userData['experiences'] ?? [];
-            $educations = $userData['educations'] ?? [];
-            $projects = $userData['projects'] ?? [];
-            $languages = $userData['languages'] ?? [];
-            $interests = $userData['interests'] ?? [];
-            $contactInfo = [];
-            if (!empty($userData['email'])) $contactInfo[] = $userData['email'];
-            if (!empty($userData['phone'])) $contactInfo[] = $userData['phone'];
-            if (!empty($userData['address'])) $contactInfo[] = $userData['address'];
-            if (!empty($userData['portfolioUrl'])) $contactInfo[] = $userData['portfolioUrl'];
-        @endphp
+        </style>
+    @endslot
 
-        <!-- Header Section -->
+    @php
+        $userData = $cv['user_data'] ?? [];
+        $fullName = trim(($userData['firstName'] ?? '') . ' ' . ($userData['lastName'] ?? ''));
+        $jobTitle = $userData['jobTitle'] ?? '';
+        $summary = $userData['summary'] ?? '';
+        $skills = $userData['skills'] ?? [];
+        $experiences = $userData['experiences'] ?? [];
+        $educations = $userData['educations'] ?? [];
+        $projects = $userData['projects'] ?? [];
+        $languages = $userData['languages'] ?? [];
+        $interests = $userData['interests'] ?? [];
+        $contactInfo = [];
+        if (!empty($userData['email'])) $contactInfo[] = $userData['email'];
+        if (!empty($userData['phone'])) $contactInfo[] = $userData['phone'];
+        if (!empty($userData['address'])) $contactInfo[] = $userData['address'];
+        if (!empty($userData['portfolioUrl'])) $contactInfo[] = $userData['portfolioUrl'];
+    @endphp
+
+    <!-- Header Section -->
         <div class="header-section mb-6 border-b-4 border-blue-600 pb-4">
             <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ $fullName }}</h1>
             @if($jobTitle)
@@ -107,7 +102,7 @@
         <!-- Summary Section -->
         @if($summary)
             <div class="section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Summary</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Summary') }}</h2>
                 <p class="text-gray-700 leading-relaxed">{{ $summary }}</p>
             </div>
         @endif
@@ -115,7 +110,7 @@
         <!-- Skills Section -->
         @if(!empty($skills))
             <div class="section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Skills</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Skills') }}</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach($skills as $skill)
                         <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -129,7 +124,7 @@
         <!-- Work Experience Section -->
         @if(!empty($experiences))
             <div class="major-section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Work Experience</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Work Experience') }}</h2>
                 <div class="space-y-4">
                     @foreach($experiences as $exp)
                         <div class="experience-item border-l-4 border-blue-600 pl-4">
@@ -151,7 +146,7 @@
                                         <span> - </span>
                                     @endif
                                     @if($exp['current'] ?? false)
-                                        <span class="font-medium">Present</span>
+                                        <span class="font-medium">{{ __('Present') }}</span>
                                     @elseif(!empty($exp['to']))
                                         <span>{{ date('M Y', strtotime($exp['to'] . '-01')) }}</span>
                                     @endif
@@ -169,7 +164,7 @@
         <!-- Education Section -->
         @if(!empty($educations))
             <div class="major-section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Education</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Education') }}</h2>
                 <div class="space-y-4">
                     @foreach($educations as $edu)
                         <div class="education-item border-l-4 border-green-600 pl-4">
@@ -207,7 +202,7 @@
         <!-- Projects Section -->
         @if(!empty($projects))
             <div class="major-section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Projects</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Projects') }}</h2>
                 <div class="space-y-4">
                     @foreach($projects as $project)
                         <div class="project-item border-l-4 border-purple-600 pl-4">
@@ -226,7 +221,7 @@
                                         <span> - </span>
                                     @endif
                                     @if($project['current'] ?? false)
-                                        <span class="font-medium">Present</span>
+                                        <span class="font-medium">{{ __('Present') }}</span>
                                     @elseif(!empty($project['to']))
                                         <span>{{ date('M Y', strtotime($project['to'] . '-01')) }}</span>
                                     @endif
@@ -236,7 +231,7 @@
                                 <p class="text-gray-700 mt-2 leading-relaxed">{{ $project['description'] }}</p>
                             @endif
                             @if(!empty($project['technologies']))
-                                <p class="text-sm text-gray-600 mt-2 italic">Technologies: {{ $project['technologies'] }}</p>
+                                <p class="text-sm text-gray-600 mt-2 italic">{{ __('Technologies') }}: {{ $project['technologies'] }}</p>
                             @endif
                         </div>
                     @endforeach
@@ -247,16 +242,16 @@
         <!-- Languages Section -->
         @if(!empty($languages))
             <div class="section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Languages</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Languages') }}</h2>
                 <div class="grid grid-cols-2 gap-4">
                     @foreach($languages as $lang)
                         <div class="flex justify-between items-center">
                             <span class="font-medium text-gray-900">{{ $lang['name'] ?? '' }}</span>
                             @php
                                 $level = $lang['proficiencyLevel'] ?? 1;
-                                $levelNames = [1 => 'Beginner', 2 => 'Intermediate', 3 => 'Advanced', 4 => 'Fluent', 5 => 'Native'];
+                                $levelNames = [1 => __('Beginner'), 2 => __('Intermediate'), 3 => __('Advanced'), 4 => __('Fluent'), 5 => __('Native')];
                             @endphp
-                            <span class="text-sm text-gray-600">{{ $levelNames[$level] ?? 'Beginner' }}</span>
+                            <span class="text-sm text-gray-600">{{ $levelNames[$level] ?? __('Beginner') }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -266,7 +261,7 @@
         <!-- Interests Section -->
         @if(!empty($interests))
             <div class="section mb-6">
-                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">Interests</h2>
+                <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Interests') }}</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach($interests as $interest)
                         <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
@@ -276,7 +271,5 @@
                 </div>
             </div>
         @endif
-    </div>
-</body>
-</html>
+</x-template-layout>
 

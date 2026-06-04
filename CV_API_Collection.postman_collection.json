@@ -1,29 +1,21 @@
 {
 	"info": {
 		"_postman_id": "e649d885-7885-4042-8a7a-7c65c1c9c0ce",
-		"name": "CV API Collection",
-		"description": "Authentication + CV endpoints for the resume builder API.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "15765892",
-		"_collection_link": "https://universal-meadow-494559.postman.co/workspace/My-Workspace~7b079930-7ccd-457c-81fe-aa3380fe65dc/collection/15765892-e649d885-7885-4042-8a7a-7c65c1c9c0ce?action=share&source=collection_link&creator=15765892"
+		"name": "CV Builder API",
+		"description": "Complete API collection for the CV Builder application: Authentication, CVs, Cover Letters, and Templates.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Auth",
+			"name": "1. Auth",
 			"item": [
 				{
-					"name": "Register",
+					"name": "POST Register",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
@@ -31,33 +23,20 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/register",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"register"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register"]
 						},
-						"description": "Create a new user account. Automatically receives an API token in the response."
+						"description": "Create a new user account. Returns an API token."
 					},
 					"response": []
 				},
 				{
-					"name": "Login",
+					"name": "POST Login",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
@@ -65,85 +44,52 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/login",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
 						},
-						"description": "Login with email & password. Copy the token field from the response into the `auth_token` collection variable."
+						"description": "Login with email & password. Copy the token into the auth_token variable."
 					},
 					"response": []
 				},
 				{
-					"name": "Logout",
+					"name": "POST Logout",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/logout",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout"]
 						},
 						"description": "Invalidate the current token."
 					},
 					"response": []
 				},
 				{
-					"name": "Me",
+					"name": "GET Me",
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/me",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "me"]
 						},
 						"description": "Return the authenticated user's profile."
 					},
 					"response": []
 				},
 				{
-					"name": "Forgot Password",
+					"name": "POST Forgot Password",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
@@ -151,33 +97,20 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/forgot-password",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"forgot-password"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "forgot-password"]
 						},
 						"description": "Send a password reset email."
 					},
 					"response": []
 				},
 				{
-					"name": "Verify Reset Token",
+					"name": "POST Verify Reset Token",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
@@ -185,420 +118,365 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/reset-token",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"reset-token"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "reset-token"]
 						},
-						"description": "Validate a reset token before allowing the user to choose a new password."
+						"description": "Validate a reset token."
 					},
 					"response": []
 				},
 				{
-					"name": "Reset Password",
+					"name": "POST Reset Password",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"john@example.com\",\n  \"token\": \"RESET_TOKEN_FROM_EMAIL\",\n  \"password\": \"new-password\",\n  \"password_confirmation\": \"new-password\"\n}"
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"token\": \"RESET_TOKEN\",\n  \"password\": \"new-password\",\n  \"password_confirmation\": \"new-password\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/reset-password",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"reset-password"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "reset-password"]
 						},
 						"description": "Reset the password using the emailed token."
 					},
 					"response": []
 				}
-			],
-			"event": [
+			]
+		},
+		{
+			"name": "2. Social Auth",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {},
-						"exec": [
-							""
-						]
-					}
+					"name": "GET Google Redirect URL",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/google/redirect",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "google", "redirect"]
+						},
+						"description": "Get the Google OAuth redirect URL. Open in browser to authenticate."
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {},
-						"exec": [
-							"// Try to get token from top-level or nested in data\r",
-							"let jsonData = pm.response.json();\r",
-							"let token = jsonData?.result?.token || null;\r",
-							"\r",
-							"if (token) {\r",
-							"    pm.environment.set(\"auth_token\", token);\r",
-							"    console.log(\"Token set in environment variable.\");\r",
-							"} else {\r",
-							"    console.warn(\"Token not found in response.\");\r",
-							"}"
-						]
-					}
+					"name": "GET LinkedIn Redirect URL",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/linkedin/redirect",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "linkedin", "redirect"]
+						},
+						"description": "Get the LinkedIn OAuth redirect URL. Open in browser to authenticate."
+					},
+					"response": []
 				}
 			]
 		},
 		{
-			"name": "CVs",
+			"name": "3. CVs",
 			"item": [
 				{
-					"name": "Create CV (Full Example)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"user_id\": null,\n  \"template_id\": null,\n  \"sections_order\": [\n    \"Personal Information\",\n    \"Skills\",\n    \"Education\",\n    \"Experience\",\n    \"Projects\",\n    \"Languages\",\n    \"Interests\"\n  ],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise in mobile app development. Passionate about creating beautiful, performant, and user-friendly applications. Strong background in cross-platform development, UI/UX design, and Agile methodologies.\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      {\n        \"name\": \"Flutter\"\n      },\n      {\n        \"name\": \"Dart\"\n      },\n      {\n        \"name\": \"Laravel\"\n      },\n      {\n        \"name\": \"PHP\"\n      },\n      {\n        \"name\": \"JavaScript\"\n      },\n      {\n        \"name\": \"React\"\n      },\n      {\n        \"name\": \"Firebase\"\n      },\n      {\n        \"name\": \"SQL\"\n      },\n      {\n        \"name\": \"Git\"\n      },\n      {\n        \"name\": \"RESTful API\"\n      }\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"description\": \"Graduated magna cum laude. Specialized in software engineering and mobile application development. Relevant coursework included Data Structures, Algorithms, Database Systems, and Software Engineering Principles.\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      },\n      {\n        \"institution\": \"Stanford Continuing Studies\",\n        \"degree\": \"Certificate\",\n        \"fieldOfStudy\": \"Mobile App Development\",\n        \"description\": \"Advanced course covering modern mobile development practices, architecture patterns, and performance optimization.\",\n        \"from\": \"2018-01\",\n        \"to\": \"2018-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications serving 100K+ users. Architected scalable solutions, mentored junior developers, and collaborated with cross-functional teams. Improved app performance by 40% through code optimization and caching strategies.\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      },\n      {\n        \"position\": \"Flutter Developer\",\n        \"company\": \"StartupXYZ\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Developed and maintained multiple Flutter applications from scratch. Implemented clean architecture patterns, RESTful API integration, and real-time features using Firebase. Delivered 3 major app releases on time.\",\n        \"from\": \"2019-06\",\n        \"to\": \"2021-02\",\n        \"current\": false\n      },\n      {\n        \"position\": \"Junior Mobile Developer\",\n        \"company\": \"Digital Solutions LLC\",\n        \"location\": \"Oakland, CA\",\n        \"description\": \"Built native and cross-platform mobile applications. Worked with React Native and later transitioned to Flutter. Collaborated with designers and backend developers to implement user-facing features.\",\n        \"from\": \"2017-08\",\n        \"to\": \"2019-05\",\n        \"current\": false\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application built with Flutter. Features include user authentication, product catalog, shopping cart, payment integration (Stripe), order tracking, and push notifications. Used Firebase for backend services and state management with Provider.\",\n        \"technologies\": \"Flutter, Dart, Firebase, Stripe API, Provider, SQLite\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Task Management App\",\n        \"description\": \"Cross-platform task management application with team collaboration features. Implemented real-time synchronization, offline mode, and intuitive UI/UX. The app supports multiple workspaces, task assignments, due dates, and notifications.\",\n        \"technologies\": \"Flutter, Dart, Firebase Firestore, BLoC Pattern, Local Storage\",\n        \"url\": \"https://github.com/johndoe/task-manager\",\n        \"from\": \"2021-06\",\n        \"to\": \"2021-11\",\n        \"current\": false\n      },\n      {\n        \"title\": \"Weather Forecast App\",\n        \"description\": \"Beautiful weather application with location-based forecasts, detailed weather maps, and weather alerts. Features include 7-day forecast, hourly updates, and beautiful animations. Integrated with OpenWeatherMap API.\",\n        \"technologies\": \"Flutter, Dart, OpenWeatherMap API, Location Services, Animations\",\n        \"url\": \"https://github.com/johndoe/weather-app\",\n        \"from\": \"2020-09\",\n        \"to\": \"2020-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      {\n        \"name\": \"English\",\n        \"proficiencyLevel\": 5\n      },\n      {\n        \"name\": \"Spanish\",\n        \"proficiencyLevel\": 3\n      },\n      {\n        \"name\": \"French\",\n        \"proficiencyLevel\": 2\n      }\n    ],\n    \"interests\": [\n      {\n        \"name\": \"Open Source Contributions\"\n      },\n      {\n        \"name\": \"Mobile UI/UX Design\"\n      },\n      {\n        \"name\": \"Reading Tech Blogs\"\n      },\n      {\n        \"name\": \"Photography\"\n      },\n      {\n        \"name\": \"Traveling\"\n      },\n      {\n        \"name\": \"Cooking\"\n      }\n    ]\n  }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/cvs",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs"
-							]
-						},
-						"description": "Public endpoint with complete example data. Auth token is optional; provide `user_id` if you want to associate an existing user. This example includes all possible fields: personal info, skills, education, experience, projects, languages, and interests.\n\nIMPORTANT: If you are unauthenticated and provide `template_id`, this endpoint will return a PDF file instead of creating a profile. To create a profile AND get PDF, use authenticated requests."
-					},
-					"response": []
-				},
-				{
-					"name": "Create CV (Returns PDF - Unauthenticated)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/pdf"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"template_id\": 1,\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-1234\",\n    \"summary\": \"Experienced developer with 5+ years in software development.\",\n    \"skills\": [\n      {\"name\": \"Laravel\"},\n      {\"name\": \"PHP\"},\n      {\"name\": \"JavaScript\"}\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ]\n  }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/cvs",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs"
-							]
-						},
-						"description": "For unauthenticated users: Provides template_id to get PDF directly without creating a profile. Note: Set Accept header to 'application/pdf' to receive PDF response."
-					},
-					"response": []
-				},
-				{
-					"name": "Create CV (Minimal)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Minimal CV\",\n  \"language\": \"en\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/cvs",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs"
-							]
-						},
-						"description": "Smallest payload allowed. Creates a profile without user_data."
-					},
-					"response": []
-				},
-				{
-					"name": "Get My CVs",
+					"name": "GET List My CVs",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Accept", "value": "application/json" }],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs?language=en",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs"
-							],
-							"query": [
-								{
-									"key": "language",
-									"value": "en",
-									"description": "Optional filter"
-								}
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs"],
+							"query": [{ "key": "language", "value": "en", "description": "Optional filter" }]
 						},
-						"description": "Returns ONLY the authenticated user's CVs."
+						"description": "Get authenticated user's CVs with optional language filter."
 					},
 					"response": []
 				},
 				{
-					"name": "Get CV by ID",
+					"name": "GET Get CV by ID",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Accept", "value": "application/json" }],
 						"url": {
-							"raw": "{{base_url}}/api/v1/cvs/:id",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
+							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
-						"description": "Fetch one CV owned by the authenticated user."
+						"description": "Fetch a specific CV by ID."
 					},
 					"response": []
 				},
 				{
-					"name": "Update CV",
+					"name": "POST Create CV",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced developer with 5+ years.\",\n    \"skills\": [\n      { \"name\": \"PHP\" },\n      { \"name\": \"Laravel\" },\n      { \"name\": \"JavaScript\" }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs"]
+						},
+						"description": "Create a new CV. Auth optional (if authenticated, associates with user)."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Update CV",
 					"request": {
 						"method": "PUT",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated CV Name\",\n  \"language\": \"ar\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Updated\",\n    \"jobTitle\": \"Senior Flutter Dev\"\n  }\n}"
+							"raw": "{\n  \"name\": \"Updated CV Name\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Updated\"\n  }\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/cvs/:id",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
+							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
-						"description": "Update fields on a CV you own."
+						"description": "Update a CV you own."
 					},
 					"response": []
 				},
 				{
-					"name": "Delete CV",
+					"name": "DELETE Delete CV",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Accept", "value": "application/json" }],
 						"url": {
-							"raw": "{{base_url}}/api/v1/cvs/:id",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id"
-								}
-							]
+							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
 						"description": "Soft delete a CV you own."
 					},
 					"response": []
 				},
 				{
-					"name": "Print CV",
+					"name": "POST Print CV (From Profile)",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/pdf"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"template_id\": 1,\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise in mobile app development. Passionate about creating beautiful, performant, and user-friendly applications. Strong background in cross-platform development, UI/UX design, and Agile methodologies.\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      {\"name\": \"Flutter\"},\n      {\"name\": \"Dart\"},\n      {\"name\": \"Laravel\"},\n      {\"name\": \"PHP\"},\n      {\"name\": \"JavaScript\"}\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"description\": \"Graduated magna cum laude. Specialized in software engineering and mobile application development.\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications serving 100K+ users. Improved app performance by 40%.\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application built with Flutter.\",\n        \"technologies\": \"Flutter, Dart, Firebase\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      {\"name\": \"English\", \"proficiencyLevel\": 5},\n      {\"name\": \"Spanish\", \"proficiencyLevel\": 3}\n    ],\n    \"interests\": [\n      {\"name\": \"Open Source\"},\n      {\"name\": \"Mobile UI/UX Design\"}\n    ]\n  }\n}"
+							"raw": "{\n  \"profile_id\": \"{{cv_id}}\",\n  \"template_id\": \"{{template_id}}\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/print",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs",
-								"print"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "print"]
 						},
-						"description": "Generate PDF from CV data. Public endpoint. You can either provide profile_id (for existing profile) or user_data (to create temporary CV). Template ID is required. Response will be a PDF file."
+						"description": "Generate PDF from an existing profile using a template. Returns PDF URL."
 					},
 					"response": []
 				},
 				{
-					"name": "Print CV (From Profile ID)",
+					"name": "POST Print CV (With Data - Unauthenticated)",
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/pdf"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"profile_id\": 1,\n  \"template_id\": 1\n}"
+							"raw": "{\n  \"template_id\": \"{{template_id}}\",\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Developer\",\n    \"email\": \"john@example.com\",\n    \"summary\": \"Brief summary.\",\n    \"skills\": [{ \"name\": \"PHP\" }]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/print",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cvs",
-								"print"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "print"]
 						},
-						"description": "Generate PDF from an existing profile. Requires authentication if profile belongs to a user. Provide profile_id and template_id."
+						"description": "Generate PDF from CV data without saving a profile. Requires template_id."
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "Shares",
+			"name": "4. Cover Letters",
 			"item": [
 				{
-					"name": "Get Templates",
+					"name": "GET List My Cover Letters",
 					"request": {
 						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters?language=en",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters"],
+							"query": [{ "key": "language", "value": "en", "description": "Optional filter" }]
+						},
+						"description": "Get authenticated user's cover letters."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Get Cover Letter by ID",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
+						},
+						"description": "Fetch a specific cover letter by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Cover Letter",
+					"request": {
+						"method": "POST",
 						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Job Application Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-123-4567\",\n    \"jobTitle\": \"Senior Developer\",\n    \"companyName\": \"Tech Corp\",\n    \"recipientName\": \"Jane Smith\",\n    \"recipientTitle\": \"HR Manager\",\n    \"recipientCompany\": \"Tech Corp\",\n    \"subject\": \"Application for Senior Developer Position\",\n    \"body\": \"I am writing to express my interest in the Senior Developer position...\",\n    \"closing\": \"Sincerely\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters"]
+						},
+						"description": "Create a new cover letter."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Update Cover Letter",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Cover Letter\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"body\": \"Updated content...\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
+						},
+						"description": "Update a cover letter you own."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Delete Cover Letter",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
+						},
+						"description": "Soft delete a cover letter you own."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Print Cover Letter (From Record)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cover_letter_id\": \"{{cover_letter_id}}\",\n  \"template_id\": \"{{cover_letter_template_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/print",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "print"]
+						},
+						"description": "Generate PDF from an existing cover letter."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Print Cover Letter (With Data)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template_id\": \"{{cover_letter_template_id}}\",\n  \"name\": \"Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"jobTitle\": \"Developer\",\n    \"subject\": \"Job Application\",\n    \"body\": \"Content here...\",\n    \"closing\": \"Best regards\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/print",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "print"]
+						},
+						"description": "Generate PDF from cover letter data without saving."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Templates",
+			"item": [
+				{
+					"name": "GET CV Templates",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
 						"url": {
 							"raw": "{{base_url}}/api/v1/shares/templates",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"shares",
-								"templates"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "shares", "templates"]
 						},
-						"description": "Public endpoint to retrieve all active templates. No authentication required."
+						"description": "Get all active CV templates."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Cover Letter Templates",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/templates",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "templates"]
+						},
+						"description": "Get all active cover letter templates."
 					},
 					"response": []
 				}
@@ -610,16 +488,11 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
 				"exec": [
-					"// Retrieve the value from the environment variable (e.g., \"originValue\")\r",
-					"const access_token = pm.environment.get(\"auth_token\");\r",
-					"\r",
-					"// Add or update the Origin header for the current request\r",
-					"pm.request.headers.add({\r",
-					"    key: 'Authorization',\r",
-					"    value: access_token ? `Bearer ${access_token}` : null\r",
+					"const access_token = pm.environment.get('auth_token');",
+					"pm.request.headers.add({",
+					"    key: 'Authorization',",
+					"    value: access_token ? `Bearer ${access_token}` : null",
 					"});"
 				]
 			}
@@ -628,10 +501,20 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
 				"exec": [
-					""
+					"let jsonData = pm.response.json();",
+					"let token = jsonData?.result?.token || null;",
+					"if (token) {",
+					"    pm.environment.set('auth_token', token);",
+					"    console.log('Token set in environment.');",
+					"}",
+					"let id = jsonData?.result?.id || null;",
+					"if (id && pm.info.requestName.startsWith('POST Create CV')) {",
+					"    pm.environment.set('cv_id', id);",
+					"}",
+					"if (id && pm.info.requestName.startsWith('POST Create Cover Letter')) {",
+					"    pm.environment.set('cover_letter_id', id);",
+					"}"
 				]
 			}
 		}
@@ -643,8 +526,27 @@
 		},
 		{
 			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "cv_id",
 			"value": "",
-			"description": "Set after logging in."
+			"description": "Set after creating a CV."
+		},
+		{
+			"key": "cover_letter_id",
+			"value": "",
+			"description": "Set after creating a cover letter."
+		},
+		{
+			"key": "template_id",
+			"value": "1",
+			"description": "CV template ID."
+		},
+		{
+			"key": "cover_letter_template_id",
+			"value": "1",
+			"description": "Cover letter template ID."
 		}
 	]
 }

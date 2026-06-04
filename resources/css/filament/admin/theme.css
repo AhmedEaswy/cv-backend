@@ -3,6 +3,13 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 
+:root {
+    --sidebar-bg: #1e1b4b;
+    --sidebar-hover: #312e81;
+    --sidebar-active: #4338ca;
+    --card-radius: 16px;
+}
+
 /* RTL Support */
 [dir="rtl"] {
     direction: rtl;
@@ -29,4 +36,192 @@
 /* Arabic Font Support */
 [dir="rtl"] body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar Styling */
+.fi-sidebar {
+    background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%) !important;
+    border-right: none !important;
+}
+
+.fi-sidebar-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.25rem 1rem;
+}
+
+.fi-sidebar-header a,
+.fi-sidebar-header span {
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+}
+
+.fi-sidebar-nav-groups-label {
+    color: rgba(199, 210, 254, 0.7) !important;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.75rem 1rem 0.25rem;
+}
+
+.fi-sidebar-nav-item a {
+    color: rgba(199, 210, 254, 0.9) !important;
+    border-radius: 10px;
+    margin: 2px 8px;
+    padding: 0.6rem 0.75rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.fi-sidebar-nav-item a:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+.fi-sidebar-nav-item-active a {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fi-sidebar-nav-item a svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    opacity: 0.8;
+}
+
+/* User Menu in Sidebar */
+.fi-sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Topbar */
+.fi-topbar {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.fi-topbar nav {
+    background: #fff;
+}
+
+/* Dashboard Cards */
+.fi-wi-stats-overview-stat {
+    border-radius: var(--card-radius) !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Tables */
+.fi-ta-table {
+    border-radius: var(--card-radius) !important;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.fi-ta-table thead {
+    background: #f8fafc;
+}
+
+.fi-ta-table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    padding: 0.75rem 1rem;
+}
+
+.fi-ta-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.fi-ta-table tbody tr:hover {
+    background: #f1f5f9;
+}
+
+/* Form Fields */
+.fi-fo-field-wrp {
+    border-radius: 10px !important;
+}
+
+.fi-input,
+.fi-select-input {
+    border-radius: 8px !important;
+    border-color: #e2e8f0 !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fi-input:focus,
+.fi-select-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Buttons */
+.fi-btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease;
+}
+
+.fi-btn.fi-color {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.fi-btn.fi-color:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge */
+.fi-badge {
+    border-radius: 6px !important;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+/* Page Content */
+.fi-main {
+    background: #f8fafc;
+}
+
+.fi-content {
+    padding: 1.5rem 2rem;
+}
+
+/* Section / Card containers */
+.fi-section {
+    border-radius: var(--card-radius) !important;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Tabs */
+.fi-tabs-item {
+    font-weight: 500 !important;
+}
+
+/* Modals */
+.fi-modal-content {
+    border-radius: var(--card-radius) !important;
+}
+
+/* Notification */
+.fi-no-notification {
+    border-radius: 12px !important;
+}
+
+/* Repeaters */
+.fi-fo-repeater-item {
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }

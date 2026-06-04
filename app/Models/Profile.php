@@ -24,6 +24,9 @@ class Profile extends Model
         'experiences',
         'projects',
         'educations',
+        'ip_address',
+        'country',
+        'device',
     ];
 
     protected function casts(): array

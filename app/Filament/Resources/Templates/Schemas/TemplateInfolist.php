@@ -21,7 +21,7 @@ class TemplateInfolist
                     ->label('Active')
                     ->badge()
                     ->color(fn (bool $state): string => $state ? 'success' : 'danger')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Active' : 'Inactive'),
+                    ->formatStateUsing(fn (bool $state): string => $state ? __('Active') : __('Inactive')),
                 TextEntry::make('created_at')
                     ->dateTime(),
                 TextEntry::make('updated_at')
