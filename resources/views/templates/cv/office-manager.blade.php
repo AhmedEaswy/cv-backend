@@ -2,7 +2,7 @@
     @slot('head')
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Noto+Sans+Arabic:wght@400;600;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script>
@@ -18,8 +18,8 @@
                         "paper-dark": "#1f2937",
                     },
                     fontFamily: {
-                        display: ["'Playfair Display'", "serif"],
-                        body: ["'Merriweather'", "serif"],
+                        display: ["'Playfair Display'", "'Noto Sans Arabic'", "serif"],
+                        body: ["'Merriweather'", "'Noto Sans Arabic'", "serif"],
                     },
                     borderRadius: {
                         DEFAULT: "0.5rem",
@@ -108,7 +108,7 @@
     @endphp
 
     <!-- Header Section -->
-        <header class="header-section mb-10 text-left">
+        <header class="header-section mb-10 text-start">
             <h1 class="text-5xl md:text-6xl font-display font-black tracking-tight text-gray-900 mb-3 leading-tight">
                 @if(!empty($userData['firstName']))
                     {{ $userData['firstName'] }}
@@ -126,24 +126,24 @@
                 <div class="border-t border-b border-gray-300 py-4 flex flex-col md:flex-row md:justify-between gap-4 text-sm">
                     @if($email)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="mailto:{{ $email }}">
-                            <span class="material-icons text-lg text-gray-400">{{ __('email') }}</span>
+                            <span class="material-icons text-lg text-gray-400" aria-hidden="true">email</span>
                             <span>{{ $email }}</span>
                         </a>
                     @endif
                     @if($phone)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="tel:{{ $phone }}">
-                            <span class="material-icons text-lg text-gray-400">{{ __('phone') }}</span>
+                            <span class="material-icons text-lg text-gray-400" aria-hidden="true">phone</span>
                             <span>{{ $phone }}</span>
                         </a>
                     @endif
                     @if($portfolioUrl)
                         <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="{{ $portfolioUrl }}" target="_blank">
-                            <span class="material-icons text-lg text-gray-400">link</span>
+                            <span class="material-icons text-lg text-gray-400" aria-hidden="true">link</span>
                                             <span>{{ $userData['address'] ?? __('Portfolio') }}</span>
                         </a>
                     @elseif(!empty($userData['address']))
                         <div class="flex items-center gap-2 text-gray-700">
-                            <span class="material-icons text-lg text-gray-400">{{ __('location') }}</span>
+                            <span class="material-icons text-lg text-gray-400" aria-hidden="true">location_on</span>
                             <span>{{ $userData['address'] }}</span>
                         </div>
                     @endif
@@ -168,9 +168,9 @@
                     {{ __('Experience') }}
                 </h2>
                 @foreach($experiences as $index => $exp)
-                    <div class="experience-item mb-8 relative pl-4 border-l-2 border-gray-200 {{ !$loop->last ? '' : 'border-transparent' }}">
+                    <div class="experience-item mb-8 relative ps-4 border-s-2 border-gray-200 {{ !$loop->last ? '' : 'border-transparent' }}">
                         @if(!$loop->last)
-                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
+                            <div class="absolute -start-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
                         @endif
                         <div class="mb-2">
                             <span class="block text-xs font-semibold uppercase text-primary mb-1">
@@ -268,8 +268,8 @@
                     {{ __('Projects') }}
                 </h2>
                 @foreach($projects as $project)
-                    <div class="experience-item mb-8 relative pl-4 border-l-2 border-gray-200">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
+                    <div class="experience-item mb-8 relative ps-4 border-s-2 border-gray-200">
+                        <div class="absolute -start-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
                         <div class="mb-2">
                             <h3 class="text-xl font-bold font-display text-gray-900">
                                 {{ $project['title'] ?? '' }}

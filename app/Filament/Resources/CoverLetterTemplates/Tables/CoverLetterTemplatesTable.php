@@ -28,8 +28,9 @@ class CoverLetterTemplatesTable
                     ->searchable(),
                 ImageColumn::make('preview')
                     ->label('Preview')
+                    ->disk('public')
                     ->circular()
-                    ->defaultImageUrl(null),
+                    ->defaultImageUrl(url('/placeholder-image.png')),
                 TextColumn::make('name')
                     ->label('Name')
                     ->sortable()

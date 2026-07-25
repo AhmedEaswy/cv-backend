@@ -4,8 +4,8 @@ namespace App\Filament\Resources\CoverLetters\Schemas;
 
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class CoverLetterInfolist
@@ -29,7 +29,9 @@ class CoverLetterInfolist
                             ->badge(),
                         TextEntry::make('is_public')
                             ->label('Public')
-                            ->boolean(),
+                            ->badge()
+                            ->color(fn (bool $state): string => $state ? 'success' : 'gray')
+                            ->formatStateUsing(fn (bool $state): string => $state ? __('Yes') : __('No')),
                         TextEntry::make('created_at')
                             ->label('Created At')
                             ->dateTime(),

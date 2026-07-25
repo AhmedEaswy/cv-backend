@@ -49,3 +49,6 @@ Route::get('/admin/switch-language/{locale}', function ($locale) {
 
 Route::get('/profile/{id}', [\App\Http\Controllers\ProfilePreviewController::class, 'preview'])
     ->name('profile.preview');
+
+Route::get('/cover-letter/{id}', [\App\Http\Controllers\CoverLetterPreviewController::class, 'preview'])
+    ->name('cover-letter.preview');

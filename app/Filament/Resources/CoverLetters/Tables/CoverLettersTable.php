@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CoverLetters\Tables;
 
+use App\Models\CoverLetter;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -87,6 +89,20 @@ class CoverLettersTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                Action::make('preview')
+                    ->label(__('Preview'))
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(function (CoverLetter $record): string {
+                        $url = route('cover-letter.preview', ['id' => $record->id]);
+
+                        if ($record->cover_letter_template_id) {
+                            $url .= '?template_id='.$record->cover_letter_template_id;
+                        }
+
+                        return $url;
+                    })
+                    ->openUrlInNewTab(),
                 EditAction::make(),
             ])
             ->toolbarActions([

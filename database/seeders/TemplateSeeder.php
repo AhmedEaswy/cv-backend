@@ -16,15 +16,22 @@ class TemplateSeeder extends Seeder
         $templates = [
             [
                 'name' => 'modern-professional',
-                'preview' => 'images/templates/modern-professional.png',
+                'preview' => 'templates/previews/modern-professional.svg',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
                 'is_active' => true,
                 'is_default' => true,
             ],
             [
                 'name' => 'office-manager',
-                'preview' => 'images/templates/office-manager.png',
+                'preview' => 'templates/previews/office-manager.svg',
                 'description' => 'A template for office managers and administrators.',
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'name' => 'ats-classic',
+                'preview' => 'templates/previews/ats-classic.svg',
+                'description' => 'ATS-friendly single-column layout with clear sections, optimized for English and Arabic.',
                 'is_active' => true,
                 'is_default' => false,
             ],

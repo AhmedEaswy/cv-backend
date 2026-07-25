@@ -19,7 +19,9 @@ class CoverLetterTemplateForm
                     ->maxLength(255),
                 FileUpload::make('preview')
                     ->image()
+                    ->disk('public')
                     ->directory('cover-letter-templates')
+                    ->visibility('public')
                     ->imagePreviewHeight('250')
                     ->columnSpanFull(),
                 Textarea::make('description')

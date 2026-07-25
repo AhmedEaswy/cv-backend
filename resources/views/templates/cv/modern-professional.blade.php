@@ -127,7 +127,7 @@
                 <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Work Experience') }}</h2>
                 <div class="space-y-4">
                     @foreach($experiences as $exp)
-                        <div class="experience-item border-l-4 border-blue-600 pl-4">
+                        <div class="experience-item border-s-4 border-blue-600 ps-4">
                             <div class="flex justify-between items-start mb-1">
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">{{ $exp['position'] ?? '' }}</h3>
@@ -138,7 +138,7 @@
                                         <p class="text-sm text-gray-600">{{ $exp['location'] }}</p>
                                     @endif
                                 </div>
-                                <div class="text-right text-sm text-gray-600">
+                                <div class="text-end text-sm text-gray-600 shrink-0">
                                     @if(!empty($exp['from']))
                                         <span>{{ date('M Y', strtotime($exp['from'] . '-01')) }}</span>
                                     @endif
@@ -167,7 +167,7 @@
                 <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Education') }}</h2>
                 <div class="space-y-4">
                     @foreach($educations as $edu)
-                        <div class="education-item border-l-4 border-green-600 pl-4">
+                        <div class="education-item border-s-4 border-green-600 ps-4">
                             <div class="flex justify-between items-start mb-1">
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">{{ $edu['degree'] ?? '' }}</h3>
@@ -178,7 +178,7 @@
                                         <p class="text-gray-700">{{ $edu['institution'] }}</p>
                                     @endif
                                 </div>
-                                <div class="text-right text-sm text-gray-600">
+                                <div class="text-end text-sm text-gray-600 shrink-0">
                                     @if(!empty($edu['from']))
                                         <span>{{ date('M Y', strtotime($edu['from'] . '-01')) }}</span>
                                     @endif
@@ -205,7 +205,7 @@
                 <h2 class="text-2xl font-bold text-blue-600 mb-3 border-b-2 border-blue-200 pb-1">{{ __('Projects') }}</h2>
                 <div class="space-y-4">
                     @foreach($projects as $project)
-                        <div class="project-item border-l-4 border-purple-600 pl-4">
+                        <div class="project-item border-s-4 border-purple-600 ps-4">
                             <div class="flex justify-between items-start mb-1">
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">{{ $project['title'] ?? '' }}</h3>
@@ -213,7 +213,7 @@
                                         <a href="{{ $project['url'] }}" class="text-blue-600 hover:underline text-sm">{{ $project['url'] }}</a>
                                     @endif
                                 </div>
-                                <div class="text-right text-sm text-gray-600">
+                                <div class="text-end text-sm text-gray-600 shrink-0">
                                     @if(!empty($project['from']))
                                         <span>{{ date('M Y', strtotime($project['from'] . '-01')) }}</span>
                                     @endif

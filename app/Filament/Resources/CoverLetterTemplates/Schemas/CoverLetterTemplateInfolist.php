@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources\CoverLetterTemplates\Schemas;
 
-use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class CoverLetterTemplateInfolist
@@ -18,14 +19,22 @@ class CoverLetterTemplateInfolist
                             ->label('ID'),
                         TextEntry::make('name')
                             ->label('Name'),
+                        ImageEntry::make('preview')
+                            ->label('Preview Image')
+                            ->disk('public')
+                            ->height(200),
                         TextEntry::make('description')
                             ->label('Description'),
                         TextEntry::make('is_active')
                             ->label('Active')
-                            ->boolean(),
+                            ->badge()
+                            ->color(fn (bool $state): string => $state ? 'success' : 'danger')
+                            ->formatStateUsing(fn (bool $state): string => $state ? __('Active') : __('Inactive')),
                         TextEntry::make('is_default')
                             ->label('Default')
-                            ->boolean(),
+                            ->badge()
+                            ->color(fn (bool $state): string => $state ? 'success' : 'gray')
+                            ->formatStateUsing(fn (bool $state): string => $state ? __('Yes') : __('No')),
                         TextEntry::make('created_at')
                             ->label('Created At')
                             ->dateTime(),

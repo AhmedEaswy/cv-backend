@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\Template;
 use App\Services\CVDataMapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 class ProfilePreviewController extends Controller
 {
@@ -70,6 +71,7 @@ class ProfilePreviewController extends Controller
 
         // Format profile data for view (same format as PDF generation)
         $cvData = $this->dataMapper->formatProfileResponse($profile);
+        App::setLocale($cvData['language'] ?? 'en');
 
         // Return the view
         return view($viewPath, ['cv' => $cvData]);

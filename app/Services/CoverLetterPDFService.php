@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CoverLetter;
 use App\Models\CoverLetterTemplate;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ class CoverLetterPDFService
         }
 
         $data = $this->dataMapper->formatCoverLetterResponse($coverLetter);
+        App::setLocale($data['language'] ?? 'en');
 
         try {
             $pdf = Pdf::view($viewPath, ['coverLetter' => $data])

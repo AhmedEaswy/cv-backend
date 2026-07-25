@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Profile;
 use App\Models\Template;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\ViewException;
@@ -48,6 +49,7 @@ class CVPDFService
 
         // Format profile data for view
         $cvData = $this->dataMapper->formatProfileResponse($profile);
+        App::setLocale($cvData['language'] ?? 'en');
 
         try {
             $pdf = Pdf::view($viewPath, ['cv' => $cvData])

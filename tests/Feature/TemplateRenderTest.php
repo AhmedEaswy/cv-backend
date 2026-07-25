@@ -177,13 +177,31 @@ class TemplateRenderTest extends TestCase
             'user_id' => $user->id,
             'name' => 'Arabic CV',
             'language' => 'ar',
-            'info' => ['firstName' => 'أحمد', 'lastName' => 'محمد'],
+            'info' => ['firstName' => 'أحمد', 'lastName' => 'محمد', 'summary' => 'مهندس برمجيات'],
         ]);
 
         $cvData = $this->mapper->formatProfileResponse($profile);
+        app()->setLocale('ar');
 
-        $html = view('templates.cv.modern-professional', ['cv' => $cvData])->render();
+        foreach (['modern-professional', 'office-manager', 'ats-classic'] as $template) {
+            $html = view("templates.cv.{$template}", ['cv' => $cvData])->render();
 
-        $this->assertStringContainsString('dir="rtl"', $html);
+            $this->assertStringContainsString('dir="rtl"', $html, "Template {$template} should render RTL");
+            $this->assertStringContainsString('الملخص', $html, "Template {$template} should show Arabic section labels");
+        }
+    }
+
+    public function test_ats_classic_template_renders(): void
+    {
+        $profile = $this->createTestProfile();
+        $cvData = $this->mapper->formatProfileResponse($profile);
+
+        $html = view('templates.cv.ats-classic', ['cv' => $cvData])->render();
+
+        $this->assertStringContainsString('John Doe', $html);
+        $this->assertStringContainsString('Software Engineer', $html);
+        $this->assertStringContainsString('PHP, Laravel, JavaScript', $html);
+        $this->assertStringContainsString('Acme Corp', $html);
+        $this->assertStringNotContainsString('material-icons', $html);
     }
 }

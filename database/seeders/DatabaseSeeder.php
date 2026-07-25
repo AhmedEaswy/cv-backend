@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             TemplateSeeder::class,
+            CoverLetterTemplateSeeder::class,
             ProfileSeeder::class,
         ]);
     }
