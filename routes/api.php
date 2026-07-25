@@ -1,12 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AnalyticsClickController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Middleware\AnalyticsMiddleware;
+
+Route::prefix('v1')->group(function () {
+    // Public click-tracking endpoint (landing page App Store / Play Store badges).
+    // Intentionally NOT inside the AnalyticsMiddleware group — the controller
+    // records its own event with a specific action_type, and we don't want a
+    // duplicate null-action row.
+    Route::post('/analytics/click', [AnalyticsClickController::class, 'store']);
+});
 
 Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function () {
     // Public auth routes

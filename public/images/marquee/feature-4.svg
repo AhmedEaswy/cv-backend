@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="One-tap PDF export — placeholder">
+    <defs>
+        <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#efe7ff"/>
+            <stop offset="100%" stop-color="#fcefe6"/>
+        </linearGradient>
+    </defs>
+    <rect width="300" height="300" fill="url(#bg4)"/>
+    <rect x="80" y="50" width="140" height="180" rx="10" fill="#ffffff" stroke="#e8e3d7"/>
+    <rect x="80" y="50" width="140" height="40" rx="10" fill="#5c17e7"/>
+    <rect x="80" y="80" width="140" height="10" fill="#5c17e7"/>
+    <rect x="100" y="64" width="100" height="14" rx="2" fill="#ffffff" opacity="0.85"/>
+    <text x="150" y="74" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#5c17e7" letter-spacing="1.5">CV.PDF</text>
+    <rect x="100" y="110" width="60" height="8" rx="2" fill="#130e21"/>
+    <rect x="100" y="124" width="40" height="5" rx="2" fill="#b3a4ff"/>
+    <line x1="100" y1="142" x2="200" y2="142" stroke="#ece8de"/>
+    <rect x="100" y="152" width="100" height="5" rx="2" fill="#ece8de"/>
+    <rect x="100" y="162" width="86" height="5" rx="2" fill="#ece8de"/>
+    <rect x="100" y="172" width="72" height="5" rx="2" fill="#ece8de"/>
+    <rect x="100" y="190" width="50" height="5" rx="2" fill="#130e21"/>
+    <rect x="100" y="202" width="100" height="5" rx="2" fill="#ece8de"/>
+    <circle cx="220" cy="240" r="32" fill="#130e21"/>
+    <path d="M220 226 L220 254 M210 244 L230 244" stroke="#5c17e7" stroke-width="3" stroke-linecap="round"/>
+    <path d="M214 250 L220 256 L228 248" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

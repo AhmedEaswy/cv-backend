@@ -10,12 +10,12 @@ class LocaleSwitcher extends Component
 {
     public function switchLocale(string $locale): void
     {
-        if (in_array($locale, ['en', 'ar'])) {
+        if (in_array($locale, ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'])) {
             Session::put('locale', $locale);
             App::setLocale($locale);
 
             // Set direction for RTL languages
-            if ($locale === 'ar') {
+            if (in_array($locale, ['ar', 'ur'])) {
                 Session::put('direction', 'rtl');
             } else {
                 Session::put('direction', 'ltr');

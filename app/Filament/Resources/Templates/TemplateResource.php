@@ -31,11 +31,27 @@ class TemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = 'templates';
+    protected static bool $hasTitleCaseModelLabel = false;
 
-    protected static ?string $modelLabel = 'templates';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('CV Builder');
+    }
 
-    protected static ?string $pluralModelLabel = 'templates';
+    public static function getNavigationLabel(): string
+    {
+        return __('templates');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('templates');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('templates');
+    }
 
     public static function form(Schema $schema): Schema
     {

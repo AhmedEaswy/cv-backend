@@ -9,19 +9,25 @@
         </x-slot>
 
         <x-filament::dropdown.list>
-            <x-filament::dropdown.list.item
-                :href="url('/admin/switch-language/en')"
-                :icon="app()->getLocale() === 'en' ? 'heroicon-o-check' : null"
-            >
-                {{ __('English') }}
-            </x-filament::dropdown.list.item>
-
-            <x-filament::dropdown.list.item
-                :href="url('/admin/switch-language/ar')"
-                :icon="app()->getLocale() === 'ar' ? 'heroicon-o-check' : null"
-            >
-                {{ __('Arabic') }}
-            </x-filament::dropdown.list.item>
+            @php
+                $adminLocales = [
+                    'en' => 'English',
+                    'ar' => 'Arabic',
+                    'tr' => 'Turkish',
+                    'es' => 'Spanish',
+                    'fr' => 'French',
+                    'de' => 'German',
+                    'ur' => 'Urdu',
+                ];
+            @endphp
+            @foreach($adminLocales as $code => $name)
+                <x-filament::dropdown.list.item
+                    :href="url('/admin/switch-language/' . $code)"
+                    :icon="app()->getLocale() === $code ? 'heroicon-o-check' : null"
+                >
+                    {{ __($name) }}
+                </x-filament::dropdown.list.item>
+            @endforeach
         </x-filament::dropdown.list>
     </x-filament::dropdown>
 </div>

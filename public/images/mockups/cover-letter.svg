@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-label="Cover letter — placeholder mockup">
+    <rect width="600" height="800" fill="#fbfaf7"/>
+    <rect x="40" y="40" width="520" height="720" rx="8" fill="#fffefb" stroke="#e8e3d7"/>
+    <!-- Two stacked avatar circles (matches CV brand) -->
+    <circle cx="80" cy="90" r="22" fill="#5c17e7"/>
+    <circle cx="105" cy="90" r="22" fill="#130e21" stroke="#fffefb" stroke-width="2"/>
+    <!-- Recipient block -->
+    <text x="60" y="160" font-family="Inter, sans-serif" font-size="9" font-weight="700" letter-spacing="1.2" fill="#8a8499">TO</text>
+    <rect x="60" y="170" width="200" height="12" rx="3" fill="#130e21"/>
+    <rect x="60" y="190" width="240" height="8" rx="2" fill="#8a8499"/>
+    <!-- Subject block -->
+    <text x="60" y="240" font-family="Inter, sans-serif" font-size="9" font-weight="700" letter-spacing="1.2" fill="#8a8499">SUBJECT</text>
+    <rect x="60" y="250" width="320" height="12" rx="3" fill="#130e21"/>
+    <!-- Body paragraph 1 -->
+    <rect x="60" y="300" width="480" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="312" width="460" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="324" width="440" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="336" width="420" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="348" width="320" height="6" rx="2" fill="#4a4458"/>
+    <!-- Body paragraph 2 -->
+    <rect x="60" y="380" width="470" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="392" width="430" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="404" width="400" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="416" width="280" height="6" rx="2" fill="#4a4458"/>
+    <!-- Body paragraph 3 -->
+    <rect x="60" y="448" width="460" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="460" width="380" height="6" rx="2" fill="#4a4458"/>
+    <!-- Sign-off -->
+    <rect x="60" y="540" width="120" height="8" rx="2" fill="#4a4458"/>
+    <text x="60" y="580" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#5c17e7">Sincerely,</text>
+    <rect x="60" y="600" width="160" height="14" rx="3" fill="#130e21"/>
+    <rect x="60" y="622" width="120" height="8" rx="2" fill="#8a8499"/>
+    <!-- Match badge -->
+    <rect x="420" y="600" width="120" height="28" rx="14" fill="#efe7ff"/>
+    <text x="480" y="618" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#5c17e7">Matches CV</text>
+    <!-- Accent footer rule -->
+    <rect x="60" y="710" width="60" height="2" fill="#5c17e7"/>
+    <text x="60" y="734" font-family="Inter, sans-serif" font-size="9" fill="#8a8499" letter-spacing="1">COVER LETTER — PLACEHOLDER MOCKUP</text>
+</svg>

@@ -20,11 +20,11 @@ class SetLocale
         $locale = Session::get('locale', config('app.locale', 'en'));
 
         // Validate locale
-        if (in_array($locale, ['en', 'ar'])) {
+        if (in_array($locale, ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'])) {
             App::setLocale($locale);
 
             // Set direction for RTL languages
-            if ($locale === 'ar') {
+            if (in_array($locale, ['ar', 'ur'])) {
                 Session::put('direction', 'rtl');
             } else {
                 Session::put('direction', 'ltr');

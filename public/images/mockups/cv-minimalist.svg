@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-label="Minimalist Clean CV — placeholder mockup">
+    <rect width="600" height="800" fill="#fbfaf7"/>
+    <rect x="40" y="40" width="520" height="720" rx="8" fill="#ffffff" stroke="#ece8de"/>
+    <!-- Name with single accent rule -->
+    <rect x="60" y="80" width="280" height="22" rx="3" fill="#130e21"/>
+    <rect x="60" y="112" width="120" height="3" fill="#5c17e7"/>
+    <rect x="60" y="125" width="180" height="8" rx="2" fill="#8a8499"/>
+    <!-- Summary -->
+    <rect x="60" y="172" width="480" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="184" width="460" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="196" width="380" height="6" rx="2" fill="#4a4458"/>
+    <!-- Experience section -->
+    <rect x="60" y="240" width="80" height="14" rx="2" fill="#130e21"/>
+    <rect x="60" y="278" width="180" height="11" rx="2" fill="#130e21"/>
+    <rect x="60" y="296" width="100" height="7" rx="2" fill="#8a8499"/>
+    <rect x="60" y="316" width="480" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="328" width="440" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="340" width="400" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="370" width="180" height="11" rx="2" fill="#130e21"/>
+    <rect x="60" y="388" width="100" height="7" rx="2" fill="#8a8499"/>
+    <rect x="60" y="408" width="480" height="6" rx="2" fill="#4a4458"/>
+    <rect x="60" y="420" width="380" height="6" rx="2" fill="#4a4458"/>
+    <!-- Skills -->
+    <rect x="60" y="468" width="60" height="14" rx="2" fill="#130e21"/>
+    <rect x="60" y="500" width="100" height="6" rx="3" fill="#5c17e7"/>
+    <rect x="60" y="514" width="380" height="6" rx="3" fill="#ece8de"/>
+    <rect x="60" y="528" width="80" height="6" rx="3" fill="#5c17e7"/>
+    <rect x="60" y="542" width="320" height="6" rx="3" fill="#ece8de"/>
+    <rect x="60" y="556" width="60" height="6" rx="3" fill="#5c17e7"/>
+    <rect x="60" y="570" width="280" height="6" rx="3" fill="#ece8de"/>
+    <!-- Education -->
+    <rect x="60" y="618" width="80" height="14" rx="2" fill="#130e21"/>
+    <rect x="60" y="650" width="200" height="10" rx="2" fill="#130e21"/>
+    <rect x="60" y="668" width="140" height="6" rx="2" fill="#8a8499"/>
+    <!-- Accent line bottom -->
+    <rect x="60" y="710" width="60" height="2" fill="#5c17e7"/>
+    <text x="60" y="734" font-family="Inter, sans-serif" font-size="9" fill="#8a8499" letter-spacing="1">CV — PLACEHOLDER MOCKUP</text>
+</svg>

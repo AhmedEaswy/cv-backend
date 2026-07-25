@@ -47,4 +47,12 @@ return [
         'redirect' => env('LINKEDIN_REDIRECT_URI'),
     ],
 
+    'app_store' => [
+        'url' => env('APP_STORE_URL', 'https://apps.apple.com/us/app/cv-resume-builder/id6744250877'),
+    ],
+
+    'play_store' => [
+        'url' => env('PLAY_STORE_URL', 'https://play.google.com/store/apps/details?id=app.cv.creator'),
+    ],
+
 ];

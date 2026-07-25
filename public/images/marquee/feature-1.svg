@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="Live preview as you type — placeholder">
+    <defs>
+        <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#efe7ff"/>
+            <stop offset="100%" stop-color="#fbfaf7"/>
+        </linearGradient>
+    </defs>
+    <rect width="300" height="300" fill="url(#bg1)"/>
+    <rect x="40" y="60" width="220" height="180" rx="10" fill="#ffffff" stroke="#e8e3d7"/>
+    <rect x="56" y="78" width="120" height="10" rx="2" fill="#130e21"/>
+    <rect x="56" y="96" width="80" height="6" rx="2" fill="#b3a4ff"/>
+    <line x1="56" y1="120" x2="244" y2="120" stroke="#ece8de"/>
+    <rect x="56" y="134" width="188" height="6" rx="2" fill="#ece8de"/>
+    <rect x="56" y="146" width="160" height="6" rx="2" fill="#ece8de"/>
+    <rect x="56" y="158" width="140" height="6" rx="2" fill="#ece8de"/>
+    <rect x="56" y="180" width="60" height="6" rx="2" fill="#5c17e7"/>
+    <rect x="56" y="192" width="100" height="6" rx="2" fill="#ece8de"/>
+    <rect x="56" y="204" width="80" height="6" rx="2" fill="#ece8de"/>
+    <circle cx="230" cy="60" r="20" fill="#5c17e7"/>
+    <path d="M222 60 L228 66 L238 54" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

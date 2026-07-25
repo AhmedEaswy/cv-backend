@@ -1,90 +1,118 @@
 # CV API Collection Documentation
 
-Complete documentation for all endpoints in the CV API Postman Collection.
+Complete documentation for every endpoint in the **CV Builder API** Postman collection.
+
+> **Last updated:** 2026-07-25 — aligned with the Cover Letter API updates.
+> See `COVER_LETTER_API_UPDATES.md` for the full change log of the cover-letter feature.
 
 ## Table of Contents
 
 - [Collection Overview](#collection-overview)
 - [Getting Started](#getting-started)
 - [Authentication](#authentication)
+- [Response Envelope](#response-envelope)
 - [Folders](#folders)
-  - [Auth](#auth)
-  - [CVs](#cvs)
-  - [Shares](#shares)
+  - [1. Auth](#1-auth)
+  - [2. Social Auth](#2-social-auth)
+  - [3. CVs](#3-cvs)
+  - [4. Cover Letters](#4-cover-letters)
+  - [5. Templates](#5-templates)
+- [Error Responses](#error-responses)
 
 ---
 
 ## Collection Overview
 
-**Collection Name:** CV API Collection  
-**Description:** Authentication + CV endpoints for the resume builder API.  
-**Base URL:** `{{base_url}}` (default: `http://localhost:8000`)  
-**API Version:** v1  
-**Collection Link:** [Postman Collection](https://universal-meadow-494559.postman.co/workspace/My-Workspace~7b079930-7ccd-457c-81fe-aa3380fe65dc/collection/15765892-e649d885-7885-4042-8a7a-7c65c1c9c0ce)
+)
+- [Notes**Collection name:** `CV Builder API`
+**Base URL:** `{{base_url}}` (default `http://localhost:8000`)
+**API version:** `v1`
+**File:** `CV_API_Collection.postman_collection.json`
 
 ### Collection Variables
 
-- `base_url`: Base URL for API requests (default: `http://localhost:8000`)
-- `auth_token`: Bearer token for authentication (set automatically after login)
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `base_url` | `http://localhost:8000` | Base URL for every request. |
+| `auth_token` | `""` | Bearer token. Auto-stored after `POST Register` / `POST Login`. |
+| `cv_id` | `""` | Auto-stored after `POST Create CV`. |
+| `cover_letter_id` | `""` | Auto-stored after `POST Create Cover Letter`. |
+| `template_id` | `1` | Active CV template ID. Get a fresh one from `GET CV Templates`. |
+| `cover_letter_template_id` | `1` | Active cover-letter template ID. Get a fresh one from `GET List Cover Letter Templates`. |
+| `last_pdf_url` | `""` | Auto-stored after any `/print` request. |
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-1. Import the Postman collection into Postman
-2. Set up the `base_url` variable in your Postman environment
-3. For authenticated requests, use the Login endpoint first
-
-### Authentication Setup
-
-The collection uses Bearer token authentication. After logging in:
-
-1. The token is automatically extracted from the Login/Register response
-2. It's stored in the `auth_token` environment variable
-3. The collection's pre-request script automatically adds it to all requests as `Authorization: Bearer {token}`
+1. Import `CV_API_Collection.postman_collection.json` into Postman.
+2. Set the `base_url` variable to your environment (e.g. `http://localhost:8000` or your staging URL).
+3. Run `POST Login` (or `POST Register`) — the token is auto-saved to `auth_token` and added to every subsequent request as `Authorization: Bearer {auth_token}`.
 
 ---
 
 ## Authentication
 
-The collection automatically handles authentication via pre-request scripts that add the `Authorization` header using the stored `auth_token` variable.
+All authenticated endpoints use **Laravel Sanctum** Bearer tokens. The collection's pre-request script automatically appends:
 
-### Pre-Request Script
-
-All requests automatically include:
-```javascript
+```
 Authorization: Bearer {auth_token}
 ```
+
+when `auth_token` is set. The test script extracts the token from the `result.token` field of `Register` / `Login` responses.
+
+---
+
+## Response Envelope
+
+Success:
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "result": {}
+}
+```
+
+Error:
+
+```json
+{
+  "success": false,
+  "message": "...",
+  "code": 400,
+  "errors": null
+}
+```
+
+> Print endpoints return `{ "result": { "url": "..." } }` — they **do not** return a raw PDF body. Open `result.url` in a browser or download manager to grab the file.
 
 ---
 
 ## Folders
 
-## Auth
+## 1. Auth
 
-The **Auth** folder contains all authentication-related endpoints. This includes user registration, login, logout, password reset functionality, and retrieving the authenticated user's profile.
+User authentication, account management, and password recovery.
 
-**Folder Description:** User authentication and account management endpoints.
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `POST` | `/api/v1/auth/register` | — | Returns user + `result.token`. |
+| `POST` | `/api/v1/auth/login` | — | Returns user + `result.token`. |
+| `POST` | `/api/v1/auth/logout` | Required | Invalidates the current token. |
+| `GET` | `/api/v1/auth/me` | Required | Current user profile. |
+| `POST` | `/api/v1/auth/forgot-password` | — | Sends reset email. |
+| `POST` | `/api/v1/auth/reset-token` | — | Validates a reset token. |
+| `POST` | `/api/v1/auth/reset-password` | — | Resets password with token. |
 
 ### Register
 
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/register`  
-**Authentication:** Not required
-
-#### Description
-Create a new user account. Automatically receives an API token in the response.
-
-#### Headers
-```
+```json
+POST /api/v1/auth/register
 Content-Type: application/json
 Accept: application/json
-```
 
-#### Request Body
-```json
 {
   "name": "John Doe",
   "email": "john@example.com",
@@ -93,251 +121,70 @@ Accept: application/json
 }
 ```
 
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | User's full name |
-| email | string | Yes | User's email address |
-| password | string | Yes | User's password |
-| password_confirmation | string | Yes | Password confirmation (must match password) |
-
-#### Response
-Returns user data along with an authentication token. The token is automatically stored in the `auth_token` collection variable.
-
-#### Test Script
-The Auth folder includes a test script that automatically extracts the token from the response and stores it in the `auth_token` environment variable.
-
----
-
 ### Login
 
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/login`  
-**Authentication:** Not required
-
-#### Description
-Login with email & password. Copy the token field from the response into the `auth_token` collection variable.
-
-#### Headers
-```
+```json
+POST /api/v1/auth/login
 Content-Type: application/json
 Accept: application/json
-```
 
-#### Request Body
-```json
 {
   "email": "user@app.com",
   "password": "123456789"
 }
 ```
 
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| email | string | Yes | User's email address |
-| password | string | Yes | User's password |
+The `result.token` is auto-extracted by the test script and stored in `auth_token`.
 
-#### Response
-Returns user data along with an authentication token. The token is automatically extracted and stored in the `auth_token` collection variable for subsequent requests.
+### Forgot / Reset Password
+
+```json
+POST /api/v1/auth/forgot-password   { "email": "..." }
+POST /api/v1/auth/reset-token       { "email": "...", "token": "..." }
+POST /api/v1/auth/reset-password    { "email": "...", "token": "...", "password": "...", "password_confirmation": "..." }
+```
 
 ---
 
-### Logout
+## 2. Social Auth
 
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/logout`  
-**Authentication:** Required
+OAuth redirect and callback endpoints. The redirect returns the provider's auth URL — open it in a browser to grant access. The callback exchanges the `code` for a Sanctum token.
 
-#### Description
-Invalidate the current token.
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `GET` | `/api/v1/auth/google/redirect` | — | Returns the Google auth URL. |
+| `GET` | `/api/v1/auth/google/callback` | — | Exchanges `code` for a token. |
+| `GET` | `/api/v1/auth/linkedin/redirect` | — | Returns the LinkedIn auth URL. |
+| `GET` | `/api/v1/auth/linkedin/callback` | — | Exchanges `code` for a token. |
 
-#### Headers
-```
-Accept: application/json
+In Postman, copy the `code` and `state` from the redirect URL and run the matching callback request manually.
+
+---
+
+## 3. CVs
+
+CV / Resume management: full CRUD plus PDF print. Some endpoints are public (create/print) so unauthenticated users can build a CV; the rest require auth and return only the caller's CVs.
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `GET` | `/api/v1/cvs?language=en` | Required | List my CVs (optional `language` filter). |
+| `GET` | `/api/v1/cvs/{id}` | Required | Get one of my CVs. |
+| `POST` | `/api/v1/cvs` | Optional | Create a CV. Unauth + `template_id` → returns `result.url` PDF. |
+| `PUT` | `/api/v1/cvs/{id}` | Required | Update a CV I own. |
+| `DELETE` | `/api/v1/cvs/{id}` | Required | Soft delete. |
+| `POST` | `/api/v1/cvs/print` | Optional | Generate PDF. Returns `{ result: { url } }`. |
+
+### Create CV (Authenticated → profile)
+
+```json
+POST /api/v1/cvs
 Authorization: Bearer {auth_token}
-```
-
-#### Request Body
-None
-
-#### Response
-Confirmation that the token has been invalidated.
-
----
-
-### Me
-
-**Method:** `GET`  
-**Endpoint:** `/api/v1/auth/me`  
-**Authentication:** Required
-
-#### Description
-Return the authenticated user's profile.
-
-#### Headers
-```
-Accept: application/json
-Authorization: Bearer {auth_token}
-```
-
-#### Request Body
-None
-
-#### Response
-Returns the authenticated user's profile information including:
-- User ID
-- Name
-- Email
-- Other user details
-
----
-
-### Forgot Password
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/forgot-password`  
-**Authentication:** Not required
-
-#### Description
-Send a password reset email to the user.
-
-#### Headers
-```
 Content-Type: application/json
-Accept: application/json
-```
 
-#### Request Body
-```json
-{
-  "email": "john@example.com"
-}
-```
-
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| email | string | Yes | User's email address to send reset link |
-
-#### Response
-Confirmation that the password reset email has been sent.
-
----
-
-### Verify Reset Token
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/reset-token`  
-**Authentication:** Not required
-
-#### Description
-Validate a reset token before allowing the user to choose a new password.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/json
-```
-
-#### Request Body
-```json
-{
-  "email": "john@example.com",
-  "token": "RESET_TOKEN_FROM_EMAIL"
-}
-```
-
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| email | string | Yes | User's email address |
-| token | string | Yes | Reset token received from the password reset email |
-
-#### Response
-Confirmation whether the token is valid or not.
-
----
-
-### Reset Password
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/auth/reset-password`  
-**Authentication:** Not required
-
-#### Description
-Reset the password using the emailed token.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/json
-```
-
-#### Request Body
-```json
-{
-  "email": "john@example.com",
-  "token": "RESET_TOKEN_FROM_EMAIL",
-  "password": "new-password",
-  "password_confirmation": "new-password"
-}
-```
-
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| email | string | Yes | User's email address |
-| token | string | Yes | Reset token received from the password reset email |
-| password | string | Yes | New password |
-| password_confirmation | string | Yes | Password confirmation (must match password) |
-
-#### Response
-Confirmation that the password has been reset successfully.
-
----
-
-## CVs
-
-The **CVs** folder contains all CV (Curriculum Vitae) management endpoints. This includes creating, reading, updating, deleting CVs, and generating PDFs. The endpoints support both authenticated and unauthenticated access, with different behaviors based on authentication status.
-
-**Folder Description:** CV/Resume management endpoints for creating, managing, and generating PDFs of CVs.
-
-### Create CV (Full Example)
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/cvs`  
-**Authentication:** Optional
-
-#### Description
-Public endpoint with complete example data. Auth token is optional; provide `user_id` if you want to associate an existing user. This example includes all possible fields: personal info, skills, education, experience, projects, languages, and interests.
-
-**IMPORTANT:** If you are unauthenticated and provide `template_id`, this endpoint will return a PDF file instead of creating a profile. To create a profile AND get PDF, use authenticated requests.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/json
-```
-
-#### Request Body
-Complete example with all available fields:
-
-```json
 {
   "name": "My Professional CV",
   "language": "en",
-  "user_id": null,
-  "template_id": null,
-  "sections_order": [
-    "Personal Information",
-    "Skills",
-    "Education",
-    "Experience",
-    "Projects",
-    "Languages",
-    "Interests"
-  ],
+  "sections_order": ["Personal Information", "Skills", "Education", "Experience", "Projects", "Languages", "Interests"],
   "user_data": {
     "firstName": "John",
     "lastName": "Doe",
@@ -346,597 +193,332 @@ Complete example with all available fields:
     "address": "123 Tech Street, San Francisco, CA 94105, USA",
     "portfolioUrl": "https://johndoe.dev",
     "phone": "+1-555-123-4567",
-    "summary": "Experienced Flutter developer with 5+ years of expertise...",
+    "summary": "Experienced Flutter developer with 5+ years...",
     "birthdate": "1990-05-15",
-    "skills": [
-      {"name": "Flutter"},
-      {"name": "Dart"},
-      {"name": "Laravel"}
-    ],
+    "skills": [ { "name": "Flutter" }, { "name": "Dart" } ],
     "educations": [
-      {
-        "institution": "University of California, Berkeley",
-        "degree": "Bachelor of Science",
-        "fieldOfStudy": "Computer Science",
-        "description": "Graduated magna cum laude...",
-        "from": "2010-09",
-        "to": "2014-06"
-      }
+      { "institution": "UC Berkeley", "degree": "BSc", "fieldOfStudy": "CS", "from": "2010-09", "to": "2014-06" }
     ],
     "experiences": [
-      {
-        "position": "Senior Flutter Developer",
-        "company": "Tech Innovations Inc.",
-        "location": "San Francisco, CA",
-        "description": "Lead development of enterprise mobile applications...",
-        "from": "2021-03",
-        "to": null,
-        "current": true
-      }
+      { "position": "Senior Flutter Dev", "company": "Tech Innovations", "from": "2021-03", "to": null, "current": true }
     ],
     "projects": [
-      {
-        "title": "E-Commerce Mobile App",
-        "description": "A full-featured e-commerce mobile application...",
-        "technologies": "Flutter, Dart, Firebase, Stripe API, Provider, SQLite",
-        "url": "https://github.com/johndoe/ecommerce-app",
-        "from": "2022-01",
-        "to": "2022-12",
-        "current": false
-      }
+      { "title": "E-Commerce App", "technologies": "Flutter, Dart, Firebase", "from": "2022-01", "to": "2022-12" }
     ],
-    "languages": [
-      {
-        "name": "English",
-        "proficiencyLevel": 5
-      },
-      {
-        "name": "Spanish",
-        "proficiencyLevel": 3
-      }
-    ],
-    "interests": [
-      {"name": "Open Source Contributions"},
-      {"name": "Mobile UI/UX Design"}
-    ]
+    "languages": [ { "name": "English", "proficiencyLevel": 5 } ],
+    "interests": [ { "name": "Open Source" } ]
   }
 }
 ```
 
-#### Request Parameters
+`user_data` is mapped server-side into the relational profile structure (info, educations, experiences, etc.). `result.id` is auto-stored as `cv_id`.
 
-**Top-level fields:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Name/title of the CV |
-| language | string | Yes | Language code (e.g., "en", "ar") |
-| user_id | integer | No | Associate CV with existing user (if authenticated) |
-| template_id | integer | No | Template ID to use (if provided and unauthenticated, returns PDF) |
-| sections_order | array | No | Array of section names in desired order |
+### Create CV (Unauthenticated → PDF URL)
 
-**user_data object fields:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| firstName | string | Yes | First name |
-| lastName | string | Yes | Last name |
-| jobTitle | string | No | Current job title |
-| email | string | No | Email address |
-| address | string | No | Physical address |
-| portfolioUrl | string | No | Portfolio website URL |
-| phone | string | No | Phone number |
-| summary | string | No | Professional summary |
-| birthdate | string | No | Birthdate in YYYY-MM-DD format |
-| skills | array | No | Array of skill objects: `[{"name": "Skill Name"}]` |
-| educations | array | No | Array of education objects |
-| experiences | array | No | Array of experience objects |
-| projects | array | No | Array of project objects |
-| languages | array | No | Array of language objects with proficiency level |
-| interests | array | No | Array of interest objects: `[{"name": "Interest Name"}]` |
+If you send `template_id` **without** a Bearer token, the API still creates a profile, then returns the generated PDF URL:
 
-**Education object:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| institution | string | Yes | School/university name |
-| degree | string | Yes | Degree type |
-| fieldOfStudy | string | No | Field of study |
-| description | string | No | Additional details |
-| from | string | No | Start date (YYYY-MM format) |
-| to | string | No | End date (YYYY-MM format) |
-
-**Experience object:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| position | string | Yes | Job position title |
-| company | string | Yes | Company name |
-| location | string | No | Job location |
-| description | string | No | Job description |
-| from | string | Yes | Start date (YYYY-MM format) |
-| to | string | No | End date (YYYY-MM format, null if current) |
-| current | boolean | No | Whether currently working here |
-
-**Project object:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| title | string | Yes | Project title |
-| description | string | No | Project description |
-| technologies | string | No | Technologies used (comma-separated) |
-| url | string | No | Project URL |
-| from | string | No | Start date (YYYY-MM format) |
-| to | string | No | End date (YYYY-MM format) |
-| current | boolean | No | Whether currently working on this |
-
-**Language object:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Language name |
-| proficiencyLevel | integer | No | Proficiency level (1-5) |
-
-#### Response
-- **Authenticated:** Returns created CV profile data
-- **Unauthenticated with template_id:** Returns PDF file
-- **Unauthenticated without template_id:** Returns created CV profile data
-
----
-
-### Create CV (Returns PDF - Unauthenticated)
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/cvs`  
-**Authentication:** Not required
-
-#### Description
-For unauthenticated users: Provides template_id to get PDF directly without creating a profile. Note: Set Accept header to 'application/pdf' to receive PDF response.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/pdf
-```
-
-#### Request Body
 ```json
+POST /api/v1/cvs
+Content-Type: application/json
+
 {
   "name": "My CV",
   "language": "en",
   "template_id": 1,
-  "user_data": {
-    "firstName": "John",
-    "lastName": "Doe",
-    "jobTitle": "Senior Developer",
-    "email": "john@example.com",
-    "phone": "+1-555-1234",
-    "summary": "Experienced developer with 5+ years in software development.",
-    "skills": [
-      {"name": "Laravel"},
-      {"name": "PHP"},
-      {"name": "JavaScript"}
-    ],
-    "experiences": [
-      {
-        "position": "Senior Developer",
-        "company": "Tech Corp",
-        "from": "2021-01",
-        "current": true
-      }
-    ]
-  }
+  "user_data": { "firstName": "John", "lastName": "Doe", "jobTitle": "Developer", "email": "john@example.com" }
 }
 ```
 
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Name/title of the CV |
-| language | string | Yes | Language code |
-| template_id | integer | Yes | Template ID to use for PDF generation |
-| user_data | object | Yes | CV data (see Create CV Full Example for structure) |
+Response:
 
-#### Response
-Returns a PDF file directly without creating a profile in the database.
-
----
-
-### Create CV (Minimal)
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/cvs`  
-**Authentication:** Optional
-
-#### Description
-Smallest payload allowed. Creates a profile without user_data.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/json
-```
-
-#### Request Body
 ```json
-{
-  "name": "Minimal CV",
-  "language": "en"
-}
+{ "success": true, "message": "...", "result": { "url": "http://localhost:8000/storage/cvs/abc.pdf" } }
 ```
-
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | Yes | Name/title of the CV |
-| language | string | Yes | Language code (e.g., "en", "ar") |
-
-#### Response
-Returns created CV profile with minimal data.
-
----
-
-### Get My CVs
-
-**Method:** `GET`  
-**Endpoint:** `/api/v1/cvs`  
-**Authentication:** Required
-
-#### Description
-Returns ONLY the authenticated user's CVs.
-
-#### Headers
-```
-Accept: application/json
-Authorization: Bearer {auth_token}
-```
-
-#### Query Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| language | string | No | Optional filter by language code (e.g., "en") |
-
-#### Example Request
-```
-GET /api/v1/cvs?language=en
-```
-
-#### Response
-Returns an array of CV profiles belonging to the authenticated user.
-
----
-
-### Get CV by ID
-
-**Method:** `GET`  
-**Endpoint:** `/api/v1/cvs/:id`  
-**Authentication:** Required
-
-#### Description
-Fetch one CV owned by the authenticated user.
-
-#### Headers
-```
-Accept: application/json
-Authorization: Bearer {auth_token}
-```
-
-#### Path Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | integer | Yes | CV profile ID |
-
-#### Example Request
-```
-GET /api/v1/cvs/1
-```
-
-#### Response
-Returns the CV profile data for the specified ID if it belongs to the authenticated user.
-
----
 
 ### Update CV
 
-**Method:** `PUT`  
-**Endpoint:** `/api/v1/cvs/:id`  
-**Authentication:** Required
-
-#### Description
-Update fields on a CV you own.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {auth_token}
-```
-
-#### Path Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | integer | Yes | CV profile ID to update |
-
-#### Request Body
 ```json
+PUT /api/v1/cvs/{cv_id}
+Authorization: Bearer {auth_token}
+Content-Type: application/json
+
 {
   "name": "Updated CV Name",
   "language": "ar",
-  "user_data": {
-    "firstName": "John",
-    "lastName": "Doe Updated",
-    "jobTitle": "Senior Flutter Dev"
-  }
+  "user_data": { "firstName": "John", "lastName": "Doe Updated" }
 }
 ```
 
-#### Request Parameters
-All fields are optional. Only include the fields you want to update:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| name | string | No | Updated CV name |
-| language | string | No | Updated language code |
-| user_data | object | No | Updated user data (see Create CV Full Example for structure) |
-| sections_order | array | No | Updated sections order |
-| template_id | integer | No | Updated template ID |
-
-#### Response
-Returns the updated CV profile data.
-
----
-
-### Delete CV
-
-**Method:** `DELETE`  
-**Endpoint:** `/api/v1/cvs/:id`  
-**Authentication:** Required
-
-#### Description
-Soft delete a CV you own.
-
-#### Headers
-```
-Accept: application/json
-Authorization: Bearer {auth_token}
-```
-
-#### Path Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | integer | Yes | CV profile ID to delete |
-
-#### Example Request
-```
-DELETE /api/v1/cvs/1
-```
-
-#### Request Body
-None
-
-#### Response
-Returns confirmation of deletion.
-
----
+All fields optional. Only the fields you include are written.
 
 ### Print CV
 
-**Method:** `POST`  
-**Endpoint:** `/api/v1/cvs/print`  
-**Authentication:** Not required (Public endpoint)
+Two options, both return JSON `{ result: { url } }`:
 
-#### Description
-Generate PDF from CV data. Public endpoint. You can either provide profile_id (for existing profile) or user_data (to create temporary CV). Template ID is required. Response will be a PDF file.
+**Option A — from a saved profile**
 
-#### Headers
-```
-Content-Type: application/json
-Accept: application/pdf
-```
-
-#### Request Body
-**Option 1: Using user_data (temporary CV)**
 ```json
+POST /api/v1/cvs/print
+{ "profile_id": 1, "template_id": 1 }
+```
+
+**Option B — ad-hoc data**
+
+```json
+POST /api/v1/cvs/print
 {
   "template_id": 1,
+  "name": "My CV",
+  "language": "en",
+  "user_data": { "firstName": "John", "lastName": "Doe", "jobTitle": "Developer", "email": "john@example.com" }
+}
+```
+
+The response body **is not a PDF** — it is JSON. Open `result.url` in a browser / `url_launcher` to download the file. The same URL is auto-saved to the `last_pdf_url` variable.
+
+---
+
+## 4. Cover Letters
+
+Full cover-letter lifecycle: templates, CRUD, JSON-URL print, and a web HTML preview. Public routes (templates, create, print) are accessible without auth; the rest require the owner.
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `GET` | `/api/v1/cover-letters/templates` | — | Active templates. `preview` is a full URL. |
+| `GET` | `/api/v1/cover-letters?language=en` | Required | List my cover letters. |
+| `GET` | `/api/v1/cover-letters/{id}` | Required | Get one of my cover letters. |
+| `POST` | `/api/v1/cover-letters` | Optional* | Create a cover letter. |
+| `PUT` | `/api/v1/cover-letters/{id}` | Required | Update a cover letter I own. |
+| `DELETE` | `/api/v1/cover-letters/{id}` | Required | Soft delete. |
+| `POST` | `/api/v1/cover-letters/print` | Optional* | Returns `{ result: { url } }`. |
+| `GET` | `/cover-letter/{id}?template_id=` | — | Web HTML preview (no `/api` prefix). |
+
+\* Public create/print still respect an authenticated user when a token is sent — `user_id` is taken from the token if present.
+
+### List Cover Letter Templates
+
+```http
+GET /api/v1/cover-letters/templates
+```
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "result": [
+    { "id": 1, "name": "ats-classic",    "preview": "http://localhost:8000/storage/cover-letter-templates/ats-classic.svg", "description": "ATS-friendly...",  "is_default": true  },
+    { "id": 2, "name": "professional",   "preview": "http://localhost:8000/storage/cover-letter-templates/professional.svg", "description": "Professional...", "is_default": false }
+  ]
+}
+```
+
+`preview` is an absolute URL — load it directly in `<img src="...">` or an `Image.network` widget. Treat `null` as "no image".
+
+### `user_data` Shape
+
+Used on create, update, and the ad-hoc print variant.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `firstName` | string | Required on print when sending `user_data`. |
+| `lastName` | string | Required on print when sending `user_data`. |
+| `email` | string | |
+| `phone` | string \| null | |
+| `address` | string \| null | |
+| `jobTitle` | string | Sender role / title. |
+| `companyName` | string \| null | |
+| `recipientName` | string | |
+| `recipientTitle` | string \| null | |
+| `recipientCompany` | string \| null | |
+| `subject` | string | |
+| `body` | string | Letter body (HTML/text as stored). |
+| `closing` | string \| null | e.g. `"Sincerely"`. |
+| `experiences` | array | Passed through as-is. |
+
+### Create Cover Letter
+
+```json
+POST /api/v1/cover-letters
+Content-Type: application/json
+
+{
+  "name": "Application – Acme",
+  "language": "en",
+  "cover_letter_template_id": 1,
+  "sections_order": ["info", "body"],
   "user_data": {
     "firstName": "John",
     "lastName": "Doe",
-    "jobTitle": "Senior Flutter Developer",
-    "email": "john.doe@example.com",
-    "address": "123 Tech Street, San Francisco, CA 94105, USA",
-    "portfolioUrl": "https://johndoe.dev",
-    "phone": "+1-555-123-4567",
-    "summary": "Experienced Flutter developer...",
-    "birthdate": "1990-05-15",
-    "skills": [
-      {"name": "Flutter"},
-      {"name": "Dart"}
-    ],
-    "educations": [
-      {
-        "institution": "University of California, Berkeley",
-        "degree": "Bachelor of Science",
-        "fieldOfStudy": "Computer Science",
-        "description": "Graduated magna cum laude...",
-        "from": "2010-09",
-        "to": "2014-06"
-      }
-    ],
-    "experiences": [
-      {
-        "position": "Senior Flutter Developer",
-        "company": "Tech Innovations Inc.",
-        "location": "San Francisco, CA",
-        "description": "Lead development of enterprise mobile applications...",
-        "from": "2021-03",
-        "to": null,
-        "current": true
-      }
-    ],
-    "projects": [
-      {
-        "title": "E-Commerce Mobile App",
-        "description": "A full-featured e-commerce mobile application...",
-        "technologies": "Flutter, Dart, Firebase",
-        "url": "https://github.com/johndoe/ecommerce-app",
-        "from": "2022-01",
-        "to": "2022-12",
-        "current": false
-      }
-    ],
-    "languages": [
-      {"name": "English", "proficiencyLevel": 5},
-      {"name": "Spanish", "proficiencyLevel": 3}
-    ],
-    "interests": [
-      {"name": "Open Source"},
-      {"name": "Mobile UI/UX Design"}
-    ]
+    "email": "john@example.com",
+    "phone": "+1-555-0100",
+    "address": "City, Country",
+    "jobTitle": "Software Engineer",
+    "companyName": "",
+    "recipientName": "Hiring Manager",
+    "recipientTitle": "HR Lead",
+    "recipientCompany": "Acme Inc.",
+    "subject": "Application for Software Engineer",
+    "body": "I am writing to apply for the Software Engineer role...",
+    "closing": "Sincerely",
+    "experiences": []
   }
 }
 ```
 
-#### Request Parameters
+Top-level fields:
 
-**Option 1: Using user_data**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| template_id | integer | Yes | Template ID to use for PDF generation |
-| user_data | object | Yes | CV data (see Create CV Full Example for structure) |
+| Field | Required | Rules |
+|-------|----------|-------|
+| `name` | Yes | string, max 255 |
+| `language` | No | `en` \| `ar` \| `tr` (default `en`) |
+| `cover_letter_template_id` | No | Must exist in `cover_letter_templates` |
+| `sections_order` | No | string[] |
+| `user_id` | No | Only if creating without a Bearer token |
+| `user_data` | No | See table above |
 
-**Option 2: Using profile_id**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| template_id | integer | Yes | Template ID to use for PDF generation |
-| profile_id | integer | Yes | Existing CV profile ID |
+Returns `201 Created`. The new `result.id` is auto-stored as `cover_letter_id`.
 
-#### Response
-Returns a PDF file of the CV.
+### List / Show / Update / Delete
 
----
-
-### Print CV (From Profile ID)
-
-**Method:** `POST`  
-**Endpoint:** `/api/v1/cvs/print`  
-**Authentication:** Required (if profile belongs to a user)
-
-#### Description
-Generate PDF from an existing profile. Requires authentication if profile belongs to a user. Provide profile_id and template_id.
-
-#### Headers
-```
-Content-Type: application/json
-Accept: application/pdf
-Authorization: Bearer {auth_token} (if profile belongs to a user)
+```http
+GET    /api/v1/cover-letters?language=en
+GET    /api/v1/cover-letters/{id}
+PUT    /api/v1/cover-letters/{id}     # same shape as create, all fields optional
+DELETE /api/v1/cover-letters/{id}     # soft delete
 ```
 
-#### Request Body
+Ownership: only the owner can show/update/delete. Other users get `404`.
+
+### Print Cover Letter — JSON `{url}` response
+
+> **Behaviour change (2026-07-25):** the response body is **JSON**, not a raw PDF. Open `result.url` to download.
+
+**Option A — from an existing record**
+
 ```json
+POST /api/v1/cover-letters/print
+{ "cover_letter_id": 1, "template_id": 1 }
+```
+
+**Option B — ad-hoc data (no saved letter yet)**
+
+```json
+POST /api/v1/cover-letters/print
 {
-  "profile_id": 1,
-  "template_id": 1
+  "template_id": 1,
+  "name": "Draft Cover Letter",
+  "language": "en",
+  "user_data": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "jobTitle": "Software Engineer",
+    "subject": "Application for Software Engineer",
+    "body": "I am writing to apply...",
+    "closing": "Sincerely"
+  }
 }
 ```
 
-#### Request Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| profile_id | integer | Yes | Existing CV profile ID |
-| template_id | integer | Yes | Template ID to use for PDF generation |
+Response:
 
-#### Response
-Returns a PDF file of the CV using the specified profile and template.
+```json
+{ "success": true, "message": "...", "result": { "url": "http://localhost:8000/storage/cover-letters/cl_xxxx.pdf" } }
+```
+
+`user_data` must contain at least `firstName` + `lastName` when no `cover_letter_id` is supplied. If the letter belongs to another user → `404`. Inactive / missing template → `404`.
+
+### HTML Preview (WebView / iframe)
+
+Useful for live preview before or after save. **No `/api` prefix** — it's a web route (`routes/web.php` → `CoverLetterPreviewController@preview`).
+
+```http
+GET /cover-letter/{id}?template_id={optional}
+```
+
+- Uses the saved `cover_letter_template_id` when `template_id` is omitted.
+- Falls back to the default active template, then any active template.
+- Locale follows the cover letter's `language` (`en` / `ar` / `tr`).
+
+Example: `http://localhost:8000/cover-letter/12?template_id=1`
 
 ---
 
-## Shares
+## 5. Templates
 
-The **Shares** folder contains public endpoints that don't require authentication. These endpoints provide access to shared resources like templates that can be used by anyone.
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `GET` | `/api/v1/shares/templates` | — | Public. All active CV templates. |
 
-**Folder Description:** Public shared resources endpoints.
-
-### Get Templates
-
-**Method:** `GET`  
-**Endpoint:** `/api/v1/shares/templates`  
-**Authentication:** Not required (Public endpoint)
-
-#### Description
-Public endpoint to retrieve all active templates. No authentication required.
-
-#### Headers
-```
-Accept: application/json
+```http
+GET /api/v1/shares/templates
 ```
 
-#### Request Body
-None
+Returns an array of active CV templates with `id`, `name`, `type`, `preview_url`, etc. Use the `id` as `template_id` when calling `POST /cvs/print`.
 
-#### Response
-Returns an array of all active CV templates with details such as:
-- Template ID
-- Template name
-- Preview URL
-- Description
-- Other template metadata
-
----
-
-## Notes
-
-### Authentication Behavior
-
-- **Unauthenticated requests:** Can create CVs, generate PDFs, and access public templates
-- **Authenticated requests:** Full CRUD operations, can manage owned CVs, and have persistent profiles
-- **Token storage:** Tokens are automatically managed via Postman collection scripts
-
-### PDF Generation
-
-- Set `Accept: application/pdf` header to receive PDF responses
-- For unauthenticated users with `template_id`, the Create CV endpoint returns PDF directly
-- The Print CV endpoint always returns PDF regardless of authentication status
-
-### Date Formats
-
-- **Birthdate:** `YYYY-MM-DD` (e.g., "1990-05-15")
-- **Education/Experience/Project dates:** `YYYY-MM` (e.g., "2021-03")
-- Use `null` for ongoing/current items where `to` date applies
-
-### Language Support
-
-Supported language codes include:
-- `en` - English
-- `ar` - Arabic
-- Other languages as configured
+> Cover-letter templates live under `/api/v1/cover-letters/templates` (see **4. Cover Letters** above) and are kept in the Cover Letters folder of the collection for grouping.
 
 ---
 
 ## Error Responses
 
-All endpoints follow a consistent error response format:
+| Status | When |
+|--------|------|
+| `200` | Success. |
+| `201` | Resource created. |
+| `400` | Bad request / validation error. |
+| `401` | Missing or invalid Bearer token. |
+| `403` | Authenticated but not allowed (rare — most cases return `404`). |
+| `404` | Resource not found, or not owned by the caller. |
+| `422` | Validation failed (Laravel default). |
+| `500` | Server error (e.g. PDF generation failure). |
 
 ```json
 {
-  "error": {
-    "code": "error_code",
-    "message": "Human-readable error message",
-    "fields": {
-      "field_name": "Field-specific error message"
-    }
-  }
+  "success": false,
+  "message": "Human-readable error message",
+  "code": 400,
+  "errors": null
 }
 ```
 
-Common HTTP status codes:
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation errors)
-- `401` - Unauthorized (authentication required)
-- `403` - Forbidden (insufficient permissions)
-- `404` - Not Found
-- `422` - Unprocessable Entity (validation failed)
-- `500` - Internal Server Error
+---
+
+## Notes
+
+### Authentication Behaviour
+
+- **Unauthenticated requests:** can call `POST /cvs`, `POST /cvs/print`, `POST /cover-letters`, `POST /cover-letters/print`, `GET /shares/templates`, `GET /cover-letters/templates`, and `/cover-letter/{id}` (HTML preview).
+- **Authenticated requests:** full CRUD on the caller's own CVs and cover letters; PDFs and templates are still available.
+- **Token storage** is handled by the collection's pre-request + test scripts — no manual copy/paste.
+
+### PDF / Print Behaviour
+
+- All `/print` endpoints (CV and Cover Letter) return **JSON** with `result.url`. Open the URL in a browser or `url_launcher` to download.
+- The `last_pdf_url` variable is auto-set after any print request.
+
+### Date Formats
+
+- **Birthdate:** `YYYY-MM-DD` (e.g. `1990-05-15`).
+- **Education / Experience / Project dates:** `YYYY-MM` (e.g. `2021-03`).
+- Use `null` for ongoing / current items where `to` applies.
+
+### Languages
+
+- Supported: `en`, `ar`, `tr`. RTL for `ar`.
+- Locale is taken from the CV / cover letter's `language` field for PDFs and the HTML preview.
+
+### Suggested Frontend Flow (Cover Letter)
+
+1. `GET /cover-letters/templates` → show picker (`preview` + `is_default`).
+2. Form edits → keep local `user_data` + `language` + selected `template_id`.
+3. Optional live preview after save: load `/cover-letter/{id}?template_id=...` in a WebView.
+4. Save: `POST /cover-letters` (guest or auth) or `PUT /cover-letters/{id}` (auth).
+5. Export: `POST /cover-letters/print` with `template_id` + `cover_letter_id` (or `user_data`) → open `result.url`.
+6. Library screen (logged in): `GET /cover-letters` → show / edit / delete.
 
 ---
 
 ## Support
 
-For issues or questions about the API, please refer to the main project documentation or contact the development team.
-
-**Last Updated:** Based on Postman Collection version dated at collection creation
-
+For issues or questions about the API, refer to the main project documentation or contact the development team.

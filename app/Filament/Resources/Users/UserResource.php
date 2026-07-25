@@ -26,11 +26,22 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = 'users';
+    protected static bool $hasTitleCaseModelLabel = false;
 
-    protected static ?string $modelLabel = 'users';
+    public static function getNavigationLabel(): string
+    {
+        return __('users');
+    }
 
-    protected static ?string $pluralModelLabel = 'users';
+    public static function getModelLabel(): string
+    {
+        return __('users');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('users');
+    }
 
     public static function form(Schema $schema): Schema
     {

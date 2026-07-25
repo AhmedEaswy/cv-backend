@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="Multi-language with RTL support — placeholder">
+    <defs>
+        <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fbfaf7"/>
+            <stop offset="100%" stop-color="#efe7ff"/>
+        </linearGradient>
+    </defs>
+    <rect width="300" height="300" fill="url(#bg2)"/>
+    <rect x="50" y="80" width="80" height="44" rx="8" fill="#ffffff" stroke="#5c17e7" stroke-width="1.5"/>
+    <text x="90" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#5c17e7">EN</text>
+    <rect x="170" y="80" width="80" height="44" rx="8" fill="#ffffff" stroke="#5c17e7" stroke-width="1.5"/>
+    <text x="210" y="108" text-anchor="middle" font-family="Cairo, sans-serif" font-size="16" font-weight="700" fill="#5c17e7">ع</text>
+    <rect x="50" y="176" width="80" height="44" rx="8" fill="#ffffff" stroke="#d97a4a" stroke-width="1.5"/>
+    <text x="90" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#d97a4a">TR</text>
+    <rect x="170" y="176" width="80" height="44" rx="8" fill="#ffffff" stroke="#d97a4a" stroke-width="1.5"/>
+    <text x="210" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#d97a4a">FR</text>
+    <circle cx="150" cy="150" r="14" fill="#130e21"/>
+    <path d="M150 142 L150 158 M142 150 L158 150" stroke="#5c17e7" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

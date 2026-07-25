@@ -50,6 +50,12 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                \App\Filament\Widgets\AppStatsOverview::class,
+                \App\Filament\Widgets\UserRegistrationsChart::class,
+                \App\Filament\Widgets\ContentActivityChart::class,
+                \App\Filament\Widgets\AppClicksChart::class,
+                \App\Filament\Widgets\DeviceBreakdownChart::class,
+                \App\Filament\Widgets\CountryBreakdownChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

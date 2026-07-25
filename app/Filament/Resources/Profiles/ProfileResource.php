@@ -32,11 +32,27 @@ class ProfileResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'user.name';
 
-    protected static ?string $navigationLabel = 'profiles';
+    protected static bool $hasTitleCaseModelLabel = false;
 
-    protected static ?string $modelLabel = 'profiles';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('CV Builder');
+    }
 
-    protected static ?string $pluralModelLabel = 'profiles';
+    public static function getNavigationLabel(): string
+    {
+        return __('profiles');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('profiles');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('profiles');
+    }
 
     public static function form(Schema $schema): Schema
     {

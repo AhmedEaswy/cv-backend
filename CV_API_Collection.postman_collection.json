@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "e649d885-7885-4042-8a7a-7c65c1c9c0ce",
+		"_postman_id": "f0a7c3e1-2b4d-4e89-9c1a-8b6d5e4c3b2a",
 		"name": "CV Builder API",
-		"description": "Complete API collection for the CV Builder application: Authentication, CVs, Cover Letters, and Templates.",
+		"description": "Complete API collection for the CV Builder application: Authentication, CVs, Cover Letters, Templates, and Cover-Letter HTML preview.\n\n**Updated 2026-07-25** — aligned with the Cover Letter API updates:\n- Full Cover Letter CRUD + print + templates under `/api/v1/cover-letters`\n- `GET /cover-letters/templates` returns a full `preview` URL (use as-is in `<img>`)\n- `POST /cover-letters/print` returns JSON `{ url }` (open the URL, do NOT expect a PDF body)\n- New web preview route `GET /cover-letter/{id}?template_id=…` for iframe/WebView\n- Languages: `en`, `ar`, `tr`\n\nAll auth-protected requests use a Bearer token that is auto-extracted from `POST Login` / `POST Register` and stored in the `auth_token` environment variable. The collection's pre-request script automatically injects `Authorization: Bearer {auth_token}` when the variable is set.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -26,7 +26,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "register"]
 						},
-						"description": "Create a new user account. Returns an API token."
+						"description": "Create a new user account. Returns an API token in `result.token` (auto-stored as `auth_token` by the test script)."
 					},
 					"response": []
 				},
@@ -47,7 +47,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
 						},
-						"description": "Login with email & password. Copy the token into the auth_token variable."
+						"description": "Login with email & password. The token in `result.token` is auto-stored as `auth_token`."
 					},
 					"response": []
 				},
@@ -63,7 +63,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "logout"]
 						},
-						"description": "Invalidate the current token."
+						"description": "Invalidate the current token. Auth required."
 					},
 					"response": []
 				},
@@ -79,7 +79,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "me"]
 						},
-						"description": "Return the authenticated user's profile."
+						"description": "Return the authenticated user's profile. Auth required."
 					},
 					"response": []
 				},
@@ -121,7 +121,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "reset-token"]
 						},
-						"description": "Validate a reset token."
+						"description": "Validate a reset token before allowing the user to choose a new password."
 					},
 					"response": []
 				},
@@ -182,6 +182,46 @@
 						"description": "Get the LinkedIn OAuth redirect URL. Open in browser to authenticate."
 					},
 					"response": []
+				},
+				{
+					"name": "GET Google Callback",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/google/callback?code=AUTH_CODE&state=STATE",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "google", "callback"],
+							"query": [
+								{ "key": "code", "value": "AUTH_CODE", "description": "Returned by Google after user consent" },
+								{ "key": "state", "value": "STATE", "description": "CSRF state from /redirect" }
+							]
+						},
+						"description": "OAuth callback. In normal browser flow the user is redirected here automatically; in Postman paste the `code` and `state` you captured from the redirect URL."
+					},
+					"response": []
+				},
+				{
+					"name": "GET LinkedIn Callback",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/linkedin/callback?code=AUTH_CODE&state=STATE",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "linkedin", "callback"],
+							"query": [
+								{ "key": "code", "value": "AUTH_CODE" },
+								{ "key": "state", "value": "STATE" }
+							]
+						},
+						"description": "OAuth callback for LinkedIn."
+					},
+					"response": []
 				}
 			]
 		},
@@ -192,14 +232,18 @@
 					"name": "GET List My CVs",
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs?language=en",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs"],
-							"query": [{ "key": "language", "value": "en", "description": "Optional filter" }]
+							"query": [
+								{ "key": "language", "value": "en", "description": "Optional filter: en | ar | tr" }
+							]
 						},
-						"description": "Get authenticated user's CVs with optional language filter."
+						"description": "Get the authenticated user's CVs. Optional `language` query param filters by locale. Auth required."
 					},
 					"response": []
 				},
@@ -207,18 +251,20 @@
 					"name": "GET Get CV by ID",
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
-						"description": "Fetch a specific CV by ID."
+						"description": "Fetch a specific CV by ID. Only the owner can read it. Auth required."
 					},
 					"response": []
 				},
 				{
-					"name": "POST Create CV",
+					"name": "POST Create CV (Authenticated → profile)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -227,14 +273,35 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced developer with 5+ years.\",\n    \"skills\": [\n      { \"name\": \"PHP\" },\n      { \"name\": \"Laravel\" },\n      { \"name\": \"JavaScript\" }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ]\n  }\n}"
+							"raw": "{\n  \"name\": \"My Professional CV\",\n  \"language\": \"en\",\n  \"sections_order\": [\n    \"Personal Information\",\n    \"Skills\",\n    \"Education\",\n    \"Experience\",\n    \"Projects\",\n    \"Languages\",\n    \"Interests\"\n  ],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"123 Tech Street, San Francisco, CA 94105, USA\",\n    \"portfolioUrl\": \"https://johndoe.dev\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years of expertise...\",\n    \"birthdate\": \"1990-05-15\",\n    \"skills\": [\n      { \"name\": \"Flutter\" },\n      { \"name\": \"Dart\" },\n      { \"name\": \"Laravel\" }\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"University of California, Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"from\": \"2010-09\",\n        \"to\": \"2014-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Innovations Inc.\",\n        \"location\": \"San Francisco, CA\",\n        \"description\": \"Lead development of enterprise mobile applications...\",\n        \"from\": \"2021-03\",\n        \"to\": null,\n        \"current\": true\n      }\n    ],\n    \"projects\": [\n      {\n        \"title\": \"E-Commerce Mobile App\",\n        \"description\": \"A full-featured e-commerce mobile application...\",\n        \"technologies\": \"Flutter, Dart, Firebase, Stripe API\",\n        \"url\": \"https://github.com/johndoe/ecommerce-app\",\n        \"from\": \"2022-01\",\n        \"to\": \"2022-12\",\n        \"current\": false\n      }\n    ],\n    \"languages\": [\n      { \"name\": \"English\", \"proficiencyLevel\": 5 },\n      { \"name\": \"Spanish\", \"proficiencyLevel\": 3 }\n    ],\n    \"interests\": [\n      { \"name\": \"Open Source Contributions\" },\n      { \"name\": \"Mobile UI/UX Design\" }\n    ]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs"]
 						},
-						"description": "Create a new CV. Auth optional (if authenticated, associates with user)."
+						"description": "Create a new CV. When authenticated, the CV is saved to the user and `result.id` is auto-stored as `cv_id`. Top-level fields: `name` (required), `language` (default `en`), `sections_order`, `user_data`."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create CV (Unauthenticated → PDF URL)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"template_id\": 1,\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced developer with 5+ years in software development.\",\n    \"skills\": [\n      { \"name\": \"Laravel\" },\n      { \"name\": \"PHP\" },\n      { \"name\": \"JavaScript\" }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs"]
+						},
+						"description": "Unauthenticated user with `template_id`: the API saves the profile AND returns `result.url` to the generated PDF. No Bearer token is sent. (Behavior since the v2 refactor: the response is always JSON, never a raw PDF body.)"
 					},
 					"response": []
 				},
@@ -248,14 +315,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated CV Name\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Updated\"\n  }\n}"
+							"raw": "{\n  \"name\": \"Updated CV Name\",\n  \"language\": \"ar\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Updated\",\n    \"jobTitle\": \"Senior Flutter Dev\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
-						"description": "Update a CV you own."
+						"description": "Update a CV you own. All fields optional; same shape as create. Auth required."
 					},
 					"response": []
 				},
@@ -263,18 +330,20 @@
 					"name": "DELETE Delete CV",
 					"request": {
 						"method": "DELETE",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/{{cv_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs", "{{cv_id}}"]
 						},
-						"description": "Soft delete a CV you own."
+						"description": "Soft delete a CV you own. Auth required."
 					},
 					"response": []
 				},
 				{
-					"name": "POST Print CV (From Profile)",
+					"name": "POST Print CV (From Profile ID)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -283,19 +352,19 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"profile_id\": \"{{cv_id}}\",\n  \"template_id\": \"{{template_id}}\"\n}"
+							"raw": "{\n  \"profile_id\": {{cv_id}},\n  \"template_id\": {{template_id}}\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/print",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs", "print"]
 						},
-						"description": "Generate PDF from an existing profile using a template. Returns PDF URL."
+						"description": "Generate PDF for an existing CV profile. Response is JSON `{ success, message, result: { url } }`. Open `result.url` in a browser or download manager to grab the PDF."
 					},
 					"response": []
 				},
 				{
-					"name": "POST Print CV (With Data - Unauthenticated)",
+					"name": "POST Print CV (Ad-hoc Data)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -304,14 +373,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"template_id\": \"{{template_id}}\",\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Developer\",\n    \"email\": \"john@example.com\",\n    \"summary\": \"Brief summary.\",\n    \"skills\": [{ \"name\": \"PHP\" }]\n  }\n}"
+							"raw": "{\n  \"template_id\": {{template_id}},\n  \"name\": \"My CV\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Developer\",\n    \"email\": \"john@example.com\",\n    \"summary\": \"Brief summary.\",\n    \"skills\": [{ \"name\": \"PHP\" }]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cvs/print",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cvs", "print"]
 						},
-						"description": "Generate PDF from CV data without saving a profile. Requires template_id."
+						"description": "Generate a PDF for CV data without an existing profile. `template_id` is required; `user_data` follows the same shape as Create. Response is JSON `{ result: { url } }`."
 					},
 					"response": []
 				}
@@ -321,17 +390,37 @@
 			"name": "4. Cover Letters",
 			"item": [
 				{
+					"name": "GET List Cover Letter Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cover-letters/templates",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cover-letters", "templates"]
+						},
+						"description": "Public. Returns all active cover-letter templates. Each entry has `id`, `name` (`ats-classic` / `professional`), `preview` (absolute URL — use directly in `<img>`), `description`, `is_default`. Prefer `is_default: true` when nothing is selected yet."
+					},
+					"response": []
+				},
+				{
 					"name": "GET List My Cover Letters",
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters?language=en",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters"],
-							"query": [{ "key": "language", "value": "en", "description": "Optional filter" }]
+							"query": [
+								{ "key": "language", "value": "en", "description": "Optional filter: en | ar | tr" }
+							]
 						},
-						"description": "Get authenticated user's cover letters."
+						"description": "Get the authenticated user's cover letters. Auth required."
 					},
 					"response": []
 				},
@@ -339,13 +428,15 @@
 					"name": "GET Get Cover Letter by ID",
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
 						},
-						"description": "Fetch a specific cover letter by ID."
+						"description": "Fetch a specific cover letter by ID. Only the owner can read it. Auth required."
 					},
 					"response": []
 				},
@@ -359,14 +450,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Job Application Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-123-4567\",\n    \"jobTitle\": \"Senior Developer\",\n    \"companyName\": \"Tech Corp\",\n    \"recipientName\": \"Jane Smith\",\n    \"recipientTitle\": \"HR Manager\",\n    \"recipientCompany\": \"Tech Corp\",\n    \"subject\": \"Application for Senior Developer Position\",\n    \"body\": \"I am writing to express my interest in the Senior Developer position...\",\n    \"closing\": \"Sincerely\"\n  }\n}"
+							"raw": "{\n  \"name\": \"Application – Acme\",\n  \"language\": \"en\",\n  \"cover_letter_template_id\": 1,\n  \"sections_order\": [\"info\", \"body\"],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-0100\",\n    \"address\": \"City, Country\",\n    \"jobTitle\": \"Software Engineer\",\n    \"companyName\": \"\",\n    \"recipientName\": \"Hiring Manager\",\n    \"recipientTitle\": \"HR Lead\",\n    \"recipientCompany\": \"Acme Inc.\",\n    \"subject\": \"Application for Software Engineer\",\n    \"body\": \"I am writing to apply for the Software Engineer role...\",\n    \"closing\": \"Sincerely\",\n    \"experiences\": []\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters"]
 						},
-						"description": "Create a new cover letter."
+						"description": "Create a new cover letter. Optional Bearer token: if present, the letter is owned by that user; if absent, the `user_id` field can be used to associate it manually. The new `result.id` is auto-stored as `cover_letter_id`.\n\nFields: `name` (required, max 255), `language` (default `en`, one of `en`/`ar`/`tr`), `cover_letter_template_id` (optional, must exist), `sections_order` (optional string[]), `user_data` (optional, see schema in the docs)."
 					},
 					"response": []
 				},
@@ -380,14 +471,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated Cover Letter\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"body\": \"Updated content...\"\n  }\n}"
+							"raw": "{\n  \"name\": \"Updated Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"subject\": \"Updated subject\",\n    \"body\": \"Updated content...\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
 						},
-						"description": "Update a cover letter you own."
+						"description": "Update a cover letter you own. All fields optional; same shape as create. Auth required."
 					},
 					"response": []
 				},
@@ -395,13 +486,15 @@
 					"name": "DELETE Delete Cover Letter",
 					"request": {
 						"method": "DELETE",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters/{{cover_letter_id}}",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters", "{{cover_letter_id}}"]
 						},
-						"description": "Soft delete a cover letter you own."
+						"description": "Soft delete a cover letter you own. Auth required."
 					},
 					"response": []
 				},
@@ -415,19 +508,19 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"cover_letter_id\": \"{{cover_letter_id}}\",\n  \"template_id\": \"{{cover_letter_template_id}}\"\n}"
+							"raw": "{\n  \"cover_letter_id\": {{cover_letter_id}},\n  \"template_id\": {{cover_letter_template_id}}\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters/print",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters", "print"]
 						},
-						"description": "Generate PDF from an existing cover letter."
+						"description": "**Option A — from an existing record.** Generate a PDF for a saved cover letter. Response is JSON `{ success, message, result: { url } }`. Open `result.url` to download / preview the PDF (do NOT expect a raw PDF body). Locale follows the saved `language`."
 					},
 					"response": []
 				},
 				{
-					"name": "POST Print Cover Letter (With Data)",
+					"name": "POST Print Cover Letter (Ad-hoc Data)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -436,14 +529,33 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"template_id\": \"{{cover_letter_template_id}}\",\n  \"name\": \"Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"jobTitle\": \"Developer\",\n    \"subject\": \"Job Application\",\n    \"body\": \"Content here...\",\n    \"closing\": \"Best regards\"\n  }\n}"
+							"raw": "{\n  \"template_id\": {{cover_letter_template_id}},\n  \"name\": \"Draft Cover Letter\",\n  \"language\": \"en\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"jobTitle\": \"Software Engineer\",\n    \"recipientName\": \"Hiring Manager\",\n    \"subject\": \"Application for Software Engineer\",\n    \"body\": \"I am writing to apply...\",\n    \"closing\": \"Sincerely\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/cover-letters/print",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cover-letters", "print"]
 						},
-						"description": "Generate PDF from cover letter data without saving."
+						"description": "**Option B — ad-hoc data, no saved letter.** `template_id` is required and `user_data` must contain at least `firstName` + `lastName`. Response is JSON `{ result: { url } }`. Useful for \"preview before save\" flows."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Cover Letter HTML Preview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "text/html" }
+						],
+						"url": {
+							"raw": "{{base_url}}/cover-letter/{{cover_letter_id}}?template_id={{cover_letter_template_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["cover-letter", "{{cover_letter_id}}"],
+							"query": [
+								{ "key": "template_id", "value": "{{cover_letter_template_id}}", "description": "Optional. Falls back to the letter's saved template, then the default active template." }
+							]
+						},
+						"description": "**Web preview route (no `/api` prefix).** Returns an HTML page that renders the cover letter with the chosen template — load it in an iframe / WebView to preview before or after saving. Locale follows the cover letter's `language`. (Route: `routes/web.php` → `CoverLetterPreviewController@preview`.)"
 					},
 					"response": []
 				}
@@ -456,27 +568,15 @@
 					"name": "GET CV Templates",
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/v1/shares/templates",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "shares", "templates"]
 						},
-						"description": "Get all active CV templates."
-					},
-					"response": []
-				},
-				{
-					"name": "GET Cover Letter Templates",
-					"request": {
-						"method": "GET",
-						"header": [{ "key": "Accept", "value": "application/json" }],
-						"url": {
-							"raw": "{{base_url}}/api/v1/cover-letters/templates",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "cover-letters", "templates"]
-						},
-						"description": "Get all active cover letter templates."
+						"description": "Public. Returns all active CV templates. Each entry has `id`, `name`, `type`, `preview_url` and other metadata. Use the `id` as `template_id` for `POST /cvs/print`."
 					},
 					"response": []
 				}
@@ -490,10 +590,12 @@
 				"type": "text/javascript",
 				"exec": [
 					"const access_token = pm.environment.get('auth_token');",
-					"pm.request.headers.add({",
-					"    key: 'Authorization',",
-					"    value: access_token ? `Bearer ${access_token}` : null",
-					"});"
+					"if (access_token) {",
+					"    pm.request.headers.upsert({",
+					"        key: 'Authorization',",
+					"        value: `Bearer ${access_token}`",
+					"    });",
+					"}"
 				]
 			}
 		},
@@ -502,18 +604,38 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"let jsonData = pm.response.json();",
-					"let token = jsonData?.result?.token || null;",
+					"let jsonData = {};",
+					"try {",
+					"    jsonData = pm.response.json();",
+					"} catch (e) {",
+					"    /* non-JSON response (e.g. PDF, HTML preview) — nothing to extract */",
+					"}",
+					"",
+					"const result = jsonData?.result;",
+					"",
+					"// Auto-store token after Register / Login",
+					"const token = result?.token || null;",
 					"if (token) {",
 					"    pm.environment.set('auth_token', token);",
-					"    console.log('Token set in environment.');",
+					"    console.log('auth_token saved.');",
 					"}",
-					"let id = jsonData?.result?.id || null;",
-					"if (id && pm.info.requestName.startsWith('POST Create CV')) {",
-					"    pm.environment.set('cv_id', id);",
+					"",
+					"// Auto-store cv_id after Create CV",
+					"if (result && result.id && pm.info.requestName.startsWith('POST Create CV')) {",
+					"    pm.environment.set('cv_id', result.id);",
+					"    console.log('cv_id =', result.id);",
 					"}",
-					"if (id && pm.info.requestName.startsWith('POST Create Cover Letter')) {",
-					"    pm.environment.set('cover_letter_id', id);",
+					"",
+					"// Auto-store cover_letter_id after Create Cover Letter",
+					"if (result && result.id && pm.info.requestName.startsWith('POST Create Cover Letter')) {",
+					"    pm.environment.set('cover_letter_id', result.id);",
+					"    console.log('cover_letter_id =', result.id);",
+					"}",
+					"",
+					"// Store PDF URL into a variable so you can use url_launcher / browser easily",
+					"if (result && result.url) {",
+					"    pm.environment.set('last_pdf_url', result.url);",
+					"    console.log('last_pdf_url =', result.url);",
 					"}"
 				]
 			}
@@ -522,31 +644,44 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8000"
+			"value": "http://localhost:8000",
+			"type": "string"
 		},
 		{
 			"key": "auth_token",
-			"value": ""
+			"value": "",
+			"type": "string",
+			"description": "Bearer token. Auto-stored after Register / Login."
 		},
 		{
 			"key": "cv_id",
 			"value": "",
-			"description": "Set after creating a CV."
+			"type": "string",
+			"description": "Auto-stored after POST Create CV."
 		},
 		{
 			"key": "cover_letter_id",
 			"value": "",
-			"description": "Set after creating a cover letter."
+			"type": "string",
+			"description": "Auto-stored after POST Create Cover Letter."
 		},
 		{
 			"key": "template_id",
 			"value": "1",
-			"description": "CV template ID."
+			"type": "string",
+			"description": "Active CV template ID (from GET /api/v1/shares/templates)."
 		},
 		{
 			"key": "cover_letter_template_id",
 			"value": "1",
-			"description": "Cover letter template ID."
+			"type": "string",
+			"description": "Active cover letter template ID (from GET /api/v1/cover-letters/templates)."
+		},
+		{
+			"key": "last_pdf_url",
+			"value": "",
+			"type": "string",
+			"description": "Auto-stored after any /print request. Open in browser to download the PDF."
 		}
 	]
 }
