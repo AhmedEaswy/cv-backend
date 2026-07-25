@@ -31,8 +31,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->globalSearch(false)
+            ->brandLogo(asset('images/logo-horizontal.png'))
+            ->brandLogoHeight('2.25rem')
+            ->favicon(asset('images/logo-icon.png'))
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::hex('#5c17e7'),
+                'secondary' => Color::hex('#130e21'),
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->renderHook('panels::body.end', fn (): string => '<script>document.documentElement.dir = "' . session("direction", "ltr") . '";</script>')

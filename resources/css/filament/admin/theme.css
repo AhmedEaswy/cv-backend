@@ -4,10 +4,76 @@
 @source '../../../../resources/views/filament/**/*';
 
 :root {
-    --sidebar-bg: #1e1b4b;
-    --sidebar-hover: #312e81;
-    --sidebar-active: #4338ca;
+    --brand-primary: #5c17e7;
+    --brand-secondary: #130e21;
+    --sidebar-bg: #130e21;
+    --sidebar-hover: #1f1733;
+    --sidebar-active: #5c17e7;
     --card-radius: 16px;
+}
+
+/* Brand sidebar — always dark, readable in light + dark app mode */
+.fi-sidebar {
+    background-color: var(--sidebar-bg) !important;
+}
+
+.fi-sidebar-header {
+    background-color: var(--sidebar-bg) !important;
+    border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+.fi-sidebar .fi-sidebar-item-label {
+    color: rgb(229 231 235) !important; /* gray-200 */
+}
+
+.fi-sidebar .fi-sidebar-group-label {
+    color: rgb(156 163 175) !important; /* gray-400 */
+}
+
+.fi-sidebar .fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar .fi-sidebar-group-btn .fi-icon,
+.fi-sidebar .fi-sidebar-group-dropdown-trigger-btn .fi-icon,
+.fi-sidebar .fi-sidebar-group-collapse-btn {
+    color: rgb(156 163 175) !important; /* gray-400 */
+}
+
+.fi-sidebar .fi-sidebar-item-btn:hover,
+.fi-sidebar .fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover,
+.fi-sidebar .fi-sidebar-item-has-url > .fi-sidebar-item-btn:focus-visible,
+.fi-sidebar .fi-sidebar-group-btn:hover,
+.fi-sidebar .fi-sidebar-group-dropdown-trigger-btn:hover,
+.fi-sidebar .fi-sidebar-group-dropdown-trigger-btn:focus-visible {
+    background-color: var(--sidebar-hover) !important;
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar .fi-sidebar-item-has-active-child-items > .fi-sidebar-item-btn {
+    background-color: color-mix(in srgb, var(--brand-primary) 28%, transparent) !important;
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar .fi-sidebar-item-has-active-child-items > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-item-has-active-child-items > .fi-sidebar-item-btn > .fi-icon {
+    color: #fff !important;
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-grouped-border-part {
+    background-color: #fff !important;
+}
+
+.fi-sidebar .fi-sidebar-item-grouped-border-part-not-first,
+.fi-sidebar .fi-sidebar-item-grouped-border-part-not-last {
+    background-color: rgb(255 255 255 / 0.2) !important;
+}
+
+.fi-sidebar .fi-sidebar-item-grouped-border-part {
+    background-color: rgb(156 163 175) !important;
+}
+
+.fi-logo {
+    max-height: 2.25rem;
+    width: auto;
 }
 
 /* RTL Support */
