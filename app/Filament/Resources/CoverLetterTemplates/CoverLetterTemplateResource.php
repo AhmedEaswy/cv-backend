@@ -70,7 +70,9 @@ class CoverLetterTemplateResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\CoverLettersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

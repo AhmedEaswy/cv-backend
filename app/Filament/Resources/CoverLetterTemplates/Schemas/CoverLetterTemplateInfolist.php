@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CoverLetterTemplates\Schemas;
 
+use App\Filament\Support\ImagePlaceholder;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -13,33 +15,31 @@ class CoverLetterTemplateInfolist
     {
         return $schema
             ->components([
-                Section::make()
+                Section::make(__('Template details'))
                     ->schema([
                         TextEntry::make('id')
                             ->label('ID'),
                         TextEntry::make('name')
-                            ->label('Name'),
+                            ->weight('bold'),
+                        TextEntry::make('description')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                         ImageEntry::make('preview')
                             ->label('Preview Image')
                             ->getStateUsing(fn ($record) => $record->preview_url)
-                            ->height(200),
-                        TextEntry::make('description')
-                            ->label('Description'),
-                        TextEntry::make('is_active')
+                            ->height(200)
+                            ->defaultImageUrl(ImagePlaceholder::url())
+                            ->extraImgAttributes(ImagePlaceholder::imgAttributes())
+                            ->columnSpanFull(),
+                        IconEntry::make('is_active')
                             ->label('Active')
-                            ->badge()
-                            ->color(fn (bool $state): string => $state ? 'success' : 'danger')
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('Active') : __('Inactive')),
-                        TextEntry::make('is_default')
+                            ->boolean(),
+                        IconEntry::make('is_default')
                             ->label('Default')
-                            ->badge()
-                            ->color(fn (bool $state): string => $state ? 'success' : 'gray')
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('Yes') : __('No')),
+                            ->boolean(),
                         TextEntry::make('created_at')
-                            ->label('Created At')
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label('Updated At')
                             ->dateTime(),
                     ])
                     ->columns(2),

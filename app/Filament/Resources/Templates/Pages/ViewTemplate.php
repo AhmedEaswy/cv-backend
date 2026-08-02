@@ -16,4 +16,9 @@ class ViewTemplate extends ViewRecord
             EditAction::make(),
         ];
     }
+
+    public function getContentTabLabel(): ?string
+    {
+        return __('Template info');
+    }
 }
