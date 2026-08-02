@@ -362,6 +362,13 @@
     "dashboard.stats.app_downloads": "App downloads (clicks)",
     "dashboard.stats.new_in_30_days": ":count new in the last 30 days",
     "dashboard.stats.app_downloads_summary": ":total in the last 30 days · :ios iOS · :android Android",
+    "dashboard.stats.ats_checks_total": "ATS checks",
+    "dashboard.stats.ats_avg_score": "Avg ATS score",
+    "dashboard.stats.ats_avg_score_30d": ":score% avg in the last 30 days",
+    "dashboard.stats.ats_pass_rate": "ATS pass rate (B+)",
+    "dashboard.stats.ats_pass_rate_hint": "Share of checks scoring 70 or higher",
+    "dashboard.stats.ats_with_jd": "Checks with job description",
+    "dashboard.stats.ats_with_jd_hint": "Keyword / fit scoring enabled",
     "dashboard.charts.users_heading": "New users (last 30 days)",
     "dashboard.charts.users_description": "Daily sign-ups, excluding today (incomplete).",
     "dashboard.charts.users_dataset": "New users",
@@ -381,5 +388,11 @@
     "dashboard.charts.app_clicks_heading": "App downloads (clicks)",
     "dashboard.charts.app_clicks_description": "App Store vs Play Store clicks over the last 14 days.",
     "dashboard.charts.app_store_dataset": "App Store (iOS)",
-    "dashboard.charts.play_store_dataset": "Play Store (Android)"
+    "dashboard.charts.play_store_dataset": "Play Store (Android)",
+    "dashboard.charts.ats_heading": "ATS checks (last 30 days)",
+    "dashboard.charts.ats_description": "Daily check volume and average score.",
+    "dashboard.charts.ats_checks_dataset": "Checks",
+    "dashboard.charts.ats_avg_score_dataset": "Avg score",
+    "ATS Checks": "ATS Checks",
+    "ATS Check": "ATS Check"
 }

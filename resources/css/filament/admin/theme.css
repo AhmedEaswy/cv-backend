@@ -103,3 +103,7 @@
 [dir="rtl"] body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.fi-main {
+    @apply w-full max-w-full;
+}

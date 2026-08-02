@@ -6,12 +6,14 @@ use App\Http\Requests\Api\AtsCheckRequest;
 use App\Http\Requests\Api\AtsCheckUploadRequest;
 use App\Repositories\CVRepositoryInterface;
 use App\Services\Ats\AtsCheckerService;
+use App\Services\Ats\AtsCheckRecorder;
 use Illuminate\Support\Facades\App;
 
 class AtsCheckController extends BaseApiController
 {
     public function __construct(
         private AtsCheckerService $atsChecker,
+        private AtsCheckRecorder $atsCheckRecorder,
         private CVRepositoryInterface $cvRepository,
     ) {
     }
@@ -26,6 +28,8 @@ class AtsCheckController extends BaseApiController
         }
 
         $jobDescription = $request->input('job_description');
+        $profile = null;
+        $userData = null;
 
         if ($request->filled('profile_id')) {
             $profile = $this->cvRepository->findById((int) $request->input('profile_id'));
@@ -36,11 +40,19 @@ class AtsCheckController extends BaseApiController
 
             $result = $this->atsChecker->checkProfile($profile, $jobDescription);
         } else {
-            $result = $this->atsChecker->checkUserData(
-                $request->input('user_data', []),
-                $jobDescription
-            );
+            $userData = $request->input('user_data', []);
+            $result = $this->atsChecker->checkUserData($userData, $jobDescription);
         }
+
+        $record = $this->atsCheckRecorder->record(
+            $request,
+            $result,
+            $profile,
+            $userData,
+            $jobDescription
+        );
+
+        $result['check_id'] = $record->id;
 
         return $this->successResponse($result, __('ats.checked_successfully'));
     }
@@ -61,10 +73,19 @@ class AtsCheckController extends BaseApiController
             return $this->errorResponse(__('ats.errors.pdf_unreadable'), 422);
         }
 
-        $result = $this->atsChecker->checkPdf(
-            $path,
-            $request->input('job_description')
+        $jobDescription = $request->input('job_description');
+        $result = $this->atsChecker->checkPdf($path, $jobDescription);
+
+        $record = $this->atsCheckRecorder->record(
+            $request,
+            $result,
+            null,
+            null,
+            $jobDescription,
+            $file
         );
+
+        $result['check_id'] = $record->id;
 
         return $this->successResponse($result, __('ats.checked_successfully'));
     }

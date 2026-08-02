@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\AtsCheck;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,12 +67,19 @@ class AtsCheckTest extends TestCase
                     'categories',
                     'checks',
                     'keywords',
+                    'check_id',
                 ],
             ]);
 
         $this->assertSame('structured', $response->json('result.source'));
         $this->assertNull($response->json('result.keywords'));
         $this->assertGreaterThanOrEqual(70, $response->json('result.score'));
+        $this->assertDatabaseHas('ats_checks', [
+            'id' => $response->json('result.check_id'),
+            'source' => 'structured',
+            'grade' => $response->json('result.grade'),
+        ]);
+        $this->assertSame(1, AtsCheck::count());
     }
 
     public function test_structured_ats_check_with_job_description_includes_keywords(): void
@@ -88,6 +96,10 @@ class AtsCheckTest extends TestCase
         $this->assertArrayHasKey('coverage_percent', $response->json('result.keywords'));
         $this->assertArrayHasKey('keyword_fit', $response->json('result.categories'));
         $this->assertContains('flutter', $response->json('result.keywords.matched'));
+        $this->assertDatabaseHas('ats_checks', [
+            'id' => $response->json('result.check_id'),
+            'has_job_description' => 1,
+        ]);
     }
 
     public function test_structured_ats_check_via_profile_id(): void
@@ -134,6 +146,12 @@ class AtsCheckTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('result.source', 'structured');
+
+        $this->assertDatabaseHas('ats_checks', [
+            'id' => $response->json('result.check_id'),
+            'profile_id' => $profile->id,
+            'user_id' => $user->id,
+        ]);
     }
 
     public function test_structured_ats_check_requires_profile_or_user_data(): void
@@ -163,6 +181,11 @@ class AtsCheckTest extends TestCase
 
         $this->assertNotNull($response->json('result.keywords'));
         $this->assertGreaterThan(0, $response->json('result.score'));
+        $this->assertDatabaseHas('ats_checks', [
+            'id' => $response->json('result.check_id'),
+            'source' => 'pdf',
+            'pdf_original_name' => 'resume.pdf',
+        ]);
 
         @unlink($pdfPath);
     }

@@ -53,6 +53,8 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\AppClicksChart::class,
                 \App\Filament\Widgets\DeviceBreakdownChart::class,
                 \App\Filament\Widgets\CountryBreakdownChart::class,
+                \App\Filament\Widgets\AtsStatsOverview::class,
+                \App\Filament\Widgets\AtsChecksChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
