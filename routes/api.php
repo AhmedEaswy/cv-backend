@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AnalyticsClickController;
+use App\Http\Controllers\Api\AtsCheckController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
@@ -42,6 +43,8 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     // Public CV routes
     Route::post('/cvs', [CVController::class, 'store']);
     Route::post('/cvs/print', [CVController::class, 'print']);
+    Route::post('/cvs/ats-check', [AtsCheckController::class, 'check']);
+    Route::post('/cvs/ats-check/upload', [AtsCheckController::class, 'checkUpload']);
 
     // Public cover letter routes
     Route::get('/cover-letters/templates', [CoverLetterController::class, 'templates']);

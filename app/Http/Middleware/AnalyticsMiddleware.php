@@ -50,7 +50,11 @@ class AnalyticsMiddleware
         if (str_contains($endpoint, '/cvs')) {
             return match ($method) {
                 'GET' => 'list_cvs',
-                'POST' => str_contains($endpoint, 'print') ? 'print_cv' : 'create_cv',
+                'POST' => match (true) {
+                    str_contains($endpoint, 'ats-check') => 'ats_check',
+                    str_contains($endpoint, 'print') => 'print_cv',
+                    default => 'create_cv',
+                },
                 'PUT' => 'update_cv',
                 'DELETE' => 'delete_cv',
                 default => null,
@@ -96,6 +100,26 @@ class AnalyticsMiddleware
         $exclude = ['password', 'password_confirmation', 'token', 'authorization'];
 
         $data = $request->except($exclude);
+
+        foreach ($request->allFiles() as $key => $file) {
+            unset($data[$key]);
+            if (is_array($file)) {
+                $data[$key] = array_map(
+                    fn ($f) => $f ? [
+                        'name' => $f->getClientOriginalName(),
+                        'mime' => $f->getClientMimeType(),
+                        'size' => $f->getSize(),
+                    ] : null,
+                    $file
+                );
+            } elseif ($file) {
+                $data[$key] = [
+                    'name' => $file->getClientOriginalName(),
+                    'mime' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ];
+            }
+        }
 
         return $data ?: null;
     }

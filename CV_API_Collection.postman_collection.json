@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "f0a7c3e1-2b4d-4e89-9c1a-8b6d5e4c3b2a",
 		"name": "CV Builder API",
-		"description": "Complete API collection for the CV Builder application: Authentication, CVs, Cover Letters, Templates, and Cover-Letter HTML preview.\n\n**Updated 2026-07-25** — aligned with the Cover Letter API updates:\n- Full Cover Letter CRUD + print + templates under `/api/v1/cover-letters`\n- `GET /cover-letters/templates` returns a full `preview` URL (use as-is in `<img>`)\n- `POST /cover-letters/print` returns JSON `{ url }` (open the URL, do NOT expect a PDF body)\n- New web preview route `GET /cover-letter/{id}?template_id=…` for iframe/WebView\n- Languages: `en`, `ar`, `tr`\n\nAll auth-protected requests use a Bearer token that is auto-extracted from `POST Login` / `POST Register` and stored in the `auth_token` environment variable. The collection's pre-request script automatically injects `Authorization: Bearer {auth_token}` when the variable is set.",
+		"description": "Complete API collection for the CV Builder application: Authentication, CVs, Cover Letters, ATS Checker, Public Profiles, Templates, and Analytics.\n\n**Updated 2026-08-02**\n- ATS Checker (rule-based, no LLM): `POST /cvs/ats-check` (structured / profile_id) and `POST /cvs/ats-check/upload` (PDF)\n- Optional `job_description` for keyword / fit score on both ATS endpoints\n- Public Profiles CRUD + templates under `/api/v1/public-profiles`\n- Analytics click beacon: `POST /analytics/click`\n- Cover Letter CRUD + print + templates (unchanged)\n- Languages: `en`, `ar`, `tr`\n\nAll auth-protected requests use a Bearer token that is auto-extracted from `POST Login` / `POST Register` and stored in the `auth_token` environment variable. The collection's pre-request script automatically injects `Authorization: Bearer {auth_token}` when the variable is set.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -581,6 +581,212 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "6. ATS Checker",
+			"item": [
+				{
+					"name": "POST ATS Check (user_data)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"language\": \"en\",\n  \"job_description\": \"Looking for a Flutter and Dart engineer with Laravel experience. Firebase and CI/CD are a plus.\",\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john.doe@example.com\",\n    \"address\": \"San Francisco, CA\",\n    \"phone\": \"+1-555-123-4567\",\n    \"summary\": \"Experienced Flutter developer with 5+ years building production mobile apps and APIs.\",\n    \"skills\": [\n      { \"name\": \"Flutter\" },\n      { \"name\": \"Dart\" },\n      { \"name\": \"Laravel\" },\n      { \"name\": \"Firebase\" }\n    ],\n    \"educations\": [\n      {\n        \"institution\": \"UC Berkeley\",\n        \"degree\": \"Bachelor of Science\",\n        \"fieldOfStudy\": \"Computer Science\",\n        \"from\": \"2014-09\",\n        \"to\": \"2018-06\"\n      }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Corp\",\n        \"location\": \"Remote\",\n        \"description\": \"Developed and led Flutter apps used by 100k+ users. Improved release cycle and CI/CD reliability.\",\n        \"from\": \"2021-01\",\n        \"current\": true\n      }\n    ],\n    \"projects\": [],\n    \"languages\": [\n      { \"name\": \"English\", \"proficiencyLevel\": 5 }\n    ],\n    \"interests\": [\n      { \"name\": \"Open Source\" }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs/ats-check",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "ats-check"]
+						},
+						"description": "Public. Rule-based ATS score for inline `user_data`. Optional `job_description` adds keyword match + `keyword_fit` category (70% structural + 30% keyword). Response: `score`, `grade`, `source` (`structured`), `categories`, `checks[]`, `keywords` (null if no JD)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST ATS Check (profile_id)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile_id\": {{cv_id}},\n  \"language\": \"en\",\n  \"job_description\": \"Senior software engineer with PHP, Laravel, and Flutter experience.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs/ats-check",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "ats-check"]
+						},
+						"description": "Public. Same ATS scorer, but loads an existing Profile by `profile_id` (use `cv_id` from Create CV). Provide either `profile_id` or `user_data` (not neither)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST ATS Check Upload PDF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "PDF resume (max 5MB). Text-based PDF preferred; scanned/image PDFs score poorly on parseability."
+								},
+								{
+									"key": "job_description",
+									"type": "text",
+									"value": "Looking for a Flutter and Dart engineer with Laravel experience.",
+									"description": "Optional. Enables keyword / fit scoring."
+								},
+								{
+									"key": "language",
+									"type": "text",
+									"value": "en"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cvs/ats-check/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cvs", "ats-check", "upload"]
+						},
+						"description": "Public. Multipart upload of a PDF CV. Extracts text via PDF parser, then runs PDF-specific ATS rules (+ optional JD keyword match). `result.source` is `pdf`."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Public Profiles",
+			"item": [
+				{
+					"name": "GET Public Profile Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/public-profiles/templates",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "public-profiles", "templates"]
+						},
+						"description": "Public. List active public-profile templates. Use an `id` as `public_profile_template_id` when creating/updating."
+					},
+					"response": []
+				},
+				{
+					"name": "GET My Public Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/public-profiles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "public-profiles"]
+						},
+						"description": "Auth required. Returns the current user's public profile (one per user)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Public Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"slug\": \"john-doe\",\n  \"language\": \"en\",\n  \"is_public\": true,\n  \"headline\": \"Flutter & Laravel developer\",\n  \"about\": \"I build mobile and API products.\",\n  \"public_profile_template_id\": {{public_profile_template_id}},\n  \"sections_order\": [\"about\", \"experience\", \"projects\", \"skills\"],\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Senior Flutter Developer\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1-555-0100\",\n    \"city\": \"San Francisco\",\n    \"country\": \"USA\",\n    \"website\": \"https://johndoe.dev\",\n    \"skills\": [\n      { \"name\": \"Flutter\" },\n      { \"name\": \"Dart\" }\n    ],\n    \"experiences\": [\n      {\n        \"position\": \"Senior Flutter Developer\",\n        \"company\": \"Tech Corp\",\n        \"from\": \"2021-01\",\n        \"current\": true,\n        \"description\": \"Built production Flutter apps.\"\n      }\n    ],\n    \"projects\": [],\n    \"educations\": [],\n    \"languages\": [\n      { \"name\": \"English\", \"proficiencyLevel\": 5 }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/public-profiles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "public-profiles"]
+						},
+						"description": "Auth required. Creates the user's public profile. Returns 409 if one already exists."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Update Public Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"headline\": \"Updated headline\",\n  \"about\": \"Updated about section.\",\n  \"is_public\": true,\n  \"public_profile_template_id\": {{public_profile_template_id}},\n  \"user_data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"jobTitle\": \"Lead Flutter Developer\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/public-profiles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "public-profiles"]
+						},
+						"description": "Auth required. Updates the current user's public profile."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Public Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/public-profiles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "public-profiles"]
+						},
+						"description": "Auth required. Deletes the current user's public profile."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. Analytics",
+			"item": [
+				{
+					"name": "POST Store Click",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target\": \"app_store\",\n  \"page\": \"/\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/analytics/click",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "analytics", "click"]
+						},
+						"description": "Public. Landing-page click beacon (`target`: `app_store` | `play_store`). Returns **204 No Content** (no JSON body). Safe for `navigator.sendBeacon()`."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -682,6 +888,12 @@
 			"value": "",
 			"type": "string",
 			"description": "Auto-stored after any /print request. Open in browser to download the PDF."
+		},
+		{
+			"key": "public_profile_template_id",
+			"value": "1",
+			"type": "string",
+			"description": "Active public-profile template ID (from GET /api/v1/public-profiles/templates)."
 		}
 	]
 }

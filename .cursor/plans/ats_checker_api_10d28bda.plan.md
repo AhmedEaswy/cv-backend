@@ -4,19 +4,19 @@ overview: Add a rule-based ATS checker API that scores in-app CV JSON and upload
 todos:
   - id: deps-config
     content: Add smalot/pdfparser + config/ats.php (weights, verbs, stopwords)
-    status: pending
+    status: completed
   - id: services
     content: Implement AtsCheckerService, RulesEngine, KeywordMatcher, PdfTextExtractor
-    status: pending
+    status: completed
   - id: api
     content: Add AtsCheckController, form requests, routes for structured + PDF upload
-    status: pending
+    status: completed
   - id: i18n
     content: Add check message/tip lang strings (en at minimum)
-    status: pending
+    status: completed
   - id: tests
     content: Feature + unit tests with sample user_data and text PDF fixture
-    status: pending
+    status: completed
 isProject: false
 ---
 

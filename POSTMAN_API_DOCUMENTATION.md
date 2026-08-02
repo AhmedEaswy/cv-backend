@@ -2,8 +2,7 @@
 
 Complete documentation for every endpoint in the **CV Builder API** Postman collection.
 
-> **Last updated:** 2026-07-25 — aligned with the Cover Letter API updates.
-> See `COVER_LETTER_API_UPDATES.md` for the full change log of the cover-letter feature.
+> **Last updated:** 2026-08-02 — ATS Checker, Public Profiles, Analytics click.
 
 ## Table of Contents
 
@@ -17,14 +16,16 @@ Complete documentation for every endpoint in the **CV Builder API** Postman coll
   - [3. CVs](#3-cvs)
   - [4. Cover Letters](#4-cover-letters)
   - [5. Templates](#5-templates)
+  - [6. ATS Checker](#6-ats-checker)
+  - [7. Public Profiles](#7-public-profiles)
+  - [8. Analytics](#8-analytics)
 - [Error Responses](#error-responses)
 
 ---
 
 ## Collection Overview
 
-)
-- [Notes**Collection name:** `CV Builder API`
+**Collection name:** `CV Builder API`
 **Base URL:** `{{base_url}}` (default `http://localhost:8000`)
 **API version:** `v1`
 **File:** `CV_API_Collection.postman_collection.json`
@@ -39,6 +40,7 @@ Complete documentation for every endpoint in the **CV Builder API** Postman coll
 | `cover_letter_id` | `""` | Auto-stored after `POST Create Cover Letter`. |
 | `template_id` | `1` | Active CV template ID. Get a fresh one from `GET CV Templates`. |
 | `cover_letter_template_id` | `1` | Active cover-letter template ID. Get a fresh one from `GET List Cover Letter Templates`. |
+| `public_profile_template_id` | `1` | Active public-profile template ID. From `GET Public Profile Templates`. |
 | `last_pdf_url` | `""` | Auto-stored after any `/print` request. |
 
 ---
@@ -460,6 +462,123 @@ Returns an array of active CV templates with `id`, `name`, `type`, `preview_url`
 
 ---
 
+## 6. ATS Checker
+
+Rule-based scoring (no LLM). Public endpoints.
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `POST` | `/api/v1/cvs/ats-check` | — | Score `user_data` or `profile_id`. Optional `job_description`. |
+| `POST` | `/api/v1/cvs/ats-check/upload` | — | Multipart PDF upload (`file`, max 5MB). Optional `job_description`. |
+
+### Structured check
+
+```http
+POST /api/v1/cvs/ats-check
+Content-Type: application/json
+```
+
+```json
+{
+  "language": "en",
+  "job_description": "Optional JD text for keyword / fit score",
+  "user_data": { "...same shape as Create CV..." }
+}
+```
+
+Or:
+
+```json
+{ "profile_id": 12, "job_description": "..." }
+```
+
+Provide **either** `profile_id` **or** `user_data`. Response `result`:
+
+```json
+{
+  "score": 78,
+  "grade": "B",
+  "source": "structured",
+  "categories": {
+    "completeness": 90,
+    "contact": 100,
+    "content": 70,
+    "ats_format": 80,
+    "keyword_fit": 65
+  },
+  "checks": [
+    {
+      "id": "has_email",
+      "category": "contact",
+      "passed": true,
+      "weight": 10,
+      "message": "Valid email found.",
+      "tip": null
+    }
+  ],
+  "keywords": {
+    "matched": ["flutter", "dart"],
+    "missing": ["ci/cd"],
+    "coverage_percent": 65
+  }
+}
+```
+
+`keywords` / `keyword_fit` are only present when `job_description` is sent. With a JD, overall score = `0.7 * structural + 0.3 * keyword_coverage`.
+
+### PDF upload check
+
+```http
+POST /api/v1/cvs/ats-check/upload
+Content-Type: multipart/form-data
+```
+
+Form fields: `file` (PDF), optional `job_description`, optional `language`.  
+`result.source` is `pdf`. Scanned/image-only PDFs fail the parseability check.
+
+---
+
+## 7. Public Profiles
+
+One public profile per authenticated user.
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `GET` | `/api/v1/public-profiles/templates` | — | Public. Active templates. |
+| `GET` | `/api/v1/public-profiles` | Bearer | Current user's profile. |
+| `POST` | `/api/v1/public-profiles` | Bearer | Create (409 if already exists). |
+| `PUT` | `/api/v1/public-profiles` | Bearer | Update. |
+| `DELETE` | `/api/v1/public-profiles` | Bearer | Delete. |
+
+```json
+POST /api/v1/public-profiles
+{
+  "slug": "john-doe",
+  "language": "en",
+  "is_public": true,
+  "headline": "Flutter & Laravel developer",
+  "about": "...",
+  "public_profile_template_id": 1,
+  "user_data": { "firstName": "John", "lastName": "Doe", "...": "..." }
+}
+```
+
+---
+
+## 8. Analytics
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| `POST` | `/api/v1/analytics/click` | — | Landing click beacon. **204 No Content**. |
+
+```json
+{ "target": "app_store", "page": "/" }
+```
+
+`target` must be `app_store` or `play_store`. Designed for `navigator.sendBeacon()`.
+
+---
+
 ## Error Responses
 
 | Status | When |
@@ -488,8 +607,8 @@ Returns an array of active CV templates with `id`, `name`, `type`, `preview_url`
 
 ### Authentication Behaviour
 
-- **Unauthenticated requests:** can call `POST /cvs`, `POST /cvs/print`, `POST /cover-letters`, `POST /cover-letters/print`, `GET /shares/templates`, `GET /cover-letters/templates`, and `/cover-letter/{id}` (HTML preview).
-- **Authenticated requests:** full CRUD on the caller's own CVs and cover letters; PDFs and templates are still available.
+- **Unauthenticated requests:** can call `POST /cvs`, `POST /cvs/print`, `POST /cvs/ats-check`, `POST /cvs/ats-check/upload`, `POST /cover-letters`, `POST /cover-letters/print`, `GET /shares/templates`, `GET /cover-letters/templates`, `GET /public-profiles/templates`, `POST /analytics/click`, and `/cover-letter/{id}` (HTML preview).
+- **Authenticated requests:** full CRUD on the caller's own CVs, cover letters, and public profile; PDFs and templates are still available.
 - **Token storage** is handled by the collection's pre-request + test scripts — no manual copy/paste.
 
 ### PDF / Print Behaviour
