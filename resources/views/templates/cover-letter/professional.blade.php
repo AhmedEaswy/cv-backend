@@ -151,7 +151,9 @@
         ]));
         $bodyParagraphs = array_values(array_filter(array_map(
             'trim',
-            preg_split('/\r\n|\r|\n/', $userData['body'] ?? '') ?: []
+            preg_split('/\r\n|\r|\n/', is_array($userData['body'] ?? null)
+                ? implode("\n", $userData['body'])
+                : (string) ($userData['body'] ?? '')) ?: []
         )));
         $letterDate = now()->translatedFormat('F j, Y');
     @endphp
