@@ -50,6 +50,10 @@ jobs:
             echo "==> Running migrations"
             php artisan migrate --force
 
+            echo "==> Seeding missing templates"
+            php artisan db:seed --class=TemplateSeeder --force
+            php artisan db:seed --class=CoverLetterTemplateSeeder --force
+
             echo "==> Filament & caches"
             php artisan filament:upgrade
             php artisan storage:link || true

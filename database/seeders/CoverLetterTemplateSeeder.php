@@ -27,7 +27,10 @@ class CoverLetterTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            CoverLetterTemplate::create($template);
+            CoverLetterTemplate::firstOrCreate(
+                ['name' => $template['name']],
+                $template,
+            );
         }
     }
 }
