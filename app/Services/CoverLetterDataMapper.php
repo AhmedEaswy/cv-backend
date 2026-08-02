@@ -6,48 +6,33 @@ use App\Models\CoverLetter;
 
 class CoverLetterDataMapper
 {
+    private const TEXT_FIELDS = [
+        'firstName',
+        'lastName',
+        'email',
+        'phone',
+        'address',
+        'jobTitle',
+        'companyName',
+        'recipientName',
+        'recipientTitle',
+        'recipientCompany',
+        'subject',
+        'body',
+        'closing',
+    ];
+
     public function mapUserDataToCoverLetter(array $userData): array
     {
+        $userData = $this->normalizeJsonArray($userData);
         $info = [];
 
-        if (isset($userData['firstName'])) {
-            $info['firstName'] = $userData['firstName'];
-        }
-        if (isset($userData['lastName'])) {
-            $info['lastName'] = $userData['lastName'];
-        }
-        if (isset($userData['email'])) {
-            $info['email'] = $userData['email'];
-        }
-        if (isset($userData['phone'])) {
-            $info['phone'] = $userData['phone'];
-        }
-        if (isset($userData['address'])) {
-            $info['address'] = $userData['address'];
-        }
-        if (isset($userData['jobTitle'])) {
-            $info['jobTitle'] = $userData['jobTitle'];
-        }
-        if (isset($userData['companyName'])) {
-            $info['companyName'] = $userData['companyName'];
-        }
-        if (isset($userData['recipientName'])) {
-            $info['recipientName'] = $userData['recipientName'];
-        }
-        if (isset($userData['recipientTitle'])) {
-            $info['recipientTitle'] = $userData['recipientTitle'];
-        }
-        if (isset($userData['recipientCompany'])) {
-            $info['recipientCompany'] = $userData['recipientCompany'];
-        }
-        if (isset($userData['subject'])) {
-            $info['subject'] = $userData['subject'];
-        }
-        if (isset($userData['body'])) {
-            $info['body'] = $userData['body'];
-        }
-        if (isset($userData['closing'])) {
-            $info['closing'] = $userData['closing'];
+        foreach (self::TEXT_FIELDS as $field) {
+            if (! array_key_exists($field, $userData)) {
+                continue;
+            }
+
+            $info[$field] = $this->normalizeTextField($userData[$field]);
         }
 
         $mapped = [];
@@ -57,7 +42,7 @@ class CoverLetterDataMapper
         }
 
         if (isset($userData['experiences'])) {
-            $mapped['experiences'] = $userData['experiences'];
+            $mapped['experiences'] = $this->normalizeJsonArray($userData['experiences']);
         }
 
         return $mapped;
@@ -67,14 +52,18 @@ class CoverLetterDataMapper
     {
         $userData = [];
 
-        if ($coverLetter->info) {
-            foreach ($coverLetter->info as $key => $value) {
+        $info = $this->normalizeJsonArray($coverLetter->info);
+        foreach ($info as $key => $value) {
+            if (in_array($key, self::TEXT_FIELDS, true)) {
+                $userData[$key] = $this->normalizeTextField($value);
+            } else {
                 $userData[$key] = $value;
             }
         }
 
-        if ($coverLetter->experiences) {
-            $userData['experiences'] = $coverLetter->experiences;
+        $experiences = $this->normalizeJsonArray($coverLetter->experiences);
+        if ($experiences !== []) {
+            $userData['experiences'] = $experiences;
         }
 
         return [
@@ -89,5 +78,57 @@ class CoverLetterDataMapper
             'created_at' => $coverLetter->created_at?->toIso8601String(),
             'updated_at' => $coverLetter->updated_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeJsonArray(mixed $value): array
+    {
+        if ($value === null || $value === []) {
+            return [];
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $this->normalizeJsonArray($decoded);
+            }
+
+            return [];
+        }
+
+        if (is_object($value)) {
+            return $this->normalizeJsonArray((array) $value);
+        }
+
+        return is_array($value) ? $value : [];
+    }
+
+    private function normalizeTextField(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            $parts = array_filter(array_map(
+                fn ($part) => trim((string) $part),
+                $value
+            ));
+
+            return $parts === [] ? null : implode("\n\n", $parts);
+        }
+
+        if (is_bool($value) || is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return null;
     }
 }

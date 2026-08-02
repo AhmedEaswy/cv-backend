@@ -12,7 +12,12 @@
         $userData['recipientTitle'] ?? null,
         $userData['recipientCompany'] ?? $userData['companyName'] ?? null,
     ]);
-    $bodyParagraphs = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $userData['body'] ?? '')));
+    $bodyParagraphs = array_filter(array_map(
+        'trim',
+        preg_split('/\r\n|\r|\n/', is_array($userData['body'] ?? null)
+            ? implode("\n", $userData['body'])
+            : (string) ($userData['body'] ?? '')) ?: []
+    ));
 @endphp
 
 @if(!empty($senderLines))
