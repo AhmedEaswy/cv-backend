@@ -41,6 +41,20 @@ class TemplateTest extends TestCase
         $this->assertTrue($template->is_active);
         $this->assertIsBool($template->is_default);
         $this->assertTrue($template->is_default);
+        $this->assertIsBool($template->supports_image);
+        $this->assertFalse($template->supports_image);
+    }
+
+    public function test_template_supports_image_can_be_enabled(): void
+    {
+        $template = Template::create([
+            'name' => 'Portrait Modern',
+            'preview' => 'preview.png',
+            'is_active' => true,
+            'supports_image' => true,
+        ]);
+
+        $this->assertTrue($template->supports_image);
     }
 
     public function test_template_can_be_soft_deleted(): void

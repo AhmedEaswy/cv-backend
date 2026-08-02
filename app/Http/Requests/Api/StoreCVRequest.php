@@ -36,6 +36,7 @@ class StoreCVRequest extends BaseFormRequest
             'user_data.phone' => 'sometimes|nullable|string|max:50',
             'user_data.summary' => 'sometimes|nullable|string',
             'user_data.birthdate' => 'sometimes|nullable|date',
+            'user_data.photo' => 'sometimes|nullable|string',
             'user_data.skills' => 'sometimes|array',
             'user_data.skills.*.name' => 'required_with:user_data.skills|string|max:255',
             'user_data.educations' => 'sometimes|array',
@@ -83,6 +84,14 @@ class StoreCVRequest extends BaseFormRequest
                 }
             }
             $userData = $this->input('user_data', []);
+
+            if (array_key_exists('photo', $userData)) {
+                $photoError = app(\App\Services\CvPhotoService::class)
+                    ->validationError(is_string($userData['photo'] ?? null) ? $userData['photo'] : null);
+                if ($photoError) {
+                    $validator->errors()->add('user_data.photo', $photoError);
+                }
+            }
 
             // Validate date ranges for educations
             if (isset($userData['educations']) && is_array($userData['educations'])) {

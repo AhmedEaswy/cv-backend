@@ -43,6 +43,10 @@ class TemplateForm
                             $query->update(['is_default' => false]);
                         }
                     }),
+                Checkbox::make('supports_image')
+                    ->label('Supports Profile Photo')
+                    ->helperText('Enable when the template blade renders a portrait photo from user_data.photo.')
+                    ->default(false),
             ]);
     }
 }

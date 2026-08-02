@@ -17,6 +17,11 @@ class Template extends Model
         'description',
         'is_active',
         'is_default',
+        'supports_image',
+    ];
+
+    protected $attributes = [
+        'supports_image' => false,
     ];
 
     protected function casts(): array
@@ -24,6 +29,7 @@ class Template extends Model
         return [
             'is_active' => 'boolean',
             'is_default' => 'boolean',
+            'supports_image' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',

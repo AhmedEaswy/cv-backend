@@ -8,6 +8,7 @@ use App\Http\Requests\Api\UpdateCVRequest;
 use App\Repositories\CVRepositoryInterface;
 use App\Services\CVDataMapper;
 use App\Services\CVPDFService;
+use App\Services\CvPhotoService;
 use App\Services\TrackingService;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,8 @@ class CVController extends BaseApiController
         private CVRepositoryInterface $cvRepository,
         private CVDataMapper $dataMapper,
         private CVPDFService $pdfService,
-        private TrackingService $trackingService
+        private TrackingService $trackingService,
+        private CvPhotoService $photoService
     ) {
     }
 
@@ -54,7 +56,7 @@ class CVController extends BaseApiController
         $userId = $request->user()?->id ?? $request->input('user_id');
 
         // Map user_data to Profile structure
-        $userData = $request->input('user_data', []);
+        $userData = $this->photoService->processUserDataPhoto($request->input('user_data', []));
         $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
         $tracking = $this->trackingService->capture($request);
@@ -130,11 +132,12 @@ class CVController extends BaseApiController
 
         // Handle user_data updates
         if (isset($validated['user_data'])) {
-            $userData = $validated['user_data'];
+            $userData = $this->photoService->processUserDataPhoto($validated['user_data']);
             $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
             if (isset($mappedData['info'])) {
-                $updateData['info'] = $mappedData['info'];
+                $existingInfo = $profile->info ?? [];
+                $updateData['info'] = array_merge($existingInfo, $mappedData['info']);
             }
 
             if (isset($mappedData['interests'])) {
@@ -219,7 +222,7 @@ class CVController extends BaseApiController
             $this->cvRepository->update($profile, $this->trackingService->capture($request));
         } else {
             $profile = $this->pdfService->createTemporaryProfile(
-                $request->input('user_data', []),
+                $this->photoService->processUserDataPhoto($request->input('user_data', [])),
                 $request->user()?->id,
                 $request->input('name', 'CV'),
                 $request->input('language', 'en'),
@@ -276,7 +279,7 @@ class CVController extends BaseApiController
 
         // Create temporary profile
         $profile = $this->pdfService->createTemporaryProfile(
-            $request->input('user_data', []),
+            $this->photoService->processUserDataPhoto($request->input('user_data', [])),
             null,
             $request->input('name', 'CV'),
             $request->input('language', 'en'),

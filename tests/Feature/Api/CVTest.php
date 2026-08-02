@@ -21,7 +21,7 @@ class CVTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create(['active' => true]);
-        $this->mapper = new CVDataMapper();
+        $this->mapper = app(CVDataMapper::class);
 
         // Create an active template for PDF generation tests
         $this->template = Template::create([

@@ -17,7 +17,7 @@ class TemplateRenderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mapper = new CVDataMapper();
+        $this->mapper = app(CVDataMapper::class);
     }
 
     private function createTestProfile(): Profile
@@ -203,5 +203,35 @@ class TemplateRenderTest extends TestCase
         $this->assertStringContainsString('PHP, Laravel, JavaScript', $html);
         $this->assertStringContainsString('Acme Corp', $html);
         $this->assertStringNotContainsString('material-icons', $html);
+    }
+
+    public function test_image_capable_templates_render_with_photo(): void
+    {
+        $profile = $this->createTestProfile();
+        $info = $profile->info;
+        $info['photo'] = 'https://example.com/photo.jpg';
+        $profile->info = $info;
+        $profile->save();
+
+        $cvData = $this->mapper->formatProfileResponse($profile);
+
+        $templates = [
+            'portrait-modern',
+            'sidebar-slate',
+            'metro-grid',
+            'midnight-banner',
+            'coral-split',
+            'forest-folio',
+            'ink-editorial',
+        ];
+
+        foreach ($templates as $template) {
+            $html = view("templates.cv.{$template}", ['cv' => $cvData])->render();
+
+            $this->assertStringContainsString('John Doe', $html, "Template {$template} should show name");
+            $this->assertStringContainsString('https://example.com/photo.jpg', $html, "Template {$template} should show photo");
+            $this->assertStringContainsString('Acme Corp', $html, "Template {$template} should show experience");
+            $this->assertStringNotContainsString('@dd', $html);
+        }
     }
 }

@@ -13,7 +13,7 @@ class CVDataMapperTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mapper = new CVDataMapper();
+        $this->mapper = app(CVDataMapper::class);
     }
 
     public function test_map_user_data_to_profile_maps_basic_info(): void

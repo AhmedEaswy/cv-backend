@@ -35,6 +35,8 @@ class TemplatesTable
                     ->sortable(),
                 ConfirmableToggle::make('is_default', TemplateResource::class, 'Default')
                     ->sortable(),
+                ConfirmableToggle::make('supports_image', TemplateResource::class, 'Photo')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -16,7 +16,8 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class CVPDFService
 {
     public function __construct(
-        private CVDataMapper $dataMapper
+        private CVDataMapper $dataMapper,
+        private CvPhotoService $photoService
     ) {
     }
 
@@ -120,6 +121,7 @@ class CVPDFService
      */
     public function createTemporaryProfile(array $userData, ?int $userId = null, ?string $name = 'CV', ?string $language = 'en', ?array $sectionsOrder = null): Profile
     {
+        $userData = $this->photoService->processUserDataPhoto($userData);
         $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
         return new Profile([

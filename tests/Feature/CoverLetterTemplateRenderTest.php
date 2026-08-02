@@ -84,4 +84,30 @@ class CoverLetterTemplateRenderTest extends TestCase
         $this->assertStringContainsString('dir="rtl"', $html);
         $this->assertStringContainsString('الموضوع', $html);
     }
+
+    public function test_new_cover_letter_templates_render(): void
+    {
+        $coverLetter = $this->createTestCoverLetter();
+        $data = $this->mapper->formatCoverLetterResponse($coverLetter);
+
+        $templates = [
+            'serif-formal',
+            'stripe-modern',
+            'editorial-masthead',
+            'mono-tech',
+            'dual-tone',
+            'elegant-rules',
+            'banner-bold',
+            'compact-exec',
+        ];
+
+        foreach ($templates as $template) {
+            $html = view("templates.cover-letter.{$template}", ['coverLetter' => $data])->render();
+
+            $this->assertStringContainsString('John Doe', $html, "Template {$template} should show name");
+            $this->assertStringContainsString('Jane Smith', $html, "Template {$template} should show recipient");
+            $this->assertStringContainsString('Software Engineer role', $html, "Template {$template} should show body");
+            $this->assertStringNotContainsString('@dd', $html);
+        }
+    }
 }

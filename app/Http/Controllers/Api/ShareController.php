@@ -21,6 +21,7 @@ class ShareController extends BaseApiController
                     'name' => $template->name,
                     'preview' => $template->preview ? Storage::disk('public')->url($template->preview) : null,
                     'description' => $template->description,
+                    'supports_image' => (bool) $template->supports_image,
                     'created_at' => $template->created_at->toIso8601String(),
                     'updated_at' => $template->updated_at->toIso8601String(),
                 ];

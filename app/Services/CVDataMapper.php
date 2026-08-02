@@ -6,6 +6,11 @@ use App\Models\Profile;
 
 class CVDataMapper
 {
+    public function __construct(
+        private CvPhotoService $photoService
+    ) {
+    }
+
     /**
      * Map API user_data structure to Profile structure.
      */
@@ -26,6 +31,10 @@ class CVDataMapper
                 'summary' => $userData['summary'] ?? null,
                 'birthdate' => $userData['birthdate'] ?? null,
             ];
+
+            if (array_key_exists('photo', $userData)) {
+                $mapped['info']['photo'] = $userData['photo'];
+            }
 
             // Add skills to info if present
             if (isset($userData['skills'])) {
@@ -115,6 +124,7 @@ class CVDataMapper
             $userData['phone'] = $info['phone'] ?? null;
             $userData['summary'] = $info['summary'] ?? null;
             $userData['birthdate'] = $info['birthdate'] ?? null;
+            $userData['photo'] = $this->photoService->urlFor($info['photo'] ?? null);
 
             if (isset($info['skills'])) {
                 $userData['skills'] = $info['skills'];
@@ -200,4 +210,3 @@ class CVDataMapper
         ];
     }
 }
-

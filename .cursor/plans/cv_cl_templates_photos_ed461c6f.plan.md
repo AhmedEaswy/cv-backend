@@ -4,19 +4,19 @@ overview: Add 8 unique cover-letter templates and 7 image-capable CV templates (
 todos:
   - id: supports-image
     content: Add supports_image migration, Template model/Filament, expose in ShareController
-    status: pending
+    status: completed
   - id: photo-api
     content: CvPhotoService + Print/Store/UpdateCVRequest rules + CVDataMapper + CVController persist/resolve photo
-    status: pending
+    status: completed
   - id: cv-templates
     content: Create 7 image-capable CV blades + seed with supports_image true
-    status: pending
+    status: completed
   - id: cl-templates
     content: Create 8 unique cover letter blades + seed
-    status: pending
+    status: completed
   - id: smoke-test
     content: Verify local /test/cv and /test/cover-letter routes render for new slugs
-    status: pending
+    status: completed
 isProject: false
 ---
 
