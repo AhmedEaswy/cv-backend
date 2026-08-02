@@ -1072,7 +1072,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style="color: #8a8499;">
                 <div>© {{ date('Y') }} {{ config('app.name') }}. {{ __('landing.footer_rights') }}</div>
 
-                <a href="https://edges-gate.com" target="_blank" rel="noopener" class="edges-gate hover:opacity-90 transition" aria-label="{{ __('landing.footer_created_by') }} edges-gate">
+                <a href="https://edgesgate.com" target="_blank" rel="noopener" class="edges-gate hover:opacity-90 transition" aria-label="{{ __('landing.footer_created_by') }} edges-gate">
                     <span style="color: #cfc8e6;">{{ __('landing.footer_created_by') }}</span>
                     <img src="{{ asset('images/edges-gate.svg') }}" alt="edges-gate" onerror="this.outerHTML='<span style=&quot;color:#b3a4ff;font-weight:600;&quot;>edges-gate</span>'">
                 </a>
