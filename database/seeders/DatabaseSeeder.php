@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TemplateSeeder::class,
             CoverLetterTemplateSeeder::class,
+            PublicProfileTemplateSeeder::class,
         ]);
 
         if (app()->environment('local')) {

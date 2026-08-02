@@ -47,6 +47,7 @@ class LocalFakeDataSeeder extends Seeder
         $this->call([
             ProfileSeeder::class,
             CoverLetterSeeder::class,
+            PublicProfileSeeder::class,
         ]);
     }
 }

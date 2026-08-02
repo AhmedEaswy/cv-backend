@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Enums\UserType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -103,5 +104,13 @@ class User extends Authenticatable
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(SocialAccount::class);
+    }
+
+    /**
+     * Get the public profile for the user.
+     */
+    public function publicProfile(): HasOne
+    {
+        return $this->hasOne(PublicProfile::class);
     }
 }

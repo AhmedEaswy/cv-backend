@@ -4,25 +4,25 @@ overview: Add a new PublicProfile entity (one per user) with slug URLs at `/u/{s
 todos:
   - id: migrations-models
     content: Create public_profile_templates + public_profiles migrations and Eloquent models (slug, preview_url, relations)
-    status: pending
+    status: completed
   - id: mapper-requests
     content: Add PublicProfileDataMapper, PublicProfileTemplateData, Store/Update FormRequests
-    status: pending
+    status: completed
   - id: api-web-routes
     content: API CRUD + templates list; GET /u/{slug}; local test route
-    status: pending
+    status: completed
   - id: ten-blades
     content: Build layout component + 10 visually distinct public-profile Blade templates
-    status: pending
+    status: completed
   - id: previews-seeder
     content: Capture/save PNG previews under public/images/public-profile-templates; PublicProfileTemplateSeeder + DatabaseSeeder
-    status: pending
+    status: completed
   - id: filament-admin
     content: Filament resources for templates and public profiles
-    status: pending
+    status: completed
   - id: local-fake
     content: Seed a sample public profile in LocalFakeDataSeeder for /u/{slug} testing
-    status: pending
+    status: completed
 isProject: false
 ---
 

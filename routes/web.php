@@ -66,8 +66,14 @@ Route::get('/profile/{id}', [\App\Http\Controllers\ProfilePreviewController::cla
 Route::get('/cover-letter/{id}', [\App\Http\Controllers\CoverLetterPreviewController::class, 'preview'])
     ->name('cover-letter.preview');
 
+Route::get('/u/{slug}', [\App\Http\Controllers\PublicProfilePreviewController::class, 'preview'])
+    ->name('public-profile.preview');
+
 Route::get('/test/cv/{template}', [\App\Http\Controllers\TemplateTestController::class, 'cv'])
     ->name('templates.cv.test');
 
 Route::get('/test/cover-letter/{template}', [\App\Http\Controllers\TemplateTestController::class, 'coverLetter'])
     ->name('templates.cover-letter.test');
+
+Route::get('/test/public-profile/{template}', [\App\Http\Controllers\TemplateTestController::class, 'publicProfile'])
+    ->name('templates.public-profile.test');

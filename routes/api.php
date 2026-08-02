@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AnalyticsClickController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
+use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Middleware\AnalyticsMiddleware;
@@ -47,6 +48,9 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     Route::post('/cover-letters', [CoverLetterController::class, 'store']);
     Route::post('/cover-letters/print', [CoverLetterController::class, 'print']);
 
+    // Public profile template list
+    Route::get('/public-profiles/templates', [PublicProfileController::class, 'templates']);
+
     // Protected CV routes (authenticated users only)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/cvs', [CVController::class, 'index']);
@@ -61,5 +65,13 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::get('/cover-letters/{id}', [CoverLetterController::class, 'show']);
         Route::put('/cover-letters/{id}', [CoverLetterController::class, 'update']);
         Route::delete('/cover-letters/{id}', [CoverLetterController::class, 'destroy']);
+    });
+
+    // Protected public profile routes (one profile per user)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/public-profiles', [PublicProfileController::class, 'show']);
+        Route::post('/public-profiles', [PublicProfileController::class, 'store']);
+        Route::put('/public-profiles', [PublicProfileController::class, 'update']);
+        Route::delete('/public-profiles', [PublicProfileController::class, 'destroy']);
     });
 });
