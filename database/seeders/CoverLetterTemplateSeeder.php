@@ -12,14 +12,14 @@ class CoverLetterTemplateSeeder extends Seeder
         $templates = [
             [
                 'name' => 'ats-classic',
-                'preview' => 'cover-letter-templates/ats-classic.svg',
+                'preview' => 'images/templates/ats-classic.png',
                 'description' => 'ATS-friendly cover letter matching the ATS Classic CV style, with English and Arabic support.',
                 'is_active' => true,
                 'is_default' => true,
             ],
             [
                 'name' => 'professional',
-                'preview' => 'cover-letter-templates/professional.svg',
+                'preview' => 'images/templates/professional.png',
                 'description' => 'Professional cover letter layout with clean typography and bilingual support.',
                 'is_active' => true,
                 'is_default' => false,
@@ -27,7 +27,10 @@ class CoverLetterTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            CoverLetterTemplate::create($template);
+            CoverLetterTemplate::updateOrCreate(
+                ['name' => $template['name']],
+                $template,
+            );
         }
     }
 }

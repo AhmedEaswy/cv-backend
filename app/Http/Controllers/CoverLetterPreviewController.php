@@ -57,6 +57,9 @@ class CoverLetterPreviewController extends Controller
         $coverLetterData = $this->dataMapper->formatCoverLetterResponse($coverLetter);
         App::setLocale($coverLetterData['language'] ?? 'en');
 
-        return view($viewPath, ['coverLetter' => $coverLetterData]);
+        return view($viewPath, [
+            'coverLetter' => $coverLetterData,
+            'preview' => true,
+        ]);
     }
 }

@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Filament\Resources\Users\RelationManagers;
+
+use App\Filament\Resources\Profiles\ProfileResource;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class ProfilesRelationManager extends RelationManager
+{
+    protected static string $relationship = 'profiles';
+
+    protected static ?string $relatedResource = ProfileResource::class;
+
+    protected static ?string $title = 'CVs';
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('name')
+            ->columns([
+                TextColumn::make('name')
+                    ->label('CV Name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('language')
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('template.name')
+                    ->label('Template')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('—'),
+                IconColumn::make('is_public')
+                    ->label('Public')
+                    ->boolean(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable(),
+            ])
+            ->headerActions([])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+            ]);
+    }
+}

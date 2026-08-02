@@ -16,4 +16,9 @@ class ViewUser extends ViewRecord
             EditAction::make(),
         ];
     }
+
+    public function getContentTabLabel(): ?string
+    {
+        return __('User info');
+    }
 }

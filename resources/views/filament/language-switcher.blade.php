@@ -1,4 +1,4 @@
-<div class="fi-topbar-language-switcher">
+<div class="fi-topbar-language-switcher mx-4">
     <x-filament::dropdown placement="bottom-end">
         <x-slot name="trigger">
             <x-filament::icon-button

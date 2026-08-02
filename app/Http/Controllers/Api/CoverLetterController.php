@@ -200,7 +200,7 @@ class CoverLetterController extends BaseApiController
         $templates = $this->repository->getActiveTemplates()->map(fn ($t) => [
             'id' => $t->id,
             'name' => $t->name,
-            'preview' => $t->preview ? asset('storage/' . $t->preview) : null,
+            'preview' => $t->preview_url,
             'description' => $t->description,
             'is_default' => $t->is_default,
         ]);

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Profiles\Tables;
 
+use App\Filament\Resources\Profiles\ProfileResource;
+use App\Filament\Support\ConfirmableToggle;
 use App\Models\Profile;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -10,7 +12,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -66,13 +67,7 @@ class ProfilesTable
                     ->searchable()
                     ->badge()
                     ->color('info'),
-                IconColumn::make('is_public')
-                    ->label('Public')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-globe-alt')
-                    ->falseIcon('heroicon-o-lock-closed')
-                    ->trueColor('success')
-                    ->falseColor('gray')
+                ConfirmableToggle::make('is_public', ProfileResource::class, 'Public')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created At')

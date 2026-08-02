@@ -18,10 +18,6 @@ Route::get('/lang/{locale}', function (string $locale) {
     return redirect()->back();
 })->name('landing.locale');
 
-Route::get('/office-manager-template', function () {
-    return view('templates.cv.office-manager');
-});
-
 Route::get('/test-locale', function () {
     $currentLocale = app()->getLocale();
     $direction = session('direction', 'ltr');
@@ -69,3 +65,9 @@ Route::get('/profile/{id}', [\App\Http\Controllers\ProfilePreviewController::cla
 
 Route::get('/cover-letter/{id}', [\App\Http\Controllers\CoverLetterPreviewController::class, 'preview'])
     ->name('cover-letter.preview');
+
+Route::get('/test/cv/{template}', [\App\Http\Controllers\TemplateTestController::class, 'cv'])
+    ->name('templates.cv.test');
+
+Route::get('/test/cover-letter/{template}', [\App\Http\Controllers\TemplateTestController::class, 'coverLetter'])
+    ->name('templates.cover-letter.test');

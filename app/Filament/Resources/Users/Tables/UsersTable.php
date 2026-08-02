@@ -3,13 +3,14 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\UserType;
+use App\Filament\Resources\Users\UserResource;
+use App\Filament\Support\ConfirmableToggle;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -34,13 +35,7 @@ class UsersTable
                     ->label('Email Address')
                     ->searchable()
                     ->sortable(),
-                IconColumn::make('active')
-                    ->label('Active')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger')
+                ConfirmableToggle::make('active', UserResource::class, 'Active')
                     ->sortable(),
                 TextColumn::make('type')
                     ->label('User Type')
@@ -92,6 +87,8 @@ class UsersTable
             ])
             ->filters([
                 TrashedFilter::make(),
+                TernaryFilter::make('active')
+                    ->label('Active Status'),
             ])
             ->recordActions([
                 ViewAction::make(),

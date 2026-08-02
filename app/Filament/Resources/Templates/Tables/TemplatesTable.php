@@ -2,13 +2,15 @@
 
 namespace App\Filament\Resources\Templates\Tables;
 
+use App\Filament\Resources\Templates\TemplateResource;
+use App\Filament\Support\ConfirmableToggle;
+use App\Filament\Support\ImagePlaceholder;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -27,22 +29,11 @@ class TemplatesTable
                     ->label('Preview')
                     ->disk('public')
                     ->circular()
-                    ->defaultImageUrl(url('/placeholder-image.png')),
-                IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger')
+                    ->defaultImageUrl(ImagePlaceholder::url())
+                    ->extraImgAttributes(ImagePlaceholder::imgAttributes()),
+                ConfirmableToggle::make('is_active', TemplateResource::class, 'Active')
                     ->sortable(),
-                IconColumn::make('is_default')
-                    ->label('Default')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray')
+                ConfirmableToggle::make('is_default', TemplateResource::class, 'Default')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
