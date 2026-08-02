@@ -28,7 +28,7 @@ class CoverLetterTemplatesTable
                     ->searchable(),
                 ImageColumn::make('preview')
                     ->label('Preview')
-                    ->disk('public')
+                    ->getStateUsing(fn ($record) => $record->preview_url)
                     ->circular()
                     ->defaultImageUrl(url('/placeholder-image.png')),
                 TextColumn::make('name')

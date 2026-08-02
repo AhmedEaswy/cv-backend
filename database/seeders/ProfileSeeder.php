@@ -226,7 +226,13 @@ class ProfileSeeder extends Seeder
         ];
 
         foreach ($sampleProfiles as $profile) {
-            Profile::create($profile);
+            Profile::firstOrCreate(
+                [
+                    'user_id' => $profile['user_id'],
+                    'name' => $profile['name'],
+                ],
+                $profile,
+            );
         }
 
         $this->command->info('Profile seeder completed successfully.');

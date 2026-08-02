@@ -68,6 +68,9 @@ class CoverLetterTemplateRenderTest extends TestCase
 
         $this->assertStringContainsString('John Doe', $html);
         $this->assertStringContainsString('Acme Corp', $html);
+        $this->assertStringContainsString('professional-header', $html);
+        $this->assertStringContainsString('signature-rule', $html);
+        $this->assertStringNotContainsString('sender-block', $html);
     }
 
     public function test_cover_letter_renders_rtl_for_arabic(): void

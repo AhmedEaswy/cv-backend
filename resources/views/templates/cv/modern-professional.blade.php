@@ -1,4 +1,4 @@
-<x-template-layout :cv="$cv">
+<x-template-layout :cv="$cv" :preview="$preview ?? false">
     @slot('head')
         <script src="https://cdn.tailwindcss.com"></script>
         <style>

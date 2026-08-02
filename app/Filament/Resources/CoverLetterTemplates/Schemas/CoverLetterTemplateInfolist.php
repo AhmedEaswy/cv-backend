@@ -21,7 +21,7 @@ class CoverLetterTemplateInfolist
                             ->label('Name'),
                         ImageEntry::make('preview')
                             ->label('Preview Image')
-                            ->disk('public')
+                            ->getStateUsing(fn ($record) => $record->preview_url)
                             ->height(200),
                         TextEntry::make('description')
                             ->label('Description'),

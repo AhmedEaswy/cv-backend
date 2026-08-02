@@ -73,7 +73,9 @@ class ProfilePreviewController extends Controller
         $cvData = $this->dataMapper->formatProfileResponse($profile);
         App::setLocale($cvData['language'] ?? 'en');
 
-        // Return the view
-        return view($viewPath, ['cv' => $cvData]);
+        return view($viewPath, [
+            'cv' => $cvData,
+            'preview' => true,
+        ]);
     }
 }

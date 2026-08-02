@@ -1,4 +1,4 @@
-<x-cover-letter-layout :coverLetter="$coverLetter">
+<x-cover-letter-layout :coverLetter="$coverLetter" :preview="$preview ?? false">
     @slot('head')
         <style>
         @page {

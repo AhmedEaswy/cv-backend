@@ -1,4 +1,4 @@
-<x-template-layout :cv="$cv" class="bg-background-light text-gray-900 font-body antialiased">
+<x-template-layout :cv="$cv" :preview="$preview ?? false" class="bg-background-light text-gray-900 font-body antialiased">
     @slot('head')
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
