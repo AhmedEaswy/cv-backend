@@ -1,66 +1,71 @@
 <script setup lang="ts">
 /**
- * <LandingFooter /> — final footer with brand, nav columns, social row.
+ * <LandingSiteFooter /> — product-aligned footer for the CV app.
  */
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const appName = config.public.appName as string;
+const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const year = new Date().getFullYear();
+const route = useRoute();
+
+const logoSrc = `${laravel}/images/logo-icon.png`;
+const onHome = computed(() => route.path === '/' || route.path === '');
+
+/** Section anchors work from any page via `/#…`. */
+const section = (id: string) => (onHome.value ? `#${id}` : `/#${id}`);
 </script>
 
 <template>
-    <footer class="footer">
-        <div class="container-narrow">
-            <div class="footer__grid">
-                <div class="footer__brand">
-                    <NuxtLink to="/" class="footer__brand-mark">
-                        <span class="footer__brand-dot" aria-hidden="true" />
-                        <span class="footer__brand-name">{{ appName }}</span>
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <div class="site-footer__grid">
+                <div class="site-footer__brand">
+                    <NuxtLink to="/" class="site-footer__brand-mark">
+                        <span class="site-footer__brand-icon" aria-hidden="true">
+                            <img :src="logoSrc" alt="" width="18" height="18" />
+                        </span>
                     </NuxtLink>
-                    <p class="footer__brand-text">{{ t('landing.footer_about') }}</p>
+                    <p class="site-footer__brand-text">{{ t('landing.footer_about') }}</p>
                 </div>
 
-                <div class="footer__col">
+                <div class="site-footer__col">
                     <h4>{{ t('landing.footer_product') }}</h4>
                     <ul>
-                        <li><a href="#features">{{ t('landing.footer_features') }}</a></li>
-                        <li><a href="#download">{{ t('landing.section_download_title') }}</a></li>
-                        <li><a href="#pricing">{{ t('landing.footer_pricing') }}</a></li>
-                        <li><a href="#templates">{{ t('landing.nav.templates') }}</a></li>
+                        <li><a :href="section('platforms')">{{ t('landing.nav.platforms') }}</a></li>
+                        <li><a :href="section('mockup')">{{ t('landing.nav.mockup') }}</a></li>
+                        <li><a :href="section('pricing')">{{ t('landing.nav.pricing') }}</a></li>
+                        <li><a :href="section('download')">{{ t('landing.nav.download') }}</a></li>
                     </ul>
                 </div>
 
-                <div class="footer__col">
-                    <h4>{{ t('landing.footer_company') }}</h4>
+                <div class="site-footer__col">
+                    <h4>{{ t('landing.footer_account') }}</h4>
                     <ul>
-                        <li><a href="#">{{ t('landing.footer_about_link') }}</a></li>
-                        <li><a href="#">{{ t('landing.footer_careers') }}</a></li>
-                        <li><a href="#">{{ t('landing.footer_contact') }}</a></li>
-                        <li><a href="#">{{ t('landing.footer_press') }}</a></li>
+                        <li><NuxtLink to="/auth/login">{{ t('landing.nav.login') }}</NuxtLink></li>
+                        <li><NuxtLink to="/auth/register">{{ t('landing.footer_create_account') }}</NuxtLink></li>
+                        <li><NuxtLink to="/portal">{{ t('landing.nav.dashboard') }}</NuxtLink></li>
                     </ul>
                 </div>
 
-                <div class="footer__col">
-                    <h4>{{ t('landing.footer_resources') }}</h4>
+                <div class="site-footer__col">
+                    <h4>{{ t('landing.footer_legal') }}</h4>
                     <ul>
-                        <li><a href="#">{{ t('landing.footer_help') }}</a></li>
-                        <li><a href="#">{{ t('landing.footer_updates') }}</a></li>
-                        <li><a href="#">{{ t('landing.footer_guides') }}</a></li>
+                        <li><NuxtLink to="/privacy">{{ t('landing.footer_privacy') }}</NuxtLink></li>
+                        <li><NuxtLink to="/terms">{{ t('landing.footer_terms') }}</NuxtLink></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="footer__rule" />
+            <div class="site-footer__rule" />
 
-            <div class="footer__bottom">
-                <div class="footer__copy">© {{ year }} {{ appName }}. {{ t('landing.footer_rights') }}</div>
-                <div class="footer__social">
-                    <a href="#" aria-label="LinkedIn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8 18H5V9h3v9zM6.5 7.7a1.7 1.7 0 1 1 0-3.5 1.7 1.7 0 0 1 0 3.5zM18 18h-3v-4.5c0-1.1-.4-1.8-1.4-1.8-.8 0-1.3.5-1.5 1.1-.1.2-.1.5-.1.8V18h-3V9h3v1.3c.4-.6 1.1-1.5 2.7-1.5 2 0 3.4 1.3 3.4 4.1V18z"/></svg>
-                    </a>
-                    <a href="#" aria-label="X">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h3.3l-7.2 8.2 8.5 11.8h-6.6L10.6 14 5 22H1.6l7.7-8.8L1.5 2h6.8l4.7 6.5L18 2zM16.7 20h1.8L7.3 4H5.4L16.7 20z"/></svg>
-                    </a>
+            <div class="site-footer__bottom">
+                <p class="site-footer__copy">
+                    © {{ year }} {{ appName }}. {{ t('landing.footer_rights') }}
+                </p>
+                <div class="site-footer__legal">
+                    <NuxtLink to="/terms">{{ t('landing.footer_terms') }}</NuxtLink>
+                    <NuxtLink to="/privacy">{{ t('landing.footer_privacy') }}</NuxtLink>
                 </div>
             </div>
         </div>
@@ -68,55 +73,140 @@ const year = new Date().getFullYear();
 </template>
 
 <style scoped>
-.footer__grid {
+.site-footer {
+    width: 100%;
+    background: var(--color-white);
+    border-top: 1px solid var(--color-line);
+}
+
+.site-footer__inner {
+    max-width: 76rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 5vw, 3.5rem) 1.25rem 2rem;
+}
+
+@media (min-width: 768px) {
+    .site-footer__inner {
+        padding-inline: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .site-footer__inner {
+        padding-inline: 2.5rem;
+    }
+}
+
+.site-footer__grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-    margin-bottom: 3rem;
+    gap: 2rem 2.5rem;
+    margin-bottom: 2.5rem;
 }
-@media (min-width: 640px)  { .footer__grid { grid-template-columns: 1.5fr 1fr 1fr 1fr; } }
 
-.footer__brand-mark {
+@media (min-width: 768px) {
+    .site-footer__grid {
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+        gap: 2rem;
+    }
+}
+
+.site-footer__brand-mark {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
     text-decoration: none;
     color: var(--color-ink);
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.85rem;
 }
-.footer__brand-dot {
-    width: 28px; height: 28px;
-    border-radius: 8px;
-    background: var(--color-ink);
-    display: inline-block;
+
+.site-footer__brand-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
 }
-.footer__brand-name { font-size: 1rem; letter-spacing: -0.01em; }
-.footer__brand-text { font-size: 0.9rem; color: var(--color-ink-soft); line-height: 1.5; max-width: 26rem; margin: 0; }
 
-.footer__col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-.footer__col a { font-size: 0.9rem; }
+.site-footer__brand-icon img {
+    display: block;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
 
-.footer__rule { height: 1px; background: var(--color-line); margin: 0 0 1.5rem; }
-.footer__bottom {
+.site-footer__brand-text {
+    margin: 0;
+    max-width: 22rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--color-ink-soft);
+}
+
+.site-footer__col h4 {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+}
+
+.site-footer__col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.site-footer__col a {
+    font-size: 0.9rem;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.site-footer__col a:hover {
+    color: var(--color-ink);
+}
+
+.site-footer__rule {
+    height: 1px;
+    background: var(--color-line);
+    margin-bottom: 1.25rem;
+}
+
+.site-footer__bottom {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
 }
-.footer__copy { font-size: 0.8rem; color: var(--color-muted); }
-.footer__social { display: inline-flex; gap: 0.5rem; }
-.footer__social a {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--color-white);
-    border: 1px solid var(--color-line);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-ink-soft);
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+.site-footer__copy {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--color-muted);
 }
-.footer__social a:hover { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+
+.site-footer__legal {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.site-footer__legal a {
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+}
+
+.site-footer__legal a:hover {
+    color: var(--color-ink);
+}
 </style>

@@ -15,13 +15,15 @@ const currentLocale = computed(() =>
     ),
 );
 
+const htmlDir = computed(() => currentLocale.value?.dir ?? 'ltr');
+
 const displayFontHref =
     'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap';
 
 useHead({
     htmlAttrs: {
-        lang: locale,
-        dir: currentLocale.value?.dir ?? 'ltr',
+        lang: () => locale.value,
+        dir: () => htmlDir.value,
     },
     title: `${appName}`,
     meta: [
@@ -38,7 +40,9 @@ useHead({
 
 <template>
     <div>
-        <NuxtPage />
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
         <Toaster />
     </div>
 </template>

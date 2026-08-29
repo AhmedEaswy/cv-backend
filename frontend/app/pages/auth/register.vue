@@ -90,7 +90,12 @@ const onSubmit = () => register({ ...form });
                     required
                     :aria-invalid="!!fieldError('password')"
                 />
-                <span class="field-hint">{{ t('auth.register.terms') }}</span>
+                <span class="field-hint">
+                    {{ t('auth.register.terms_prefix') }}
+                    <NuxtLink to="/terms">{{ t('landing.footer_terms') }}</NuxtLink>
+                    {{ t('auth.register.terms_and') }}
+                    <NuxtLink to="/privacy">{{ t('landing.footer_privacy') }}</NuxtLink>.
+                </span>
                 <span v-if="fieldError('password')" class="field-error">{{ fieldError('password') }}</span>
             </div>
 

@@ -1,58 +1,26 @@
 <script setup lang="ts">
 /**
- * <LandingPricing /> — three pricing cards, middle one featured.
- * Mirrors the reference's $0.00 / $69.00 (Pro, Most Popular) / $149.00 (Vision).
+ * <LandingPricing /> — single free plan, featured.
  */
 const { t } = useI18n();
-const config = useRuntimeConfig();
-const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 
-const tiers = computed(() => ([
-    {
-        key: 'free',
-        name: t('landing.section_pricing_free_name'),
-        price: t('landing.section_pricing_free_price'),
-        priceSmall: '',
-        features: [
-            t('landing.section_pricing_feature_1'),
-            t('landing.section_pricing_feature_2'),
-            t('landing.section_pricing_feature_3'),
-        ],
-        featured: false,
-    },
-    {
-        key: 'pro',
-        name: t('landing.section_pricing_pro_name'),
-        price: t('landing.section_pricing_pro_price'),
-        priceSmall: '',
-        badge: t('landing.section_pricing_pro_badge'),
-        features: [
-            t('landing.section_pricing_pro_feature_1'),
-            t('landing.section_pricing_pro_feature_2'),
-            t('landing.section_pricing_pro_feature_3'),
-            t('landing.section_pricing_pro_feature_4'),
-        ],
-        featured: true,
-    },
-    {
-        key: 'vision',
-        name: t('landing.section_pricing_vision_name'),
-        price: t('landing.section_pricing_vision_price'),
-        priceSmall: '',
-        badge: t('landing.section_pricing_vision_badge'),
-        features: [
-            t('landing.section_pricing_vision_feature_1'),
-            t('landing.section_pricing_vision_feature_2'),
-            t('landing.section_pricing_vision_feature_3'),
-            t('landing.section_pricing_vision_feature_4'),
-        ],
-        featured: false,
-    },
-]));
+const tier = computed(() => ({
+    key: 'free',
+    name: t('landing.section_pricing_free_name'),
+    price: t('landing.section_pricing_free_price'),
+    badge: t('landing.section_pricing_free_badge'),
+    features: [
+        t('landing.section_pricing_feature_1'),
+        t('landing.section_pricing_feature_2'),
+        t('landing.section_pricing_feature_3'),
+        t('landing.section_pricing_feature_4'),
+        t('landing.section_pricing_feature_5'),
+    ],
+}));
 </script>
 
 <template>
-    <section id="pricing" class="section">
+    <section id="pricing" class="section !pb-0">
         <div class="container-narrow">
             <div class="pricing-head">
                 <h2 class="display-2">{{ t('landing.section_pricing_title') }}</h2>
@@ -60,19 +28,12 @@ const tiers = computed(() => ([
             </div>
 
             <div class="pricing-grid">
-                <article
-                    v-for="tier in tiers"
-                    :key="tier.key"
-                    :class="['price-card', tier.featured && 'price-card--featured']"
-                >
-                    <div v-if="tier.badge" class="price-card__badge">
-                        <span class="tag" :class="tier.featured ? 'tag--soft' : 'tag--default'">{{ tier.badge }}</span>
+                <article class="price-card price-card--featured">
+                    <div class="price-card__badge">
+                        <span class="tag tag--soft">{{ tier.badge }}</span>
                     </div>
                     <span class="price-card__name">{{ tier.name }}</span>
-                    <div class="price-card__price">
-                        {{ tier.price }}
-                        <small v-if="tier.priceSmall">{{ tier.priceSmall }}</small>
-                    </div>
+                    <div class="price-card__price">{{ tier.price }}</div>
                     <div class="price-card__divider" />
                     <ul class="price-card__features">
                         <li v-for="(f, i) in tier.features" :key="i" class="price-card__feature">
@@ -81,8 +42,8 @@ const tiers = computed(() => ([
                         </li>
                     </ul>
                     <Button
-                        :href="laravel + '/register'"
-                        :variant="tier.featured ? 'secondary' : 'primary'"
+                        to="/auth/register"
+                        variant="secondary"
                         block
                     >
                         {{ t('landing.section_pricing_cta_upgrade') }}
@@ -100,11 +61,10 @@ const tiers = computed(() => ([
 
 .pricing-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 22rem);
+    justify-content: center;
     gap: 1.25rem;
-    align-items: stretch;
 }
-@media (min-width: 768px)  { .pricing-grid { grid-template-columns: repeat(3, 1fr); align-items: center; } }
 
 .price-card { position: relative; }
 .price-card__badge {

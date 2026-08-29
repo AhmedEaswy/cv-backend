@@ -29,14 +29,43 @@ useHead({
         <LandingSiteHeader />
         <main>
             <LandingHeroSection />
-            <LandingMarqueeStrip />
-            <LandingNotesSection />
-            <LandingTemplatesSection />
-            <LandingFeaturesSection />
-            <LandingPricingSection />
             <LandingPlatformsSection />
-            <LandingDownloadSection />
+
+            <!-- <LandingMarqueeStrip /> -->
+            <LandingMockupSection />
+            <!-- <LandingTemplatesSection /> -->
+            <LandingPricingSection />
+            <div class="landing-closing">
+                <div class="landing-closing__shell">
+                    <LandingDownloadSection />
+                </div>
+            </div>
         </main>
         <LandingSiteFooter />
     </div>
 </template>
+
+<style scoped>
+.landing-closing {
+    background: var(--color-paper-2);
+    padding: 2rem 1rem 0;
+}
+
+@media (min-width: 768px) {
+    .landing-closing {
+        padding: 0rem 1.25rem 0;
+    }
+}
+
+.landing-closing__shell {
+    max-width: 72rem;
+    margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+    .landing-closing__shell {
+        padding: 3rem 1rem;
+        border-radius: 2rem;
+    }
+}
+</style>

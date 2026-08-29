@@ -29,7 +29,7 @@ const cards = computed(() => ([
 </script>
 
 <template>
-    <section id="features" class="section">
+    <section id="features" class="section !pb-0">
         <div class="container-narrow">
             <div class="features-head">
                 <h2 class="display-2">{{ t('landing.section_features_title') }}</h2>

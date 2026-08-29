@@ -2,13 +2,14 @@
 /**
  * <LandingHeader />
  *
- * Floating nav over the dark hero. On SSR we hit /api/v1/auth/me through
+ * Fixed floating nav over the dark hero. On SSR we hit /api/v1/auth/me through
  * the forwarded cookie so we know whether to show "Open the portal" or "Login".
  */
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const appName = config.public.appName as string;
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
+const playStore = (config.public.playStoreUrl as string) || '#download';
 
 const { user } = await useAuth();
 
@@ -27,6 +28,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('scroll', onScroll);
 });
+
+const trackDownload = () => {
+    if (!import.meta.client) return;
+    const api = useApi();
+    api('/analytics/click', { method: 'POST', body: { label: 'nav_download_app', page: 'landing' } }).catch(
+        () => undefined,
+    );
+};
 </script>
 
 <template>
@@ -45,10 +54,10 @@ onBeforeUnmount(() => {
             </a>
 
             <nav class="site-header__nav" aria-label="Primary">
-                <a href="#templates">{{ t('landing.nav.templates') }}</a>
-                <a href="#features">{{ t('landing.nav_features') }}</a>
+                <a href="#platforms">{{ t('landing.nav.platforms') }}</a>
+                <a href="#mockup">{{ t('landing.nav.mockup') }}</a>
                 <a href="#pricing">{{ t('landing.nav.pricing') }}</a>
-                <a href="#cover">{{ t('landing.nav.cover') }}</a>
+                <a href="#download">{{ t('landing.nav.download') }}</a>
             </nav>
 
             <div class="site-header__actions">
@@ -70,9 +79,15 @@ onBeforeUnmount(() => {
                     {{ t('landing.nav.login') }}
                 </NuxtLink>
 
-                <NuxtLink to="/auth/register" class="site-header__cta">
+                <a
+                    :href="playStore"
+                    class="site-header__cta"
+                    target="_blank"
+                    rel="noopener"
+                    @click="trackDownload"
+                >
                     {{ t('landing.nav.cta') }}
-                </NuxtLink>
+                </a>
             </div>
         </div>
     </header>
@@ -80,7 +95,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .site-header {
-    position: absolute;
+    position: fixed;
     top: 0.75rem;
     left: 0;
     right: 0;

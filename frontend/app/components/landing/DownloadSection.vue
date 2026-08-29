@@ -1,77 +1,199 @@
 <script setup lang="ts">
 /**
- * <LandingDownload /> — "Available on iOS & Android" section.
+ * <LandingDownloadSection /> — dark closing CTA with App Store + Play Store badges.
  */
 const { t } = useI18n();
 const config = useRuntimeConfig();
+const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const appStore = (config.public.appStoreUrl as string) || '#';
 const playStore = (config.public.playStoreUrl as string) || '#';
 
 const track = (label: string) => {
-    if (import.meta.client) {
-        const api = useApi();
-        api('/analytics/click', { method: 'POST', body: { label, page: 'landing' } }).catch(() => undefined);
-    }
+    if (!import.meta.client) return;
+    const api = useApi();
+    api('/analytics/click', { method: 'POST', body: { label, page: 'landing' } }).catch(() => undefined);
 };
 </script>
 
 <template>
-    <section id="download" class="section download-section">
-        <div class="container-narrow download">
-            <div class="download__copy">
-                <h2 class="display-2">{{ t('landing.section_download_title') }}</h2>
-                <p class="lede">{{ t('landing.section_download_subtitle') }}</p>
-            </div>
-            <div class="download__badges">
-                <a :href="appStore" target="_blank" rel="noopener" class="store-badge" @click="track('app_store')">
-                    <svg class="store-badge-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M17.05 13.06c-.03-2.7 2.21-3.99 2.31-4.06-1.26-1.84-3.22-2.09-3.92-2.12-1.67-.17-3.25.98-4.1.98-.85 0-2.16-.96-3.55-.93-1.82.03-3.5 1.06-4.43 2.68-1.89 3.28-.48 8.13 1.36 10.79.9 1.3 1.97 2.76 3.36 2.71 1.35-.05 1.86-.87 3.49-.87 1.62 0 2.09.87 3.52.84 1.46-.02 2.38-1.32 3.27-2.63 1.03-1.5 1.45-2.97 1.48-3.05-.03-.01-2.84-1.09-2.87-4.32zM14.65 5.21c.74-.9 1.24-2.14 1.1-3.38-1.06.04-2.35.71-3.11 1.6-.68.79-1.28 2.05-1.12 3.27 1.19.09 2.39-.6 3.13-1.49z" />
-                    </svg>
-                    <div class="store-badge-text">
-                        <span class="store-badge-caption">{{ t('landing.section_app_store_caption') }}</span>
-                        <span class="store-badge-label">{{ t('landing.section_app_store') }}</span>
-                    </div>
+    <section id="download" class="closing-cta" aria-labelledby="download-title">
+        <div class="closing-cta__panel">
+            <div class="closing-cta__glow" aria-hidden="true" />
+
+            <h2 id="download-title" class="closing-cta__title">
+                {{ t('landing.final_title') }}
+            </h2>
+            <p class="closing-cta__subtitle">
+                {{ t('landing.final_subtitle') }}
+            </p>
+
+            <div class="closing-cta__badges">
+                <a
+                    :href="appStore"
+                    class="closing-cta__badge"
+                    target="_blank"
+                    rel="noopener"
+                    :aria-label="`${t('landing.store_download_on')} ${t('landing.store_app_store')}`"
+                    @click="track('app_store')"
+                >
+                    <img
+                        :src="`${laravel}/images/app-store.svg`"
+                        alt=""
+                        width="22"
+                        height="22"
+                        aria-hidden="true"
+                    />
+                    <span class="closing-cta__badge-text">
+                        <span class="closing-cta__badge-caption">{{ t('landing.store_download_on') }}</span>
+                        <span class="closing-cta__badge-label">{{ t('landing.store_app_store') }}</span>
+                    </span>
                 </a>
-                <a :href="playStore" target="_blank" rel="noopener" class="store-badge store-badge-google" @click="track('play_store')">
-                    <svg class="store-badge-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M3.5 2.5v19l9-9.5z" />
-                        <path d="M3.5 2.5l13 7.5-4 2.5z" opacity="0.7" />
-                        <path d="M3.5 21.5l13-7.5-4-2.5z" opacity="0.5" />
-                        <path d="M16.5 10l4 2.3c.9.5.9 1.9 0 2.4l-4 2.3-3.5-3.5z" opacity="0.4" />
-                    </svg>
-                    <div class="store-badge-text">
-                        <span class="store-badge-caption">{{ t('landing.section_play_store_caption') }}</span>
-                        <span class="store-badge-label">{{ t('landing.section_play_store') }}</span>
-                    </div>
+                <a
+                    :href="playStore"
+                    class="closing-cta__badge"
+                    target="_blank"
+                    rel="noopener"
+                    :aria-label="`${t('landing.store_get_it_on')} ${t('landing.store_play_store')}`"
+                    @click="track('play_store')"
+                >
+                    <img
+                        :src="`${laravel}/images/google-play.svg`"
+                        alt=""
+                        width="22"
+                        height="22"
+                        aria-hidden="true"
+                    />
+                    <span class="closing-cta__badge-text">
+                        <span class="closing-cta__badge-caption">{{ t('landing.store_get_it_on') }}</span>
+                        <span class="closing-cta__badge-label">{{ t('landing.store_play_store') }}</span>
+                    </span>
                 </a>
             </div>
+
+            <p class="closing-cta__note">{{ t('landing.final_note') }}</p>
         </div>
     </section>
 </template>
 
 <style scoped>
-.download-section { background: var(--color-paper-2); border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
-.download {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    align-items: center;
-    text-align: center;
+.closing-cta {
+    padding: 0 0 0.75rem;
 }
+
+.closing-cta__panel {
+    position: relative;
+    overflow: hidden;
+    margin-inline: auto;
+    padding: clamp(3rem, 8vw, 4.5rem) 1.5rem;
+    border-radius: 1.35rem;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 65%),
+        linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    text-align: center;
+    isolation: isolate;
+}
+
 @media (min-width: 768px) {
-    .download {
-        grid-template-columns: 1.2fr 1fr;
-        text-align: start;
-        gap: 4rem;
+    .closing-cta__panel {
+        border-radius: 1.5rem;
+        padding: clamp(3.5rem, 8vw, 5rem) 2.5rem;
     }
 }
-.download__copy .display-2 { margin: 0 0 0.75rem; }
-.download__copy .lede { margin: 0; }
-.download__badges {
+
+.closing-cta__glow {
+    pointer-events: none;
+    position: absolute;
+    inset: -30% -10% auto;
+    height: 70%;
+    background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(255, 255, 255, 0.08), transparent 70%);
+    z-index: 0;
+}
+
+.closing-cta__title {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto 1rem;
+    max-width: 16ch;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    color: #ffffff;
+    text-wrap: balance;
+}
+
+.closing-cta__subtitle {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto 2rem;
+    max-width: 34rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.closing-cta__badges {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: center;
 }
-@media (min-width: 768px) { .download__badges { justify-content: flex-start; } }
+
+.closing-cta__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1.15rem 0.65rem 0.9rem;
+    border-radius: var(--radius-pill);
+    background: #f4f4f2;
+    color: #0a0a0a;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.closing-cta__badge:hover {
+    background: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5);
+}
+
+.closing-cta__badge img {
+    flex-shrink: 0;
+    display: block;
+}
+
+.closing-cta__badge-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+    text-align: start;
+}
+
+.closing-cta__badge-caption {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: rgba(10, 10, 10, 0.65);
+}
+
+.closing-cta__badge-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.closing-cta__note {
+    position: relative;
+    z-index: 1;
+    margin: 1.25rem 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.38);
+}
 </style>

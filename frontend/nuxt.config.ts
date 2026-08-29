@@ -92,22 +92,22 @@ export default defineNuxtConfig({
     i18n: {
         strategy: 'no_prefix',
         defaultLocale: 'en',
-        fallbackLocale: 'en',
-        // Point the i18n module's loader at an empty directory so it
-        // never tries to read a file. The actual messages are merged
-        // by our plugin (which imports the JSON via Vite's native
-        // JSON loader and calls `mergeLocaleMessage`).
-        restructureDir: '',
-        langDir: '_empty/',
+        // No langDir/file: messages are merged by app/plugins/i18n-messages.ts.
+        // Empty `_empty/*.json` stubs used to wipe translations on setLocale().
         locales: [
-            { code: 'en', language: 'en-US', name: 'English',   dir: 'ltr', file: 'en.json' },
-            { code: 'ar', language: 'ar',    name: 'العربية',   dir: 'rtl', file: 'ar.json' },
-            { code: 'tr', language: 'tr-TR', name: 'Türkçe',    dir: 'ltr', file: 'tr.json' },
-            { code: 'es', language: 'es-ES', name: 'Español',   dir: 'ltr', file: 'es.json' },
-            { code: 'fr', language: 'fr-FR', name: 'Français',  dir: 'ltr', file: 'fr.json' },
-            { code: 'de', language: 'de-DE', name: 'Deutsch',   dir: 'ltr', file: 'de.json' },
-            { code: 'ur', language: 'ur',    name: 'اردو',       dir: 'rtl', file: 'ur.json' },
+            { code: 'en', language: 'en-US', name: 'English',  dir: 'ltr' },
+            { code: 'ar', language: 'ar',    name: 'العربية',  dir: 'rtl' },
+            { code: 'tr', language: 'tr-TR', name: 'Türkçe',   dir: 'ltr' },
+            { code: 'es', language: 'es-ES', name: 'Español',  dir: 'ltr' },
+            { code: 'fr', language: 'fr-FR', name: 'Français', dir: 'ltr' },
+            { code: 'de', language: 'de-DE', name: 'Deutsch',  dir: 'ltr' },
+            { code: 'ur', language: 'ur',    name: 'اردو',      dir: 'rtl' },
         ],
+        detectBrowserLanguage: {
+            useCookie: true,
+            cookieKey: 'i18n_redirected',
+            redirectOn: 'root',
+        },
         bundle: {
             optimizeTranslationDirective: false,
         },

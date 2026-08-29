@@ -2,42 +2,17 @@
 /**
  * <LandingHeroSection />
  *
- * Dark circular-card hero: template mockups orbit in a full-circle
- * infinite spin around a centered CTA (download app + register).
+ * Dark circular-card hero inspired by the Seestem CTA:
+ * mockups are mounted on a spinning ring (tilted along the arc),
+ * with depth fade at the edges and dual CTAs.
  */
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const config = useRuntimeConfig();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const playStore = (config.public.playStoreUrl as string) || '#download';
 const { user } = await useAuth();
 
-const now = ref(new Date());
-let clockTimer: ReturnType<typeof setInterval> | null = null;
-
-onMounted(() => {
-    clockTimer = setInterval(() => {
-        now.value = new Date();
-    }, 1000);
-});
-
-onBeforeUnmount(() => {
-    if (clockTimer) clearInterval(clockTimer);
-});
-
-const timeLabel = computed(() => {
-    try {
-        return new Intl.DateTimeFormat(locale.value || 'en', {
-            hour: 'numeric',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-        }).format(now.value);
-    } catch {
-        return now.value.toLocaleTimeString();
-    }
-});
-
-/** Template / profile previews arranged on a full circle. */
+/** Template / profile previews mounted around the ring. */
 const orbitImages = [
     `${laravel}/images/templates/professional.png`,
     `${laravel}/images/templates/ats-classic.png`,
@@ -58,25 +33,17 @@ const orbitImages = [
 type OrbitCard = {
     src: string;
     angle: number;
-    x: number;
-    y: number;
     scale: number;
 };
 
-/** Place cards on a true circle (equal % radius on a square ring). */
+/** Even spacing; each card is rotated with the ring so it tilts along the arc. */
 const orbitCards = computed<OrbitCard[]>(() => {
     const count = orbitImages.length;
-    const radius = 46;
-    return orbitImages.map((src, i) => {
-        const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-        return {
-            src,
-            angle: (angle * 180) / Math.PI,
-            x: Math.cos(angle) * radius,
-            y: Math.sin(angle) * radius,
-            scale: 0.88 + ((i % 3) * 0.07),
-        };
-    });
+    return orbitImages.map((src, i) => ({
+        src,
+        angle: (i / count) * 360,
+        scale: 0.9 + ((i % 4) * 0.04),
+    }));
 });
 
 const registerTo = computed(() => (user.value ? '/portal' : '/auth/register'));
@@ -116,8 +83,7 @@ const trackDownload = () => {
                             :key="i"
                             class="hero-orbit__slot"
                             :style="{
-                                '--x': `${card.x}%`,
-                                '--y': `${card.y}%`,
+                                '--angle': `${card.angle}deg`,
                                 '--scale': card.scale,
                             }"
                         >
@@ -125,7 +91,7 @@ const trackDownload = () => {
                                 <img
                                     :src="card.src"
                                     alt=""
-                                    loading="lazy"
+                                    loading="eager"
                                     decoding="async"
                                     draggable="false"
                                 />
@@ -135,11 +101,6 @@ const trackDownload = () => {
                 </div>
 
                 <div class="hero-orbit__content">
-                    <p class="hero-orbit__time">
-                        {{ t('landing.hero_time_prefix') }}
-                        <time :datetime="now.toISOString()">{{ timeLabel }}</time>
-                    </p>
-
                     <h1 id="hero-orbit-title" class="hero-orbit__title">
                         <span
                             v-for="(line, i) in titleLines"
@@ -225,18 +186,18 @@ const trackDownload = () => {
         conic-gradient(
             from 200deg at 50% 0%,
             transparent 0deg,
-            rgba(255, 255, 255, 0.045) 18deg,
+            rgba(255, 255, 255, 0.05) 18deg,
             transparent 36deg,
             transparent 48deg,
-            rgba(255, 255, 255, 0.03) 62deg,
+            rgba(255, 255, 255, 0.035) 62deg,
             transparent 82deg,
             transparent 110deg,
-            rgba(255, 255, 255, 0.04) 130deg,
+            rgba(255, 255, 255, 0.045) 130deg,
             transparent 150deg,
             transparent 360deg
         );
     filter: blur(2px);
-    opacity: 0.9;
+    opacity: 0.95;
     z-index: 0;
 }
 
@@ -246,7 +207,7 @@ const trackDownload = () => {
     inset: 0;
     background:
         radial-gradient(ellipse 55% 40% at 50% 0%, rgba(255, 255, 255, 0.1), transparent 70%),
-        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0, 0, 0, 0.65), transparent 70%);
+        radial-gradient(ellipse 70% 55% at 50% 55%, transparent 35%, rgba(0, 0, 0, 0.35) 100%);
     z-index: 0;
 }
 
@@ -260,49 +221,68 @@ const trackDownload = () => {
     isolation: isolate;
 }
 
-/* Square ring so the path is a true circle */
+/*
+ * Cards mounted with rotate(angle) + translateY(-radius)
+ * so they tilt along the arc like the reference (not upright).
+ * Mask fades the bottom of the ring for depth-of-field.
+ */
 .hero-orbit__ring-wrap {
+    --radius: min(40vw, 355px);
     position: absolute;
-    top: 50%;
+    top: 48%;
     left: 50%;
     z-index: 0;
-    width: min(96vw, 860px);
-    aspect-ratio: 1;
+    width: calc(var(--radius) * 2.4);
+    height: calc(var(--radius) * 2.4);
     transform: translate(-50%, -50%);
     pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+        180deg,
+        #000 0%,
+        #000 58%,
+        rgba(0, 0, 0, 0.55) 78%,
+        transparent 96%
+    );
+    mask-image: linear-gradient(
+        180deg,
+        #000 0%,
+        #000 58%,
+        rgba(0, 0, 0, 0.55) 78%,
+        transparent 96%
+    );
 }
 
 .hero-orbit__ring {
     position: relative;
     width: 100%;
     height: 100%;
-    /* Independent `rotate` so we don't fight other transforms */
-    animation: hero-orbit-spin 48s linear infinite;
-    will-change: rotate;
+    animation: hero-orbit-spin 50s linear infinite;
+    will-change: transform;
 }
 
 .hero-orbit__slot {
     position: absolute;
-    top: calc(50% + var(--y));
-    left: calc(50% + var(--x));
+    top: 50%;
+    left: 50%;
     width: 0;
     height: 0;
+    /* Mount on the wheel — tilt follows the circle as it spins */
+    transform: rotate(var(--angle)) translateY(calc(var(--radius) * -1));
 }
 
 .hero-orbit__card {
-    width: clamp(72px, 11vw, 128px);
-    aspect-ratio: 3 / 4;
-    border-radius: 14px;
+    width: clamp(78px, 10.5vw, 118px);
+    aspect-ratio: 10 / 13;
+    border-radius: 16px;
     overflow: hidden;
-    background: #141414;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(160deg, #1c1c1f 0%, #0c0c0e 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
-        0 18px 40px -18px rgba(0, 0, 0, 0.85),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-    /* Center on slot; reverse spin keeps faces upright while the ring orbits */
+        0 22px 40px -16px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 32px -6px rgba(140, 160, 255, 0.28);
+    /* Center on the slot; no counter-rotate so cards lean with the arc */
     transform: translate(-50%, -50%) scale(var(--scale));
-    animation: hero-orbit-counter 48s linear infinite;
-    will-change: rotate;
 }
 
 .hero-orbit__card img {
@@ -315,13 +295,8 @@ const trackDownload = () => {
 }
 
 @keyframes hero-orbit-spin {
-    from { rotate: 0deg; }
-    to { rotate: 360deg; }
-}
-
-@keyframes hero-orbit-counter {
-    from { rotate: 0deg; }
-    to { rotate: -360deg; }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .hero-orbit__content {
@@ -331,19 +306,7 @@ const trackDownload = () => {
     text-align: center;
     padding: 1.25rem 0.75rem;
     border-radius: 1.5rem;
-    background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(5, 5, 5, 0.88) 0%, rgba(5, 5, 5, 0.55) 55%, transparent 75%);
-}
-
-.hero-orbit__time {
-    margin: 0 0 1rem;
-    font-size: 0.9rem;
-    font-weight: 400;
-    letter-spacing: 0.01em;
-    color: rgba(255, 255, 255, 0.45);
-}
-
-.hero-orbit__time time {
-    color: rgba(255, 255, 255, 0.55);
+    background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(5, 5, 5, 0.88) 0%, rgba(5, 5, 5, 0.45) 55%, transparent 78%);
 }
 
 .hero-orbit__title {
@@ -425,14 +388,13 @@ const trackDownload = () => {
         border-radius: 1.25rem;
     }
     .hero-orbit__ring-wrap {
-        width: min(140vw, 640px);
+        --radius: min(46vw, 220px);
+        width: calc(var(--radius) * 2.5);
+        height: calc(var(--radius) * 2.5);
     }
     .hero-orbit__card {
-        width: clamp(56px, 17vw, 84px);
-        border-radius: 10px;
-    }
-    .hero-orbit__slot:nth-child(even) .hero-orbit__card {
-        opacity: 0.4;
+        width: clamp(58px, 16vw, 80px);
+        border-radius: 12px;
     }
     .hero-orbit__slot:nth-child(3n) {
         display: none;
@@ -450,8 +412,7 @@ const trackDownload = () => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-orbit__ring,
-    .hero-orbit__card {
+    .hero-orbit__ring {
         animation: none;
     }
 }
