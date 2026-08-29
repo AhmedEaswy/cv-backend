@@ -95,4 +95,5 @@
             </div>
         @endif
     </div>
+    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

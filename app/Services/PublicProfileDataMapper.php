@@ -78,6 +78,8 @@ class PublicProfileDataMapper
             'slug' => $profile->slug,
             'public_url' => $profile->public_url,
             'is_public' => $profile->is_public,
+            'enable_contact_form' => (bool) $profile->enable_contact_form,
+            'contact_form_recipient' => $profile->contact_form_recipient,
             'language' => $profile->language,
             'headline' => $profile->headline,
             'about' => $profile->about,

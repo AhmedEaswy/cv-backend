@@ -112,4 +112,5 @@
             @endif
         </main>
     </div>
+    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

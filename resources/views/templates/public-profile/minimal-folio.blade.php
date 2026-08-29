@@ -92,4 +92,5 @@
             <a class="cta" href="{{ $d->cta['url'] }}">{{ $d->cta['label'] ?? 'Get in touch' }}</a>
         @endif
     </main>
+    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

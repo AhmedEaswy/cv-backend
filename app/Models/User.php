@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserType;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -59,7 +59,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is an admin
+     * Check if the user is an admin.
      */
     public function isAdmin(): bool
     {
@@ -67,7 +67,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is a regular user
+     * Check if the user is a regular user.
      */
     public function isUser(): bool
     {
@@ -75,11 +75,45 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is active
+     * Check if the user is active.
      */
     public function isActive(): bool
     {
         return $this->active === true;
+    }
+
+    /**
+     * Get the user's full name (first + last, fallback to name).
+     */
+    public function getFullNameAttribute(): string
+    {
+        $first = trim((string) $this->first_name);
+        $last = trim((string) $this->last_name);
+
+        if ($first !== '' || $last !== '') {
+            return trim($first.' '.$last);
+        }
+
+        return (string) $this->name;
+    }
+
+    /**
+     * Get the initials used in avatars.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $name = $this->full_name ?: ($this->email ?? '?');
+        $parts = preg_split('/\s+/u', trim($name)) ?: [];
+        $letters = '';
+
+        foreach ($parts as $part) {
+            $letters .= mb_strtoupper(mb_substr($part, 0, 1));
+            if (mb_strlen($letters) >= 2) {
+                break;
+            }
+        }
+
+        return $letters !== '' ? $letters : 'U';
     }
 
     /**
@@ -112,5 +146,21 @@ class User extends Authenticatable
     public function publicProfile(): HasOne
     {
         return $this->hasOne(PublicProfile::class);
+    }
+
+    /**
+     * Get the contact messages for the user (via their public profile).
+     */
+    public function contactMessages(): HasMany
+    {
+        return $this->hasMany(ContactMessage::class);
+    }
+
+    /**
+     * Check whether the user has a Google social account linked.
+     */
+    public function hasGoogleLinked(): bool
+    {
+        return $this->socialAccounts()->where('provider_name', 'google')->exists();
     }
 }

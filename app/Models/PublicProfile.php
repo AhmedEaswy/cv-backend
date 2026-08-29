@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -17,6 +18,8 @@ class PublicProfile extends Model
         'public_profile_template_id',
         'slug',
         'is_public',
+        'enable_contact_form',
+        'contact_form_recipient',
         'language',
         'headline',
         'about',
@@ -41,6 +44,7 @@ class PublicProfile extends Model
     {
         return [
             'is_public' => 'boolean',
+            'enable_contact_form' => 'boolean',
             'info' => 'array',
             'social_links' => 'array',
             'experiences' => 'array',
@@ -109,5 +113,33 @@ class PublicProfile extends Model
     public function getPublicUrlAttribute(): string
     {
         return url('/u/'.$this->slug);
+    }
+
+    /**
+     * Whether the contact form is enabled and ready to render.
+     */
+    public function showsContactForm(): bool
+    {
+        return $this->is_public && (bool) $this->enable_contact_form;
+    }
+
+    /**
+     * Inbox of contact messages addressed to the owner of this profile.
+     */
+    public function contactMessages(): HasMany
+    {
+        return $this->hasMany(ContactMessage::class)->latest();
+    }
+
+    /**
+     * Recipient email for the contact form (falls back to owner's email).
+     */
+    public function contactRecipient(): ?string
+    {
+        if (! empty($this->contact_form_recipient) && filter_var($this->contact_form_recipient, FILTER_VALIDATE_EMAIL)) {
+            return $this->contact_form_recipient;
+        }
+
+        return $this->user?->email;
     }
 }

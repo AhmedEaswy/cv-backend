@@ -78,4 +78,5 @@
             <p style="text-align:center;color:#888">No timeline items yet.</p>
         @endforelse
     </div>
+    @include('components.public-profile._contact_form')
 </x-public-profile-layout>
