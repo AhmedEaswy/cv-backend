@@ -1,0 +1,14 @@
+{
+    "landing.ai_connect_chip_cv": "CV oluştur",
+    "landing.ai_connect_chip_ats": "ATS kontrolü",
+    "landing.ai_connect_chip_cover": "Ön yazı",
+    "landing.ai_connect_chip_profile": "Herkese açık profil",
+    "landing.ai_connect_demo_cv_user": "Riyad'da ürün tasarımcısı olarak bir CV oluştur.",
+    "landing.ai_connect_demo_cv_bot": "Sara Hassan — Ürün Tasarımcısı taslağı hazır. ATS puanı 86 (B+). PDF hazır: cv.test/p/sara.pdf",
+    "landing.ai_connect_demo_ats_user": "Bu özgeçmişi Kıdemli PM ilanına göre değerlendir.",
+    "landing.ai_connect_demo_ats_bot": "ATS 72 (B). İki rolde ölçülebilir etki eksik. Bu maddeleri yeniden yazabilirim.",
+    "landing.ai_connect_demo_cover_user": "Bu PM rolü için bir ön yazı yaz.",
+    "landing.ai_connect_demo_cover_bot": "Ön yazı kaydedildi. PDF: cv.test/p/sara-cover.pdf",
+    "landing.ai_connect_demo_profile_user": "Bu CV'den herkese açık bir profil yayınla.",
+    "landing.ai_connect_demo_profile_bot": "cv.test/u/sara-hassan adresinde yayında — iletişim formu açık."
+}

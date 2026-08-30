@@ -55,6 +55,7 @@ const trackDownload = () => {
 
             <nav class="site-header__nav" aria-label="Primary">
                 <a href="#platforms">{{ t('landing.nav.platforms') }}</a>
+                <a href="#ai-connect">{{ t('landing.nav.ai_connect') }}</a>
                 <a href="#mockup">{{ t('landing.nav.mockup') }}</a>
                 <a href="#pricing">{{ t('landing.nav.pricing') }}</a>
                 <a href="#download">{{ t('landing.nav.download') }}</a>

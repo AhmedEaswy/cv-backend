@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
+    /** @var list<string> */
+    private const SUPPORTED = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'];
+
     /**
      * Handle an incoming request.
      *
@@ -17,20 +20,34 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = Session::get('locale', config('app.locale', 'en'));
+        $locale = $this->resolveLocale($request);
 
-        // Validate locale
-        if (in_array($locale, ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'])) {
+        if (in_array($locale, self::SUPPORTED, true)) {
             App::setLocale($locale);
 
-            // Set direction for RTL languages
-            if (in_array($locale, ['ar', 'ur'])) {
-                Session::put('direction', 'rtl');
-            } else {
-                Session::put('direction', 'ltr');
-            }
+            Session::put('direction', in_array($locale, ['ar', 'ur'], true) ? 'rtl' : 'ltr');
         }
 
         return $next($request);
+    }
+
+    private function resolveLocale(Request $request): string
+    {
+        $header = $request->header('Accept-Language');
+        if (is_string($header) && $header !== '') {
+            $candidate = strtolower(substr(trim(explode(',', $header)[0]), 0, 2));
+            if (in_array($candidate, self::SUPPORTED, true)) {
+                return $candidate;
+            }
+        }
+
+        $sessionLocale = Session::get('locale');
+        if (is_string($sessionLocale) && in_array($sessionLocale, self::SUPPORTED, true)) {
+            return $sessionLocale;
+        }
+
+        $default = config('app.locale', 'en');
+
+        return is_string($default) ? $default : 'en';
     }
 }

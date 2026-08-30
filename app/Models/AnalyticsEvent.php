@@ -19,6 +19,11 @@ class AnalyticsEvent extends Model
         'user_id',
         'profile_id',
         'action_type',
+        'channel',
+        'agent_name',
+        'agent_client',
+        'tool_name',
+        'is_agent',
         'request_data',
         'response_status',
         'duration_ms',
@@ -30,6 +35,7 @@ class AnalyticsEvent extends Model
         return [
             'request_data' => 'array',
             'created_at' => 'datetime',
+            'is_agent' => 'boolean',
         ];
     }
 

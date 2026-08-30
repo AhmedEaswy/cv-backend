@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "البيانات المقدمة غير صالحة.",
+    "messages.validation_failed": "البيانات المقدمة غير صالحة.",
+    "messages_validation_failed": "البيانات المقدمة غير صالحة.",
+    "messages.email_taken": "هذا البريد الإلكتروني مسجل بالفعل. جرّب تسجيل الدخول بدلاً من ذلك.",
+    "messages.slug_invalid": "استخدم أحرفًا صغيرة وأرقامًا وشرطات فقط.",
+    "messages.slug_taken": "هذا الرابط مستخدم بالفعل. جرّب رابطًا مختلفًا.",
+    "messages.spam_detected": "تم رفض الإرسال كرسالة غير مرغوب فيها.",
+    "messages.auth_throttle": "محاولات كثيرة جدًا. حاول مرة أخرى خلال :seconds ثانية.",
+    "messages.register_throttle": "تسجيلات كثيرة من شبكتك. حاول مرة أخرى خلال :seconds ثانية.",
+    "auth.validation_failed": "يرجى مراجعة النموذج وتصحيح الأخطاء.",
+    "auth.invalid_credentials": "بيانات الاعتماد هذه غير متطابقة مع سجلاتنا.",
+    "auth.reset_link_sent": "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.",
+    "auth.password_reset_success": "تم تحديث كلمة المرور.",
+    "auth.invalid_token": "هذا الرمز غير صالح.",
+    "auth.reset_token_expired": "انتهت صلاحية رابط إعادة التعيين.",
+    "auth.reset_token_invalid": "رابط إعادة التعيين غير صالح.",
+    "auth.reset_link_failed": "تعذّر إرسال رابط إعادة التعيين. حاول مرة أخرى لاحقًا.",
+    "auth.account_inactive": "حسابك غير نشط. تواصل مع الدعم."
+}

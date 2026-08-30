@@ -1,0 +1,14 @@
+{
+    "landing.ai_connect_chip_cv": "Crear un CV",
+    "landing.ai_connect_chip_ats": "Comprobar ATS",
+    "landing.ai_connect_chip_cover": "Carta de presentación",
+    "landing.ai_connect_chip_profile": "Perfil público",
+    "landing.ai_connect_demo_cv_user": "Créame un CV como diseñadora de producto en Riad.",
+    "landing.ai_connect_demo_cv_bot": "Borrador de Sara Hassan — Diseñadora de producto. Puntuación ATS 86 (B+). PDF listo: cv.test/p/sara.pdf",
+    "landing.ai_connect_demo_ats_user": "Evalúa este currículum frente a una oferta de PM senior.",
+    "landing.ai_connect_demo_ats_bot": "ATS 72 (B). Faltan resultados medibles en dos roles. Puedo reescribir esos puntos.",
+    "landing.ai_connect_demo_cover_user": "Escribe una carta de presentación para ese puesto de PM.",
+    "landing.ai_connect_demo_cover_bot": "Carta guardada. PDF: cv.test/p/sara-cover.pdf",
+    "landing.ai_connect_demo_profile_user": "Publica un perfil público a partir de este CV.",
+    "landing.ai_connect_demo_profile_bot": "En vivo en cv.test/u/sara-hassan — formulario de contacto activo."
+}

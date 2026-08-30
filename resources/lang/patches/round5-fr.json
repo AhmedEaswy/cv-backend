@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "Les données fournies ne sont pas valides.",
+    "messages.validation_failed": "Les données fournies ne sont pas valides.",
+    "messages_validation_failed": "Les données fournies ne sont pas valides.",
+    "messages.email_taken": "Cet e-mail est déjà enregistré. Essayez de vous connecter.",
+    "messages.slug_invalid": "Utilisez uniquement des minuscules, des chiffres et des tirets.",
+    "messages.slug_taken": "Cette URL est déjà prise. Essayez-en une autre.",
+    "messages.spam_detected": "La soumission a été signalée comme spam.",
+    "messages.auth_throttle": "Trop de tentatives. Réessayez dans :seconds secondes.",
+    "messages.register_throttle": "Trop d'inscriptions depuis votre réseau. Réessayez dans :seconds secondes.",
+    "auth.validation_failed": "Veuillez vérifier le formulaire pour les erreurs.",
+    "auth.invalid_credentials": "Ces identifiants ne correspondent pas à nos enregistrements.",
+    "auth.reset_link_sent": "Un lien de réinitialisation a été envoyé à votre e-mail.",
+    "auth.password_reset_success": "Votre mot de passe a été mis à jour.",
+    "auth.invalid_token": "Ce jeton est invalide.",
+    "auth.reset_token_expired": "Ce lien de réinitialisation a expiré.",
+    "auth.reset_token_invalid": "Ce lien de réinitialisation est invalide.",
+    "auth.reset_link_failed": "Impossible d'envoyer le lien de réinitialisation. Réessayez plus tard.",
+    "auth.account_inactive": "Votre compte est inactif. Contactez le support."
+}

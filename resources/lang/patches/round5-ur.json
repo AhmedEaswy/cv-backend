@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "فراہم کردہ ڈیٹا درست نہیں ہے۔",
+    "messages.validation_failed": "فراہم کردہ ڈیٹا درست نہیں ہے۔",
+    "messages_validation_failed": "فراہم کردہ ڈیٹا درست نہیں ہے۔",
+    "messages.email_taken": "یہ ای میل پہلے سے رجسٹرڈ ہے۔ سائن ان کرنے کی کوشش کریں۔",
+    "messages.slug_invalid": "صرف چھوٹے حروف، نمبر اور ڈیش استعمال کریں۔",
+    "messages.slug_taken": "یہ URL پہلے سے استعمال میں ہے۔ کوئی اور آزمائیں۔",
+    "messages.spam_detected": "جمع کرانا spam کے طور پر نشان زد ہوا۔",
+    "messages.auth_throttle": "بہت زیادہ کوششیں۔ :seconds سیکنڈ بعد دوبارہ کوشش کریں۔",
+    "messages.register_throttle": "آپ کے نیٹ ورک سے بہت زیادہ رجسٹریشن۔ :seconds سیکنڈ بعد دوبارہ کوشش کریں۔",
+    "auth.validation_failed": "براہ کرم فارم میں غلطیوں کی جانچ کریں۔",
+    "auth.invalid_credentials": "یہ اسناد ہمارے ریکارڈ سے مطابقت نہیں رکھتیں۔",
+    "auth.reset_link_sent": "ری سیٹ لنک آپ کے ای میل پر بھیج دیا گیا ہے۔",
+    "auth.password_reset_success": "آپ کا پاس ورڈ اپ ڈیٹ ہو گیا ہے۔",
+    "auth.invalid_token": "یہ ٹوکن درست نہیں ہے۔",
+    "auth.reset_token_expired": "یہ ری سیٹ لنک ختم ہو چکا ہے۔",
+    "auth.reset_token_invalid": "یہ ری سیٹ لنک درست نہیں ہے۔",
+    "auth.reset_link_failed": "ری سیٹ لنک نہیں بھیجا جا سکا۔ بعد میں دوبارہ کوشش کریں۔",
+    "auth.account_inactive": "آپ کا اکاؤنٹ غیر فعال ہے۔ سپورٹ سے رابطہ کریں۔"
+}

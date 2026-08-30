@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AgentTokenController;
 use App\Http\Controllers\Api\AnalyticsClickController;
 use App\Http\Controllers\Api\AtsCheckController;
 use App\Http\Controllers\Api\AuthController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Middleware\AnalyticsMiddleware;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public click-tracking endpoint (landing page App Store / Play Store badges).
@@ -76,5 +77,11 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::post('/public-profiles', [PublicProfileController::class, 'store']);
         Route::put('/public-profiles', [PublicProfileController::class, 'update']);
         Route::delete('/public-profiles', [PublicProfileController::class, 'destroy']);
+    });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/agent-tokens', [AgentTokenController::class, 'index']);
+        Route::post('/agent-tokens', [AgentTokenController::class, 'store']);
+        Route::delete('/agent-tokens/{id}', [AgentTokenController::class, 'destroy']);
     });
 });

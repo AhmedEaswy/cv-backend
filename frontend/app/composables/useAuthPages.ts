@@ -8,9 +8,9 @@ export interface AuthFieldErrors { [key: string]: string[] }
 export const useAuthPages = () => {
     const api = useApi();
     const toast = useToast();
-    const errors = ref<AuthFieldErrors>({});
-    const generalError = ref<string | null>(null);
-    const loading = ref(false);
+    const errors = useState<AuthFieldErrors>('auth.errors', () => ({}));
+    const generalError = useState<string | null>('auth.generalError', () => null);
+    const loading = useState('auth.loading', () => false);
 
     function clearErrors() {
         errors.value = {};
@@ -36,9 +36,9 @@ export const useAuthPages = () => {
         clearErrors();
         loading.value = true;
         try {
-            const res = await api<{ data: T }>(url, { method: 'POST', body });
+            const res = await api<{ result: T }>(url, { method: 'POST', body });
             if (successMessage) toast.success(successMessage);
-            return { ok: true, data: res.data };
+            return { ok: true, data: res.result };
         } catch (err: any) {
             const { general, fields } = extractError(err);
             errors.value = fields;
@@ -69,8 +69,8 @@ export const useAuthSession = () => {
 
     async function refresh() {
         try {
-            const res = await api<{ data: any }>('/auth/me');
-            user.value = res.data ?? null;
+            const res = await api<{ result: { user: any } }>('/auth/me');
+            user.value = res.result?.user ?? null;
         } catch {
             user.value = null;
         }
@@ -118,5 +118,18 @@ export const useAuthSession = () => {
         if (import.meta.client) window.location.href = '/';
     }
 
-    return { user, refresh, login, register, forgot, reset, logout };
+    const pages = useAuthPages();
+
+    return {
+        user,
+        refresh,
+        login,
+        register,
+        forgot,
+        reset,
+        logout,
+        loading: pages.loading,
+        fieldError: pages.fieldError,
+        generalError: pages.generalError,
+    };
 };

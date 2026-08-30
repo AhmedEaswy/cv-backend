@@ -1,0 +1,114 @@
+[
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 88,
+    "utilities": 10,
+    "hasScoped": false,
+    "sample": "absolute -top-4 -end-4 w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+  },
+  {
+    "file": "components/landing/PublicProfileFeature.vue",
+    "len": 87,
+    "utilities": 10,
+    "hasScoped": false,
+    "sample": "absolute -top-4 -end-4 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+  },
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 81,
+    "utilities": 9,
+    "hasScoped": false,
+    "sample": "inline-flex items-center justify-center w-5 h-5 rounded-full mt-0.5 flex-shrink-0"
+  },
+  {
+    "file": "components/landing/PublicProfileFeature.vue",
+    "len": 81,
+    "utilities": 9,
+    "hasScoped": false,
+    "sample": "inline-flex items-center justify-center w-5 h-5 rounded-full mt-0.5 flex-shrink-0"
+  },
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 77,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "font-display text-3xl sm:text-4xl font-bold text-[#130e21] mb-4 leading-tight"
+  },
+  {
+    "file": "components/landing/DownloadCTA.vue",
+    "len": 77,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "font-display text-3xl sm:text-5xl font-bold text-[#130e21] mb-5 leading-tight"
+  },
+  {
+    "file": "components/landing/FeaturesBento.vue",
+    "len": 77,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "font-display text-3xl sm:text-4xl font-bold text-[#130e21] mb-3 leading-tight"
+  },
+  {
+    "file": "components/landing/PublicProfileFeature.vue",
+    "len": 77,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "font-display text-3xl sm:text-4xl font-bold text-[#130e21] mb-4 leading-tight"
+  },
+  {
+    "file": "components/landing/TemplatesCarousel.vue",
+    "len": 77,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "font-display text-3xl sm:text-4xl font-bold text-[#130e21] mb-3 leading-tight"
+  },
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 72,
+    "utilities": 9,
+    "hasScoped": false,
+    "sample": "text-[10px] font-semibold uppercase tracking-wider text-[#8a8499] mb-1.5"
+  },
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 72,
+    "utilities": 9,
+    "hasScoped": false,
+    "sample": "text-[10px] font-semibold uppercase tracking-wider text-[#8a8499] mb-1.5"
+  },
+  {
+    "file": "components/landing/CoverFeature.vue",
+    "len": 71,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-12 items-center"
+  },
+  {
+    "file": "components/landing/PublicProfileFeature.vue",
+    "len": 71,
+    "utilities": 8,
+    "hasScoped": false,
+    "sample": "max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-12 items-center"
+  },
+  {
+    "file": "components/landing/TemplatesCarousel.vue",
+    "len": 66,
+    "utilities": 9,
+    "hasScoped": false,
+    "sample": "w-[72%] h-[86%] rounded-sm bg-white shadow-md flex overflow-hidden"
+  },
+  {
+    "file": "components/landing/TemplatesCarousel.vue",
+    "len": 65,
+    "utilities": 11,
+    "hasScoped": false,
+    "sample": "w-[72%] h-[86%] rounded-sm bg-white shadow-md p-3.5 flex flex-col"
+  },
+  {
+    "file": "components/landing/TemplatesCarousel.vue",
+    "len": 65,
+    "utilities": 11,
+    "hasScoped": false,
+    "sample": "w-[72%] h-[86%] rounded-sm bg-white shadow-md p-3.5 flex flex-col"
+  }
+]

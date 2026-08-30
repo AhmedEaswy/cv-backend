@@ -5,8 +5,7 @@
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
-const { login, loading, generalError } = useAuthSession();
-const { fieldError } = useAuthPages();
+const { login, loading, fieldError, generalError } = useAuthSession();
 
 const form = reactive({
     email: '',

@@ -17,24 +17,41 @@ const currentLocale = computed(() =>
 
 const htmlDir = computed(() => currentLocale.value?.dir ?? 'ltr');
 
-const displayFontHref =
-    'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap';
+const bodyFontHref =
+    'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
 
 useHead({
     htmlAttrs: {
         lang: () => locale.value,
         dir: () => htmlDir.value,
+        class: () => (locale.value === 'ar' ? 'locale-ar' : ''),
     },
     title: `${appName}`,
     meta: [
         { name: 'description', content: 'CV — build, share, and track your career documents.' },
         { name: 'theme-color', content: '#fafaf9' },
     ],
-    link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: displayFontHref },
-    ],
+    link: computed(() => {
+        const links: Array<Record<string, string>> = [
+            {
+                rel: 'preload',
+                href: '/fonts/thmanyah/thmanyahsans-Regular.woff2',
+                as: 'font',
+                type: 'font/woff2',
+                crossorigin: '',
+            },
+        ];
+
+        if (locale.value !== 'ar') {
+            links.push(
+                { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+                { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+                { rel: 'stylesheet', href: bodyFontHref },
+            );
+        }
+
+        return links;
+    }),
 });
 </script>
 

@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "Die eingegebenen Daten sind ungültig.",
+    "messages.validation_failed": "Die eingegebenen Daten sind ungültig.",
+    "messages_validation_failed": "Die eingegebenen Daten sind ungültig.",
+    "messages.email_taken": "Diese E-Mail ist bereits registriert. Versuchen Sie sich anzumelden.",
+    "messages.slug_invalid": "Verwenden Sie nur Kleinbuchstaben, Zahlen und Bindestriche.",
+    "messages.slug_taken": "Diese URL ist bereits vergeben. Versuchen Sie eine andere.",
+    "messages.spam_detected": "Die Übermittlung wurde als Spam markiert.",
+    "messages.auth_throttle": "Zu viele Versuche. Versuchen Sie es in :seconds Sekunden erneut.",
+    "messages.register_throttle": "Zu viele Registrierungen aus Ihrem Netzwerk. Versuchen Sie es in :seconds Sekunden erneut.",
+    "auth.validation_failed": "Bitte überprüfen Sie das Formular auf Fehler.",
+    "auth.invalid_credentials": "Diese Anmeldedaten stimmen nicht mit unseren Aufzeichnungen überein.",
+    "auth.reset_link_sent": "Ein Link zum Zurücksetzen wurde an Ihre E-Mail gesendet.",
+    "auth.password_reset_success": "Ihr Passwort wurde aktualisiert.",
+    "auth.invalid_token": "Dieses Token ist ungültig.",
+    "auth.reset_token_expired": "Dieser Link zum Zurücksetzen ist abgelaufen.",
+    "auth.reset_token_invalid": "Dieser Link zum Zurücksetzen ist ungültig.",
+    "auth.reset_link_failed": "Der Link zum Zurücksetzen konnte nicht gesendet werden. Versuchen Sie es später erneut.",
+    "auth.account_inactive": "Ihr Konto ist inaktiv. Wenden Sie sich an den Support."
+}

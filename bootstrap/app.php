@@ -25,6 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
         ]);
 
+        $middleware->api(prepend: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'mcp/*',
+        ]);
+
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
             'verified' => EnsureEmailIsVerified::class,

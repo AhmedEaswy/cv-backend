@@ -39,7 +39,6 @@ const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 
 <style scoped>
 .mockup-section {
-    margin-top: 6rem;
     padding: 6rem 0 0 0;
     overflow: hidden;
     background:

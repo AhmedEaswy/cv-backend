@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "Girilen veriler geçersiz.",
+    "messages.validation_failed": "Girilen veriler geçersiz.",
+    "messages_validation_failed": "Girilen veriler geçersiz.",
+    "messages.email_taken": "Bu e-posta zaten kayıtlı. Giriş yapmayı deneyin.",
+    "messages.slug_invalid": "Yalnızca küçük harf, rakam ve tire kullanın.",
+    "messages.slug_taken": "Bu URL zaten alınmış. Farklı bir tane deneyin.",
+    "messages.spam_detected": "Gönderim spam olarak işaretlendi.",
+    "messages.auth_throttle": "Çok fazla deneme. :seconds saniye sonra tekrar deneyin.",
+    "messages.register_throttle": "Ağınızdan çok fazla kayıt. :seconds saniye sonra tekrar deneyin.",
+    "auth.validation_failed": "Lütfen formu hatalar için kontrol edin.",
+    "auth.invalid_credentials": "Bu bilgiler kayıtlarımızla eşleşmiyor.",
+    "auth.reset_link_sent": "Sıfırlama bağlantısı e-postanıza gönderildi.",
+    "auth.password_reset_success": "Şifreniz güncellendi.",
+    "auth.invalid_token": "Bu jeton geçersiz.",
+    "auth.reset_token_expired": "Bu sıfırlama bağlantısının süresi doldu.",
+    "auth.reset_token_invalid": "Bu sıfırlama bağlantısı geçersiz.",
+    "auth.reset_link_failed": "Sıfırlama bağlantısı gönderilemedi. Daha sonra tekrar deneyin.",
+    "auth.account_inactive": "Hesabınız aktif değil. Destek ile iletişime geçin."
+}

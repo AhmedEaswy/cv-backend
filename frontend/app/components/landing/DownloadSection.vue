@@ -76,10 +76,6 @@ const track = (label: string) => {
 </template>
 
 <style scoped>
-.closing-cta {
-    padding: 0 0 0.75rem;
-}
-
 .closing-cta__panel {
     position: relative;
     overflow: hidden;

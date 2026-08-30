@@ -2,7 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\AnalyticsEvent;
+use App\Jobs\RecordAnalyticsEvent;
+use App\Services\Agent\AgentDetector;
 use App\Services\TrackingService;
 use Closure;
 use Illuminate\Http\Request;
@@ -11,9 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 class AnalyticsMiddleware
 {
     public function __construct(
-        private TrackingService $trackingService
-    ) {
-    }
+        private TrackingService $trackingService,
+        private AgentDetector $agentDetector,
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -24,29 +25,47 @@ class AnalyticsMiddleware
         $duration = (int) round((microtime(true) - $startTime) * 1000);
 
         $tracking = $this->trackingService->capture($request);
+        $agent = $this->agentDetector->detect($request);
 
         $endpoint = $request->path();
         $method = $request->method();
         $actionType = $this->resolveActionType($method, $endpoint);
 
-        AnalyticsEvent::create(array_merge($tracking, [
-            'endpoint' => $endpoint,
-            'method' => $method,
-            'user_agent' => $request->header('User-Agent'),
-            'user_id' => $request->user()?->id,
-            'profile_id' => $this->resolveProfileId($request, $endpoint),
-            'action_type' => $actionType,
-            'request_data' => $this->sanitizeRequestData($request),
-            'response_status' => $response->getStatusCode(),
-            'duration_ms' => $duration,
-            'created_at' => now(),
-        ]));
+        try {
+            RecordAnalyticsEvent::dispatch(array_merge($tracking, $agent, [
+                'endpoint' => $endpoint,
+                'method' => $method,
+                'user_agent' => $request->header('User-Agent'),
+                'user_id' => $request->user()?->id,
+                'profile_id' => $this->resolveProfileId($request, $endpoint),
+                'action_type' => $actionType,
+                'request_data' => $this->sanitizeRequestData($request),
+                'response_status' => $response->getStatusCode(),
+                'duration_ms' => $duration,
+                'created_at' => now(),
+            ]));
+        } catch (\Throwable) {
+            // Never fail the request because analytics could not be recorded.
+        }
 
         return $response;
     }
 
     private function resolveActionType(string $method, string $endpoint): ?string
     {
+        if (str_contains($endpoint, '/mcp/')) {
+            return 'mcp_call';
+        }
+
+        if (str_contains($endpoint, '/agent-tokens')) {
+            return match ($method) {
+                'GET' => 'list_agent_tokens',
+                'POST' => 'create_agent_token',
+                'DELETE' => 'revoke_agent_token',
+                default => null,
+            };
+        }
+
         if (str_contains($endpoint, '/cvs')) {
             return match ($method) {
                 'GET' => 'list_cvs',
@@ -86,10 +105,6 @@ class AnalyticsMiddleware
     {
         if (str_contains($endpoint, '/cvs')) {
             return $request->route('profile') ?? $request->route('id') ?? null;
-        }
-
-        if (str_contains($endpoint, '/cover-letters')) {
-            return null;
         }
 
         return null;

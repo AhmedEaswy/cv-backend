@@ -28,33 +28,36 @@ export const useApi = () => {
         } catch { /* ignore */ }
     }
 
-    return {
-        ...$fetch.create({
-            baseURL: `${base}${prefix}`,
+    const api = $fetch.create({
+        baseURL: `${base}${prefix}`,
 
-            onRequest({ options }) {
-                // Server: forward the cookie so /auth/me works during SSR
-                if (import.meta.server) {
-                    const headers = useRequestHeaders(['cookie']);
-                    if (headers.cookie) {
-                        options.headers = { ...(options.headers || {}), cookie: headers.cookie };
-                    }
-                    return;
+        onRequest({ options }) {
+            const locale = useNuxtApp().$i18n?.locale?.value;
+            if (locale) {
+                options.headers = { ...(options.headers || {}), 'Accept-Language': locale };
+            }
+
+            // Server: forward the cookie so /auth/me works during SSR
+            if (import.meta.server) {
+                const headers = useRequestHeaders(['cookie']);
+                if (headers.cookie) {
+                    options.headers = { ...(options.headers || {}), cookie: headers.cookie };
                 }
-                // Client: bearer token from localStorage
-                const token = getToken();
-                if (token) {
-                    options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
-                }
-                // For FormData uploads let the browser set Content-Type
-                if (options.body instanceof FormData) {
-                    delete (options.headers as any)['Content-Type'];
-                }
-            },
-        }),
-        setToken,
-        getToken,
-    };
+                return;
+            }
+            // Client: bearer token from localStorage
+            const token = getToken();
+            if (token) {
+                options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+            }
+            // For FormData uploads let the browser set Content-Type
+            if (options.body instanceof FormData) {
+                delete (options.headers as any)['Content-Type'];
+            }
+        },
+    });
+
+    return Object.assign(api, { setToken, getToken });
 };
 
 /**

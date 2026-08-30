@@ -1,0 +1,14 @@
+{
+    "landing.ai_connect_chip_cv": "Créer un CV",
+    "landing.ai_connect_chip_ats": "Vérification ATS",
+    "landing.ai_connect_chip_cover": "Lettre de motivation",
+    "landing.ai_connect_chip_profile": "Profil public",
+    "landing.ai_connect_demo_cv_user": "Crée-moi un CV en tant que product designer à Riyad.",
+    "landing.ai_connect_demo_cv_bot": "Brouillon Sara Hassan — Product Designer. Score ATS 86 (B+). PDF prêt : cv.test/p/sara.pdf",
+    "landing.ai_connect_demo_ats_user": "Évalue ce CV par rapport à un poste de PM senior.",
+    "landing.ai_connect_demo_ats_bot": "ATS 72 (B). Impact mesurable manquant sur deux postes. Je peux reformuler ces puces.",
+    "landing.ai_connect_demo_cover_user": "Rédige une lettre de motivation pour ce poste de PM.",
+    "landing.ai_connect_demo_cover_bot": "Lettre enregistrée. PDF : cv.test/p/sara-cover.pdf",
+    "landing.ai_connect_demo_profile_user": "Publie un profil public à partir de ce CV.",
+    "landing.ai_connect_demo_profile_bot": "En ligne sur cv.test/u/sara-hassan — formulaire de contact activé."
+}

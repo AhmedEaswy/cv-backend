@@ -30,6 +30,8 @@ useHead({
         <main>
             <LandingHeroSection />
             <LandingPlatformsSection />
+            <LandingAiConnectSection />
+            <LandingAiConnectModal />
 
             <!-- <LandingMarqueeStrip /> -->
             <LandingMockupSection />

@@ -1,0 +1,20 @@
+{
+    "messages.validation.failed": "Los datos proporcionados no son válidos.",
+    "messages.validation_failed": "Los datos proporcionados no son válidos.",
+    "messages_validation_failed": "Los datos proporcionados no son válidos.",
+    "messages.email_taken": "Este correo ya está registrado. Intenta iniciar sesión.",
+    "messages.slug_invalid": "Usa solo letras minúsculas, números y guiones.",
+    "messages.slug_taken": "Esta URL ya está en uso. Prueba con otra.",
+    "messages.spam_detected": "El envío fue marcado como spam.",
+    "messages.auth_throttle": "Demasiados intentos. Vuelve a intentarlo en :seconds segundos.",
+    "messages.register_throttle": "Demasiados registros desde tu red. Vuelve a intentarlo en :seconds segundos.",
+    "auth.validation_failed": "Revisa el formulario en busca de errores.",
+    "auth.invalid_credentials": "Estas credenciales no coinciden con nuestros registros.",
+    "auth.reset_link_sent": "Se envió un enlace de restablecimiento a tu correo.",
+    "auth.password_reset_success": "Tu contraseña ha sido actualizada.",
+    "auth.invalid_token": "Este token no es válido.",
+    "auth.reset_token_expired": "Este enlace de restablecimiento ha expirado.",
+    "auth.reset_token_invalid": "Este enlace de restablecimiento no es válido.",
+    "auth.reset_link_failed": "No pudimos enviar el enlace de restablecimiento. Inténtalo más tarde.",
+    "auth.account_inactive": "Tu cuenta está inactiva. Contacta con soporte."
+}

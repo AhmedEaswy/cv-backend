@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgentDiscoveryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +50,7 @@ Route::get('/admin/switch-language/{locale}', function ($locale) {
     if (str_contains($back, '/admin') && ! auth()->check()) {
         $back = '/admin/login';
     }
+
     return redirect()->to($back);
 })->middleware(['web', \App\Http\Middleware\SetLocale::class]);
 
@@ -76,6 +78,11 @@ Route::get('/test/cover-letter/{template}', [\App\Http\Controllers\TemplateTestC
 
 Route::get('/test/public-profile/{template}', [\App\Http\Controllers\TemplateTestController::class, 'publicProfile'])
     ->name('templates.public-profile.test');
+
+Route::get('/llms.txt', [AgentDiscoveryController::class, 'llms']);
+Route::get('/skill.md', [AgentDiscoveryController::class, 'skill']);
+Route::get('/openapi.json', [AgentDiscoveryController::class, 'openapi']);
+Route::get('/.well-known/mcp.json', [AgentDiscoveryController::class, 'mcp']);
 
 // Catch-all for any other /portal, /auth, or top-level request —
 // return a 404 so Laravel doesn't accidentally render a Blade view.

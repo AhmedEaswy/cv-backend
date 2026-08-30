@@ -1,0 +1,31 @@
+# CV
+
+ATS-ready resumes, cover letters, and a public profile. Agents can use this product from their own AI chat — we are not integrated with ChatGPT or Claude.
+
+## Connect
+
+- Skill (copy into your AI chat): /skill.md
+- REST catalog (OpenAPI 3.1): /openapi.json
+- MCP (no auth): /mcp/cv
+- MCP (account tools): /mcp/cv/auth  — Authorization: Bearer <agent-token>
+- Discovery: /.well-known/mcp.json
+
+## What you can do without an account
+
+POST /api/v1/cvs — create a CV (or generate a PDF if template_id is set)
+POST /api/v1/cvs/print — render a PDF, returns { url }
+POST /api/v1/cvs/ats-check — rule-based ATS score (optional job_description)
+GET  /api/v1/shares/templates — CV templates
+GET  /api/v1/cover-letters/templates
+POST /api/v1/cover-letters
+POST /api/v1/cover-letters/print
+GET  /api/v1/public-profiles/templates
+
+Always send `X-Agent-Client: <platform>` (chatgpt, claude, copilot, gemini, minimax, grok, perplexity, cursor, other).
+
+## Auth
+
+POST /api/v1/auth/register or /login → Bearer token
+Then POST /api/v1/agent-tokens to mint a dedicated agent token with abilities such as cv:read, cv:write, ats:check.
+
+Envelope: { success, message, result }

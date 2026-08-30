@@ -71,6 +71,7 @@ async function savePassword() {
     <div class="tabs" role="tablist">
         <button :aria-pressed="tab === 'profile'" @click="tab = 'profile'" role="tab">{{ t('portal.settings.profile.title') }}</button>
         <button :aria-pressed="tab === 'password'" @click="tab = 'password'" role="tab">{{ t('portal.settings.password.title') }}</button>
+        <NuxtLink to="/portal/settings/ai-access" role="tab">{{ t('portal.settings.ai.title') }}</NuxtLink>
     </div>
 
     <form v-if="tab === 'profile'" class="surface form-card" @submit.prevent="saveProfile">

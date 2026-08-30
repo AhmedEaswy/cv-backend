@@ -46,7 +46,7 @@ class AnalyticsClickTest extends TestCase
     public function test_invalid_target_is_rejected(): void
     {
         $this->postJson('/api/v1/analytics/click', [
-            'target' => 'steam',
+            'target' => 'not a target',
         ])->assertStatus(422);
 
         $this->assertDatabaseCount('analytics_events', 0);
@@ -58,6 +58,18 @@ class AnalyticsClickTest extends TestCase
             ->assertStatus(422);
 
         $this->assertDatabaseCount('analytics_events', 0);
+    }
+
+    public function test_ai_connect_platform_click_creates_event(): void
+    {
+        $this->postJson('/api/v1/analytics/click', [
+            'target' => 'ai_connect_chatgpt',
+            'page' => 'landing',
+        ])->assertNoContent();
+
+        $this->assertDatabaseHas('analytics_events', [
+            'action_type' => 'click_ai_connect_chatgpt',
+        ]);
     }
 
     public function test_click_does_not_require_authentication(): void

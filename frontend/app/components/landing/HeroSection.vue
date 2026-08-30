@@ -9,7 +9,6 @@
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
-const playStore = (config.public.playStoreUrl as string) || '#download';
 const { user } = await useAuth();
 
 /** Template / profile previews mounted around the ring. */
@@ -50,6 +49,13 @@ const registerTo = computed(() => (user.value ? '/portal' : '/auth/register'));
 const registerLabel = computed(() =>
     user.value ? t('landing.hero_cta_primary_authed') : t('landing.hero_cta_register'),
 );
+const { show: showAiConnect } = useAiConnectModal();
+const track = useClickTracker();
+
+const openAiConnect = () => {
+    track('hero_connect_ai', 'landing');
+    showAiConnect();
+};
 
 const titleLines = computed(() => {
     const line1 = t('landing.hero_title_line1');
@@ -59,14 +65,6 @@ const titleLines = computed(() => {
     if (hasSplitKeys) return [line1, line2];
     return String(t('landing.hero_title')).split(/<br\s*\/?>/i);
 });
-
-const trackDownload = () => {
-    if (!import.meta.client) return;
-    const api = useApi();
-    api('/analytics/click', { method: 'POST', body: { label: 'hero_download_app', page: 'landing' } }).catch(
-        () => undefined,
-    );
-};
 </script>
 
 <template>
@@ -115,32 +113,23 @@ const trackDownload = () => {
 
                     <div class="hero-orbit__cta">
                         <Button
-                            :href="playStore"
-                            variant="secondary"
-                            size="md"
-                            class="hero-orbit__btn hero-orbit__btn--download"
-                            target="_blank"
-                            rel="noopener"
-                            @click="trackDownload"
-                        >
-                            <Icon name="download" :size="16" />
-                            {{ t('landing.hero_cta_download') }}
-                        </Button>
-                        <Button
                             :to="registerTo"
-                            variant="ghost"
+                            variant="secondary"
                             size="md"
                             class="hero-orbit__btn hero-orbit__btn--register"
                         >
-                            <span class="hero-orbit__btn-avatar" aria-hidden="true">
-                                <img
-                                    :src="`${laravel}/images/logo-icon.png`"
-                                    alt=""
-                                    width="22"
-                                    height="22"
-                                />
-                            </span>
                             {{ registerLabel }}
+                            <Icon name="arrow-right" :size="16" class="rtl:rotate-180 ltr:rotate-0" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="md"
+                            class="hero-orbit__btn hero-orbit__btn--ai"
+                            @click="openAiConnect"
+                        >
+                            <Icon name="sparkles" :size="16" />
+                            {{ t('landing.hero_cta_ai') }}
                         </Button>
                     </div>
                 </div>
@@ -232,8 +221,8 @@ const trackDownload = () => {
     top: 48%;
     left: 50%;
     z-index: 0;
-    width: calc(var(--radius) * 2.4);
-    height: calc(var(--radius) * 2.4);
+    width: calc(var(--radius) * 3.4);
+    height: calc(var(--radius) * 3.4);
     transform: translate(-50%, -50%);
     pointer-events: none;
     -webkit-mask-image: linear-gradient(
@@ -339,47 +328,33 @@ const trackDownload = () => {
     justify-content: center;
 }
 
-.hero-orbit__btn--download {
+.hero-orbit__btn--register {
     background: #f4f4f2 !important;
     color: #0a0a0a !important;
     border-color: transparent !important;
     box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
-    padding-inline: 1.15rem 1.4rem !important;
+    padding-inline: 1.25rem 1.15rem !important;
+    font-weight: 600;
+    gap: 0.45rem;
 }
 
-.hero-orbit__btn--download:hover {
+.hero-orbit__btn--register:hover {
     background: #ffffff !important;
     transform: translateY(-1px);
+    box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.6);
 }
 
-.hero-orbit__btn--register {
+.hero-orbit__btn--ai {
     background: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
     padding-inline: 1.05rem 1.3rem !important;
 }
 
-.hero-orbit__btn--register:hover {
+.hero-orbit__btn--ai:hover {
     background: rgba(255, 255, 255, 0.14) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
     transform: translateY(-1px);
-}
-
-.hero-orbit__btn-avatar {
-    display: inline-grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #111;
-    margin-inline-end: 0.15rem;
-}
-
-.hero-orbit__btn-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 @media (max-width: 700px) {
@@ -404,7 +379,7 @@ const trackDownload = () => {
         align-items: stretch;
         padding-inline: 1rem;
     }
-    .hero-orbit__btn--download,
+    .hero-orbit__btn--ai,
     .hero-orbit__btn--register {
         width: 100%;
         justify-content: center;

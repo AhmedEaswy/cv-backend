@@ -20,8 +20,8 @@ export const useAuth = async () => {
     if (user.value === null) {
         try {
             const api = useApi();
-            const res = await api<{ data: AuthUser }>('/auth/me');
-            user.value = res.data ?? null;
+            const res = await api<{ result: { user: AuthUser } }>('/auth/me');
+            user.value = res.result?.user ?? null;
         } catch {
             user.value = null;
         }

@@ -270,7 +270,7 @@ const { t } = useI18n();
     padding-bottom: 0.25rem;
 }
 .platform-card__badge {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: 0.4rem;
     align-self: flex-start;

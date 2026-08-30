@@ -13,6 +13,13 @@ defineProps<{
     title?: string;
     text?: string;
 }>();
+
+const config = useRuntimeConfig();
+const appName = config.public.appName as string;
+
+const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
+
+const logoSrc = `${laravel}/images/logo-horizontal-white.png`;
 </script>
 
 <template>
@@ -20,13 +27,7 @@ defineProps<{
         <aside class="auth-aside">
             <div>
                 <NuxtLink to="/" class="auth-aside__brand">
-                    <span class="auth-aside__mark" aria-hidden="true">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M5 3.5C5 2.67 5.67 2 6.5 2H17c.55 0 1 .45 1 1v2.5h-2.25V4.5H8.25V6H6V3.5z" />
-                            <path d="M5 6.5h14a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1zM7 11h10v1.5H7V11zm0 3h7v1.5H7V14zm0 3h10v1.5H7V17z" />
-                        </svg>
-                    </span>
-                    <span class="auth-aside__brand-text">Scribblit</span>
+                    <img :src="logoSrc" alt="Logo" width="150" height="150" />
                 </NuxtLink>
             </div>
 
@@ -41,7 +42,7 @@ defineProps<{
             </div>
 
             <div class="auth-aside__foot">
-                © {{ new Date().getFullYear() }} Scribblit
+                © {{ new Date().getFullYear() }} {{ appName }}
             </div>
         </aside>
 

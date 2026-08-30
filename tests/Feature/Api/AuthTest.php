@@ -207,4 +207,26 @@ class AuthTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_validation_errors_are_localized_via_accept_language(): void
+    {
+        $response = $this->withHeader('Accept-Language', 'ar')
+            ->postJson('/api/v1/auth/login', [
+                'password' => 'password123',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('errors.email.0', 'حقل البريد الإلكتروني مطلوب.');
+    }
+
+    public function test_validation_general_message_is_localized(): void
+    {
+        $response = $this->withHeader('Accept-Language', 'ar')
+            ->postJson('/api/v1/auth/login', [
+                'password' => 'password123',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'البيانات المقدمة غير صالحة.');
+    }
 }

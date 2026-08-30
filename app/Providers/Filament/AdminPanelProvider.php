@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
                 'secondary' => Color::hex('#130e21'),
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->renderHook('panels::body.end', fn (): string => '<script>document.documentElement.dir = "' . session("direction", "ltr") . '";</script>')
+            ->renderHook('panels::body.end', fn (): string => '<script>document.documentElement.dir = "'.session('direction', 'ltr').'";</script>')
             ->renderHook('panels::topbar.end', fn (): string => view('filament.language-switcher')->render())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -55,6 +55,11 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\CountryBreakdownChart::class,
                 \App\Filament\Widgets\AtsStatsOverview::class,
                 \App\Filament\Widgets\AtsChecksChart::class,
+                \App\Filament\Widgets\AiUsageOverview::class,
+                \App\Filament\Widgets\AiChannelChart::class,
+                \App\Filament\Widgets\AiToolsChart::class,
+                \App\Filament\Widgets\AiPlatformChart::class,
+                \App\Filament\Widgets\AiHumanRatioChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

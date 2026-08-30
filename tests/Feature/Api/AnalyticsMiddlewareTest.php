@@ -23,7 +23,7 @@ class AnalyticsMiddlewareTest extends TestCase
     {
         $token = $this->user->createToken('test')->plainTextToken;
 
-        return ['Authorization' => 'Bearer ' . $token];
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     public function test_create_cv_request_logs_analytics_event(): void
@@ -75,6 +75,23 @@ class AnalyticsMiddlewareTest extends TestCase
         $event = AnalyticsEvent::latest()->first();
         $this->assertNotNull($event->duration_ms);
         $this->assertGreaterThanOrEqual(0, $event->duration_ms);
+    }
+
+    public function test_skill_header_marks_event_as_agent(): void
+    {
+        $this->withHeaders($this->authHeader() + ['X-Agent-Client' => 'chatgpt'])
+            ->postJson('/api/v1/cvs', [
+                'name' => 'Agent CV',
+                'language' => 'en',
+            ]);
+
+        $this->assertDatabaseHas('analytics_events', [
+            'endpoint' => 'api/v1/cvs',
+            'channel' => 'skill',
+            'is_agent' => 1,
+            'agent_client' => 'chatgpt',
+            'tool_name' => 'create_cv',
+        ]);
     }
 
     public function test_analytics_event_has_response_status(): void

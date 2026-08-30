@@ -1,0 +1,14 @@
+{
+    "landing.ai_connect_chip_cv": "Lebenslauf erstellen",
+    "landing.ai_connect_chip_ats": "ATS-Prüfung",
+    "landing.ai_connect_chip_cover": "Anschreiben",
+    "landing.ai_connect_chip_profile": "Öffentliches Profil",
+    "landing.ai_connect_demo_cv_user": "Erstelle mir einen Lebenslauf als Produktdesignerin in Riad.",
+    "landing.ai_connect_demo_cv_bot": "Entwurf Sara Hassan — Produktdesignerin. ATS-Score 86 (B+). PDF bereit: cv.test/p/sara.pdf",
+    "landing.ai_connect_demo_ats_user": "Bewerte diesen Lebenslauf gegen eine Senior-PM-Stelle.",
+    "landing.ai_connect_demo_ats_bot": "ATS 72 (B). In zwei Rollen fehlt messbarer Impact. Ich kann diese Bulletpoints umschreiben.",
+    "landing.ai_connect_demo_cover_user": "Schreibe ein Anschreiben für diese PM-Rolle.",
+    "landing.ai_connect_demo_cover_bot": "Anschreiben gespeichert. PDF: cv.test/p/sara-cover.pdf",
+    "landing.ai_connect_demo_profile_user": "Veröffentliche ein öffentliches Profil aus diesem Lebenslauf.",
+    "landing.ai_connect_demo_profile_bot": "Live unter cv.test/u/sara-hassan — Kontaktformular aktiv."
+}

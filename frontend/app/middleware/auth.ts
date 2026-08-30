@@ -3,10 +3,11 @@
  * On the server, forwards the cookie so /auth/me can run during SSR.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
+    // Bearer token is stored in localStorage — only available in the browser.
+    if (import.meta.server) return;
+
     const { user, refresh } = useAuthSession();
 
-    // Re-fetch on every navigation so we always reflect the latest session
-    // (cheap when the cookie is set — just a single /auth/me round trip).
     if (user.value === null) {
         await refresh();
     }

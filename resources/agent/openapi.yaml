@@ -1,0 +1,321 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CV API",
+    "version": "1.0.0",
+    "description": "REST catalog for the CV product. Public endpoints work without auth. Saved-account endpoints need a Sanctum Bearer token. Agents should send X-Agent-Client."
+  },
+  "servers": [
+    { "url": "/api/v1" }
+  ],
+  "tags": [
+    { "name": "Auth" },
+    { "name": "CVs" },
+    { "name": "Cover letters" },
+    { "name": "Public profiles" },
+    { "name": "Templates" },
+    { "name": "ATS" },
+    { "name": "Agent tokens" },
+    { "name": "Analytics" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "parameters": {
+      "AgentClient": {
+        "name": "X-Agent-Client",
+        "in": "header",
+        "required": false,
+        "schema": { "type": "string", "examples": ["chatgpt", "claude", "cursor"] },
+        "description": "Platform using this skill / MCP / REST catalog."
+      }
+    },
+    "schemas": {
+      "Envelope": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "result": {}
+        }
+      },
+      "UserData": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "jobTitle": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "address": { "type": "string" },
+          "summary": { "type": "string" },
+          "skills": { "type": "array", "items": { "type": "object", "properties": { "name": { "type": "string" } } } },
+          "experiences": { "type": "array", "items": { "type": "object" } },
+          "educations": { "type": "array", "items": { "type": "object" } },
+          "projects": { "type": "array", "items": { "type": "object" } },
+          "languages": { "type": "array", "items": { "type": "object" } },
+          "interests": { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password", "password_confirmation"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "password_confirmation": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created. result.token is the Bearer token." } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK. result.token." } }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": { "tags": ["Auth"], "summary": "Forgot password", "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/reset-password": {
+      "post": { "tags": ["Auth"], "summary": "Reset password", "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/reset-token": {
+      "post": { "tags": ["Auth"], "summary": "Verify reset token", "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/logout": {
+      "post": { "tags": ["Auth"], "summary": "Logout", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/me": {
+      "get": { "tags": ["Auth"], "summary": "Current user", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/{provider}/redirect": {
+      "get": { "tags": ["Auth"], "summary": "Social redirect", "parameters": [{ "name": "provider", "in": "path", "required": true, "schema": { "type": "string", "enum": ["google", "linkedin"] } }], "responses": { "302": { "description": "Redirect" } } }
+    },
+    "/auth/{provider}/callback": {
+      "get": { "tags": ["Auth"], "summary": "Social callback", "parameters": [{ "name": "provider", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/shares/templates": {
+      "get": {
+        "tags": ["Templates"],
+        "summary": "List CV templates",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/cvs": {
+      "get": {
+        "tags": ["CVs"],
+        "summary": "List my CVs",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["CVs"],
+        "summary": "Create a CV (or PDF if unauthenticated + template_id)",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "language": { "type": "string", "enum": ["en", "ar", "tr"] },
+                  "template_id": { "type": "integer" },
+                  "user_data": { "$ref": "#/components/schemas/UserData" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" }, "200": { "description": "PDF URL when template_id is set without auth" } }
+      }
+    },
+    "/cvs/{id}": {
+      "get": { "tags": ["CVs"], "summary": "Get CV", "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } },
+      "put": { "tags": ["CVs"], "summary": "Update CV", "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["CVs"], "summary": "Delete CV", "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/cvs/print": {
+      "post": {
+        "tags": ["CVs"],
+        "summary": "Render CV PDF",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["template_id"],
+                "properties": {
+                  "template_id": { "type": "integer" },
+                  "profile_id": { "type": "integer" },
+                  "user_data": { "$ref": "#/components/schemas/UserData" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "{ result: { url } }" } }
+      }
+    },
+    "/cvs/ats-check": {
+      "post": {
+        "tags": ["ATS"],
+        "summary": "Score structured CV data",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_id": { "type": "integer" },
+                  "user_data": { "$ref": "#/components/schemas/UserData" },
+                  "job_description": { "type": "string" },
+                  "language": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Score, grade, checks" } }
+      }
+    },
+    "/cvs/ats-check/upload": {
+      "post": {
+        "tags": ["ATS"],
+        "summary": "Score an uploaded PDF",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "job_description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/cover-letters/templates": {
+      "get": { "tags": ["Cover letters"], "summary": "List cover-letter templates", "responses": { "200": { "description": "OK" } } }
+    },
+    "/cover-letters": {
+      "get": { "tags": ["Cover letters"], "summary": "List my cover letters", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } },
+      "post": {
+        "tags": ["Cover letters"],
+        "summary": "Create a cover letter",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/cover-letters/{id}": {
+      "get": { "tags": ["Cover letters"], "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } },
+      "put": { "tags": ["Cover letters"], "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["Cover letters"], "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/cover-letters/print": {
+      "post": { "tags": ["Cover letters"], "summary": "Render cover-letter PDF", "responses": { "200": { "description": "{ result: { url } }" } } }
+    },
+    "/public-profiles/templates": {
+      "get": { "tags": ["Public profiles"], "summary": "List public-profile templates", "responses": { "200": { "description": "OK" } } }
+    },
+    "/public-profiles": {
+      "get": { "tags": ["Public profiles"], "summary": "Get my public profile", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } },
+      "post": { "tags": ["Public profiles"], "summary": "Create public profile", "security": [{ "bearerAuth": [] }], "responses": { "201": { "description": "Created" } } },
+      "put": { "tags": ["Public profiles"], "summary": "Update public profile", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["Public profiles"], "summary": "Delete public profile", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/agent-tokens": {
+      "get": { "tags": ["Agent tokens"], "summary": "List agent tokens", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } },
+      "post": {
+        "tags": ["Agent tokens"],
+        "summary": "Create agent token (plain text shown once)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "abilities": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created. result.token is shown once." } }
+      }
+    },
+    "/agent-tokens/{id}": {
+      "delete": { "tags": ["Agent tokens"], "summary": "Revoke agent token", "security": [{ "bearerAuth": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/analytics/click": {
+      "post": {
+        "tags": ["Analytics"],
+        "summary": "Record a landing click",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["target"],
+                "properties": {
+                  "target": { "type": "string" },
+                  "page": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "No content" } }
+      }
+    }
+  }
+}

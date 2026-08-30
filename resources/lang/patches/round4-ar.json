@@ -1,0 +1,14 @@
+{
+    "landing.ai_connect_chip_cv": "إنشاء سيرة ذاتية",
+    "landing.ai_connect_chip_ats": "فحص ATS",
+    "landing.ai_connect_chip_cover": "خطاب تقديم",
+    "landing.ai_connect_chip_profile": "ملف عام",
+    "landing.ai_connect_demo_cv_user": "أنشئ لي سيرة ذاتية كمصممة منتجات في الرياض.",
+    "landing.ai_connect_demo_cv_bot": "تمت صياغة سارة حسن — مصممة منتجات. نتيجة ATS 86 (B+). PDF جاهز: cv.test/p/sara.pdf",
+    "landing.ai_connect_demo_ats_user": "قيّم هذه السيرة مقابل وظيفة مدير منتج أول.",
+    "landing.ai_connect_demo_ats_bot": "ATS 72 (B). ينقص أثر قابل للقياس في دورين. يمكنني إعادة صياغة هذه النقاط.",
+    "landing.ai_connect_demo_cover_user": "اكتب خطاب تقديم لهذه الوظيفة.",
+    "landing.ai_connect_demo_cover_bot": "تم حفظ خطاب التقديم. PDF: cv.test/p/sara-cover.pdf",
+    "landing.ai_connect_demo_profile_user": "انشر ملفاً عاماً من هذه السيرة.",
+    "landing.ai_connect_demo_profile_bot": "مباشر على cv.test/u/sara-hassan — نموذج التواصل مفعّل."
+}

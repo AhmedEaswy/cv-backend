@@ -11,6 +11,11 @@ export default defineNuxtConfig({
     // e.g. `~/components/Foo.vue` → `app/components/Foo.vue`.
     srcDir: 'app/',
 
+    // Static assets (fonts, etc.) live in app/public/ with srcDir set.
+    dir: {
+        public: 'public',
+    },
+
     // SSR is on so the landing gets full SEO + meta tags server-rendered.
     ssr: true,
 

@@ -1,11 +1,50 @@
 @import "tailwindcss";
 
 /* =========================================================================
+   Thmanyah Sans — brand typeface for titles (self-hosted, all locales)
+   ========================================================================= */
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =========================================================================
    Design tokens — grayscale / paper aesthetic
    Reference: clean SaaS landing (Notely / Scribblit pattern)
    - Pure grayscale with one accent reserved for primary CTAs
    - Generous radius (xl → 2xl), thin hairline borders, soft shadows
-   - Display font is a serif-leaning sans, body is a calm humanist sans
+   - Display font: Thmanyah Sans (all locales); body is Inter Tight / Thmanyah (ar)
    ========================================================================= */
 @theme {
     /* Neutrals */
@@ -46,8 +85,8 @@
     --shadow-2: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
     --shadow-3: 0 12px 32px -16px rgba(0, 0, 0, 0.16);
 
-    /* Type */
-    --font-display: 'Instrument Serif', 'Cormorant Garamond', 'Playfair Display', 'Times New Roman', serif;
+    /* Type — Thmanyah Sans for titles; Inter Tight for body (LTR) */
+    --font-display: 'Thmanyah Sans', system-ui, sans-serif;
     --font-sans: 'Inter Tight', 'Inter', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -70,19 +109,35 @@ body {
     letter-spacing: -0.005em;
 }
 
-html[dir="rtl"] body {
+html[lang="ar"],
+html[lang^="ar-"],
+html.locale-ar {
+    --font-sans: 'Thmanyah Sans', system-ui, sans-serif;
+    font-family: 'Thmanyah Sans', system-ui, sans-serif;
+}
+
+html[lang="ar"] body,
+html[lang^="ar-"] body,
+html.locale-ar body {
+    font-family: 'Thmanyah Sans', system-ui, sans-serif;
+    font-feature-settings: normal;
+    letter-spacing: 0;
+}
+
+html[dir="rtl"]:not([lang="ar"]):not([lang^="ar-"]):not(.locale-ar) body {
     font-family: 'IBM Plex Sans Arabic', 'Cairo', 'Inter', system-ui, sans-serif;
     letter-spacing: 0;
 }
 
 .font-display {
     font-family: var(--font-display);
-    font-feature-settings: "ss01";
-    letter-spacing: -0.025em;
+    font-feature-settings: normal;
+    letter-spacing: -0.02em;
     font-weight: 400;
 }
-html[dir="rtl"] .font-display {
-    font-family: 'IBM Plex Sans Arabic', 'Amiri', serif;
+
+html[dir="rtl"] .font-display,
+html[dir="rtl"] :is(.display-1, .display-2, .display-3, h1, h2, h3, h4, h5, h6) {
     letter-spacing: 0;
 }
 
@@ -107,13 +162,13 @@ html[dir="rtl"] .font-display {
 }
 
 .section {
-    padding-top: 4rem;
+    padding-block: 4rem;
 }
 @media (min-width: 768px) {
-    .section { padding-top: 6rem; }
+    .section { padding-block: 6rem; }
 }
 @media (min-width: 1024px) {
-    .section { padding-top: 6rem; }
+    .section { padding-block: 6rem; }
 }
 
 /* =========================================================================
@@ -406,6 +461,9 @@ html[dir="rtl"] .select {
     letter-spacing: -0.02em;
     font-weight: 400;
     color: var(--color-ink);
+}
+html[dir="rtl"] :is(.display-1, .display-2, .display-3, .page-header__title, .modal__title, .auth-form__title, .auth-aside h2, .empty__title, [class*="__title"]) {
+    letter-spacing: 0;
 }
 
 .lede {
