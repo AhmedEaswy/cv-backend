@@ -54,29 +54,3 @@ const logoSrc = `${laravel}/images/logo-horizontal-white.png`;
     </div>
 </template>
 
-<style scoped>
-.auth-aside__brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    color: var(--color-paper);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-.auth-aside__mark {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: var(--color-paper);
-    color: var(--color-ink);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.auth-aside__brand-text { line-height: 1; }
-.auth-aside__foot {
-    font-size: 0.78rem;
-    color: rgba(250, 250, 249, 0.45);
-}
-</style>

@@ -54,31 +54,3 @@ const tier = computed(() => ({
     </section>
 </template>
 
-<style scoped>
-.pricing-head { text-align: center; margin-bottom: 3rem; max-width: 40rem; margin-inline: auto; }
-.pricing-head .display-2 { margin: 0 0 1rem; }
-.pricing-head .lede { margin: 0 auto; }
-
-.pricing-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 22rem);
-    justify-content: center;
-    gap: 1.25rem;
-}
-
-.price-card { position: relative; }
-.price-card__badge {
-    position: absolute;
-    top: 1rem;
-    inset-inline-end: 1rem;
-}
-.price-card__features {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    flex: 1;
-}
-</style>

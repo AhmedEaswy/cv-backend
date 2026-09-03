@@ -74,7 +74,7 @@ async function savePassword() {
         <NuxtLink to="/portal/settings/ai-access" role="tab">{{ t('portal.settings.ai.title') }}</NuxtLink>
     </div>
 
-    <form v-if="tab === 'profile'" class="surface form-card" @submit.prevent="saveProfile">
+    <form v-if="tab === 'profile'" class="surface form-card form-card--xl" @submit.prevent="saveProfile">
         <h2 class="form-card__title">{{ t('portal.settings.profile.title') }}</h2>
         <p class="form-card__sub">{{ t('portal.settings.profile.subtitle') }}</p>
 
@@ -109,7 +109,7 @@ async function savePassword() {
         </div>
     </form>
 
-    <form v-else class="surface form-card" @submit.prevent="savePassword">
+    <form v-else class="surface form-card form-card--xl" @submit.prevent="savePassword">
         <h2 class="form-card__title">{{ t('portal.settings.password.title') }}</h2>
         <p class="form-card__sub">{{ t('portal.settings.password.subtitle') }}</p>
 
@@ -135,12 +135,3 @@ async function savePassword() {
     </form>
 </template>
 
-<style scoped>
-.form-card { padding: 1.75rem; max-width: 48rem; }
-.form-card__title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; margin: 0 0 0.25rem; letter-spacing: -0.02em; }
-.form-card__sub { color: var(--color-ink-soft); font-size: 0.9rem; margin: 0 0 1.5rem; }
-.field { margin-bottom: 1rem; }
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
-.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-</style>

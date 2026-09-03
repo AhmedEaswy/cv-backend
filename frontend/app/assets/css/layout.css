@@ -1,0 +1,24 @@
+/* Layout helpers */
+.container-narrow {
+    @apply mx-auto max-w-[76rem] px-5 md:px-8 lg:px-10;
+}
+
+.section {
+    @apply py-16 md:py-24;
+}
+
+/* Reveal-on-scroll */
+.reveal {
+    @apply translate-y-2 opacity-0 transition duration-700 ease-out;
+    transition-property: opacity, transform;
+}
+
+.reveal.in {
+    @apply translate-y-0 opacity-100;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        @apply translate-y-0 opacity-100 transition-none;
+    }
+}

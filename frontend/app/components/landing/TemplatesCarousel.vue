@@ -72,16 +72,16 @@ const atEnd = computed(() => index.value >= totalPages.value - 1 || totalPages.v
 </script>
 
 <template>
-    <section id="templates" class="py-20 sm:py-28">
-        <div class="max-w-6xl mx-auto px-5 sm:px-8">
-            <div class="max-w-2xl mb-10">
-                <div class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: var(--color-brand-primary);">
+    <section id="templates" class="templates-section">
+        <div class="feature-section__container templates-section__inner">
+            <div class="templates-section__head">
+                <div class="feature-section__eyebrow">
                     {{ t('landing.templates_eyebrow') }}
                 </div>
-                <h2 class="font-display text-3xl sm:text-4xl font-bold text-[#130e21] mb-3 leading-tight">
+                <h2 class="feature-section__title">
                     {{ t('landing.templates_title') }}
                 </h2>
-                <p class="text-[#4a4458] text-lg">
+                <p class="feature-section__subtitle">
                     {{ t('landing.templates_subtitle') }}
                 </p>
             </div>
@@ -104,7 +104,7 @@ const atEnd = computed(() => index.value >= totalPages.value - 1 || totalPages.v
                             <div class="tp-card">
                                 <div
                                     class="tp-preview"
-                                    :style="{ background: key === 'classic' ? '#f4f1ea' : 'var(--color-paper-2)' }"
+                                    :class="key === 'classic' ? 'tp-preview--classic' : 'tp-preview--modern'"
                                 >
                                     <!-- Modern preview -->
                                     <div

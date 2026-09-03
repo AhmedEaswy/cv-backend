@@ -31,24 +31,3 @@ const track = computed(() => [...items, ...items]);
     </section>
 </template>
 
-<style scoped>
-.marquee-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.4rem;
-}
-.marquee-item__label {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    line-height: 1;
-    color: var(--color-ink);
-    letter-spacing: -0.015em;
-}
-.marquee-item__meta {
-    font-size: 0.75rem;
-    color: var(--color-muted);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-</style>

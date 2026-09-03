@@ -53,15 +53,3 @@ const variantClass = (v: string) => v === 'primary' ? 'btn--primary' : v === 'se
     </button>
 </template>
 
-<style scoped>
-.btn-spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid currentColor;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: btn-spin 0.7s linear infinite;
-    display: inline-block;
-}
-@keyframes btn-spin { to { transform: rotate(360deg); } }
-</style>

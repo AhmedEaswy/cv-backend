@@ -49,35 +49,3 @@ const cards = computed(() => ([
     </section>
 </template>
 
-<style scoped>
-.features-head { text-align: center; margin-bottom: 3.5rem; max-width: 40rem; margin-inline: auto; }
-.features-head .display-2 { margin: 0 0 1rem; }
-.features-head .lede { margin: 0 auto; }
-
-.features-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-}
-@media (min-width: 768px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
-
-.feature-card {
-    background: var(--color-white);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-xl);
-    padding: 1.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    min-height: 240px;
-}
-.feature-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-ink);
-    box-shadow: var(--shadow-2);
-}
-.feature-card__title { margin: 0; }
-.feature-card__text { margin: 0; font-size: 0.95rem; line-height: 1.55; color: var(--color-ink-soft); }
-</style>

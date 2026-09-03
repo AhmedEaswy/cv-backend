@@ -123,14 +123,3 @@ const onSubmit = () => register({ ...form });
     </NuxtLayout>
 </template>
 
-<style scoped>
-.field { margin-bottom: 1rem; }
-.auth-foot {
-    margin-top: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--color-ink-soft);
-}
-</style>

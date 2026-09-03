@@ -107,7 +107,7 @@ const previewUrl = computed(() => {
         <p class="empty__title">{{ t('portal.common.loading') }}</p>
     </div>
 
-    <form v-else class="surface form-card" @submit.prevent="onSave">
+    <form v-else class="surface form-card form-card--wide" @submit.prevent="onSave">
         <div class="field-grid">
             <div class="field">
                 <label class="field-label" for="name">{{ t('portal.public_profile.field.name') }}</label>
@@ -168,10 +168,3 @@ const previewUrl = computed(() => {
     </form>
 </template>
 
-<style scoped>
-.form-card { padding: 1.75rem; max-width: 56rem; }
-.field { margin-bottom: 1rem; }
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
-.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-</style>

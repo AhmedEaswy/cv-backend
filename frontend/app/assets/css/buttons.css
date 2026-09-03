@@ -1,0 +1,80 @@
+/* Pill-shaped monochrome buttons */
+.btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap border border-transparent bg-transparent px-[1.35rem] py-3 text-[0.9rem] font-medium leading-none text-ink no-underline transition duration-[180ms] ease-out;
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    transition-property: background, color, border-color, transform;
+}
+
+.btn:focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-50;
+}
+
+.btn--sm {
+    @apply px-4 py-2 text-[0.825rem];
+}
+
+.btn--lg {
+    @apply px-7 py-[0.95rem] text-[0.95rem];
+}
+
+.btn--icon {
+    @apply aspect-square p-2;
+}
+
+.btn--block {
+    @apply w-full;
+}
+
+.btn--primary {
+    @apply border-ink bg-ink text-paper;
+}
+
+.btn--primary:hover {
+    @apply -translate-y-px border-ink-2 bg-ink-2;
+}
+
+.btn--secondary {
+    @apply border-line-2 bg-white text-ink;
+}
+
+.btn--secondary:hover {
+    @apply border-ink bg-paper-2;
+}
+
+.btn--ghost {
+    @apply bg-transparent text-ink-soft;
+}
+
+.btn--ghost:hover {
+    @apply bg-paper-2 text-ink;
+}
+
+.btn--danger {
+    @apply border-line bg-transparent text-danger;
+}
+
+.btn--danger:hover {
+    @apply border-danger bg-danger-soft;
+}
+
+.btn--link {
+    @apply border-0 bg-transparent p-0 text-ink underline decoration-1 underline-offset-4;
+}
+
+.btn--link:hover {
+    @apply decoration-2;
+}
+
+.btn-spinner {
+    @apply inline-block size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}

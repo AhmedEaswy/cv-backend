@@ -1,0 +1,95 @@
+/* Auth layout aside extras */
+.auth-aside__brand {
+    @apply inline-flex items-center gap-[0.55rem] text-[0.95rem] font-semibold text-paper no-underline;
+}
+
+.auth-aside__brand img {
+    @apply block h-auto w-[150px] max-w-full;
+}
+
+.auth-aside__mark {
+    @apply inline-flex size-[30px] items-center justify-center rounded-lg bg-paper text-ink;
+}
+
+.auth-aside__brand-text {
+    @apply leading-none;
+}
+
+.auth-aside__foot {
+    @apply text-[0.78rem] text-paper/45;
+}
+
+/* Auth split layout */
+.auth-shell {
+    @apply grid min-h-screen grid-cols-1 bg-paper lg:grid-cols-2;
+}
+
+.auth-aside {
+    @apply relative flex min-h-[280px] flex-col justify-between overflow-hidden bg-ink p-12 text-paper lg:min-h-screen lg:px-16 lg:py-14;
+}
+
+.auth-aside::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0;
+    background:
+        radial-gradient(600px 300px at 80% 20%, rgba(255, 255, 255, 0.06), transparent 70%),
+        radial-gradient(400px 250px at 10% 90%, rgba(255, 255, 255, 0.04), transparent 70%);
+}
+
+.auth-aside > * {
+    @apply relative z-[1];
+}
+
+.auth-aside h2 {
+    @apply mb-5 font-display text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-tight tracking-tight;
+}
+
+.auth-aside p {
+    @apply max-w-lg text-[0.95rem] leading-relaxed text-paper/70;
+}
+
+.auth-aside ul {
+    @apply mt-7 flex list-none flex-col gap-3 p-0;
+}
+
+.auth-aside li {
+    @apply flex items-start gap-[0.6rem] text-sm leading-normal text-paper/85;
+}
+
+.auth-aside li svg {
+    @apply mt-[0.15rem] shrink-0;
+}
+
+.auth-form {
+    @apply flex flex-col justify-center px-6 py-8 lg:px-16 lg:py-12;
+}
+
+.auth-form__inner {
+    @apply mx-auto w-full max-w-md;
+}
+
+.auth-form__title {
+    @apply mb-2 font-display text-4xl font-normal leading-tight tracking-tight;
+}
+
+.auth-form__subtitle {
+    @apply mb-8 text-[0.95rem] text-ink-soft;
+}
+
+.auth-divider {
+    @apply my-5 flex items-center gap-3 text-[0.8rem] text-muted;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    @apply h-px flex-1 bg-line;
+}
+
+.auth-link {
+    @apply text-[0.85rem] text-ink underline decoration-1 underline-offset-[3px] hover:decoration-2;
+}
+
+.auth-form .checkbox--remember {
+    @apply mb-5;
+}

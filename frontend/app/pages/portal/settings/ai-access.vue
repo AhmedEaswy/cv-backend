@@ -84,7 +84,7 @@ const revoke = async (id: number) => {
         <span role="tab" aria-current="page">{{ t('portal.settings.ai.title') }}</span>
     </div>
 
-    <section class="surface form-card">
+    <section class="surface form-card form-card--xl">
         <h2 class="form-card__title">{{ t('portal.settings.ai.title') }}</h2>
         <p class="form-card__sub">{{ t('portal.settings.ai.subtitle') }}</p>
 
@@ -126,37 +126,3 @@ const revoke = async (id: number) => {
     </section>
 </template>
 
-<style scoped>
-.form-card { padding: 1.75rem; max-width: 48rem; }
-.form-card__title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; margin: 0 0 0.25rem; }
-.form-card__sub { color: var(--color-ink-soft); font-size: 0.9rem; margin: 0 0 1.5rem; }
-.field { margin-bottom: 1rem; }
-.token-form { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
-.token-form .field { flex: 1; min-width: 12rem; margin-bottom: 0; }
-.token-once {
-    display: flex;
-    gap: 0.6rem;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    background: var(--color-paper-2);
-    border-radius: 0.75rem;
-}
-.token-once code { font-size: 0.78rem; word-break: break-all; }
-.token-list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 0.6rem; }
-.token-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--color-line);
-}
-.token-row p { margin: 0.15rem 0 0; color: var(--color-muted); font-size: 0.8rem; }
-.token-empty { color: var(--color-muted); }
-.tabs a, .tabs span {
-    display: inline-flex;
-    padding: 0.45rem 0.9rem;
-}
-</style>

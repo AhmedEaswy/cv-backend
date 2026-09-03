@@ -61,8 +61,3 @@ async function onSubmit() {
     </NuxtLayout>
 </template>
 
-<style scoped>
-.field { margin-bottom: 1rem; }
-.auth-foot { margin-top: 1.5rem; font-size: 0.85rem; display: flex; gap: 0.5rem; align-items: center; }
-.auth-foot :deep(a) { display: inline-flex; align-items: center; gap: 0.3rem; }
-</style>

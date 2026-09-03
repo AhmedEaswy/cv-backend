@@ -83,8 +83,3 @@ function timeAgo(iso?: string) {
     </div>
 </template>
 
-<style scoped>
-.list { display: flex; flex-direction: column; gap: 0.65rem; }
-.list-card__link { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.15s ease; }
-.list-card__link:hover { border-color: var(--color-ink); }
-</style>

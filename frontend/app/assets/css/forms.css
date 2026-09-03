@@ -1,0 +1,180 @@
+/* Field wrappers & form layout */
+.field {
+    @apply mb-4;
+}
+
+.field-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+}
+
+.form-card {
+    @apply max-w-lg p-7;
+}
+
+.form-card--wide {
+    @apply max-w-4xl;
+}
+
+.form-card--xl {
+    @apply max-w-3xl;
+}
+
+.form-card__title {
+    @apply mb-1 font-display text-2xl font-normal tracking-tight;
+}
+
+.form-card__sub {
+    @apply mb-6 text-[0.9rem] text-ink-soft;
+}
+
+.form-actions {
+    @apply flex justify-end gap-2;
+}
+
+.back-link {
+    @apply mb-2 inline-flex items-center gap-[0.3rem] text-[0.825rem] text-ink-soft no-underline transition-colors duration-150;
+}
+
+.back-link:hover {
+    @apply text-ink;
+}
+
+.pwd-wrap {
+    @apply relative;
+}
+
+.pwd-wrap .input {
+    @apply pe-11;
+}
+
+.pwd-toggle {
+    @apply absolute top-1/2 -translate-y-1/2 cursor-pointer border-0 bg-transparent p-[0.35rem] text-ink-soft;
+    inset-inline-end: 0.6rem;
+    border-radius: var(--radius-sm);
+}
+
+.pwd-toggle:hover {
+    @apply bg-paper-2 text-ink;
+}
+
+.auth-foot {
+    @apply mt-6 flex flex-wrap items-center gap-2 text-[0.85rem];
+}
+
+.auth-foot a {
+    @apply inline-flex items-center gap-[0.3rem];
+}
+
+.auth-foot__sep {
+    @apply text-muted;
+}
+
+.verify {
+    @apply text-center;
+}
+
+.verify__icon {
+    @apply mb-6 inline-flex size-16 items-center justify-center rounded-full bg-paper-2 text-ink;
+}
+
+.verify__cta {
+    @apply mt-6 flex flex-col gap-2;
+}
+
+/* Labels & inputs */
+.field-label {
+    @apply mb-[0.4rem] block text-[0.8rem] font-medium tracking-wide text-ink;
+}
+
+.field-hint {
+    @apply mt-[0.3rem] block text-xs text-muted;
+}
+
+.field-error {
+    @apply mt-[0.3rem] block text-xs text-danger;
+}
+
+.input,
+.textarea,
+.select {
+    @apply w-full border border-line bg-white px-[0.95rem] py-[0.7rem] text-[0.9rem] leading-snug text-ink transition duration-150;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    transition-property: border-color, box-shadow, background;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+    @apply border-ink outline-none;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"] {
+    @apply border-danger;
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08);
+}
+
+.textarea {
+    @apply min-h-[8.5rem] resize-y;
+}
+
+.select {
+    @apply appearance-none bg-no-repeat pe-10;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-position: right 0.85rem center;
+    background-size: 14px;
+}
+
+html[dir="rtl"] .select {
+    background-position: left 0.85rem center;
+    @apply ps-10 pe-[0.95rem];
+}
+
+.checkbox {
+    @apply inline-flex cursor-pointer select-none items-center gap-[0.6rem] text-sm text-ink;
+}
+
+.checkbox input {
+    @apply size-4 cursor-pointer rounded accent-ink;
+}
+
+/* AI access token UI */
+.token-form {
+    @apply flex flex-wrap items-end gap-3;
+}
+
+.token-form .field {
+    @apply mb-0 min-w-48 flex-1;
+}
+
+.token-once {
+    @apply mb-4 flex flex-wrap items-center gap-[0.6rem] rounded-xl bg-paper-2 p-3;
+}
+
+.token-once code {
+    @apply break-all text-[0.78rem];
+}
+
+.token-list {
+    @apply mt-6 grid list-none gap-[0.6rem] p-0;
+}
+
+.token-row {
+    @apply flex items-center justify-between gap-4 border-t border-line py-3;
+}
+
+.token-row p {
+    @apply mt-[0.15rem] text-[0.8rem] text-muted;
+}
+
+.token-empty {
+    @apply text-muted;
+}
+
+.tabs a,
+.tabs span {
+    @apply inline-flex px-[0.9rem] py-[0.45rem];
+}

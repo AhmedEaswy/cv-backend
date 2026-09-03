@@ -1,0 +1,38 @@
+.eyebrow {
+    @apply inline-flex items-center gap-[0.4rem] text-[0.72rem] font-medium uppercase tracking-widest text-ink-soft;
+}
+
+.eyebrow::before {
+    content: "";
+    @apply inline-block h-px w-6 bg-ink-soft;
+}
+
+.eyebrow--plain::before {
+    @apply hidden;
+}
+
+.display-1 {
+    @apply font-display font-normal tracking-tight text-ink;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.02;
+}
+
+.display-2 {
+    @apply font-display font-normal tracking-tight text-ink;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    line-height: 1.05;
+}
+
+.display-3 {
+    @apply font-display font-normal tracking-tight text-ink;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.15;
+}
+
+html[dir="rtl"] :is(.display-1, .display-2, .display-3, .page-header__title, .modal__title, .auth-form__title, .auth-aside h2, .empty__title, [class*="__title"]) {
+    @apply tracking-normal;
+}
+
+.lede {
+    @apply max-w-[38rem] text-[1.05rem] leading-snug text-ink-soft;
+}

@@ -35,18 +35,3 @@ const { user, logout } = useAuthSession();
     </NuxtLayout>
 </template>
 
-<style scoped>
-.verify { text-align: center; }
-.verify__icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--color-paper-2);
-    color: var(--color-ink);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-}
-.verify__cta { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem; }
-</style>

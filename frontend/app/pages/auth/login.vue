@@ -85,7 +85,7 @@ const onSubmit = () => login({ ...form });
                 <span v-if="fieldError('password')" class="field-error">{{ fieldError('password') }}</span>
             </div>
 
-            <label class="checkbox" style="margin-bottom: 1.25rem;">
+            <label class="checkbox checkbox--remember">
                 <input v-model="form.remember" type="checkbox" name="remember" />
                 <span>{{ t('auth.login.remember') }}</span>
             </label>
@@ -103,30 +103,3 @@ const onSubmit = () => login({ ...form });
     </NuxtLayout>
 </template>
 
-<style scoped>
-.field { margin-bottom: 1rem; }
-.pwd-wrap { position: relative; }
-.pwd-wrap .input { padding-right: 2.75rem; }
-.pwd-toggle {
-    position: absolute;
-    inset-inline-end: 0.6rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: 0;
-    color: var(--color-ink-soft);
-    cursor: pointer;
-    padding: 0.35rem;
-    border-radius: var(--radius-sm);
-}
-.pwd-toggle:hover { background: var(--color-paper-2); color: var(--color-ink); }
-.auth-foot {
-    margin-top: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    font-size: 0.85rem;
-}
-.auth-foot__sep { color: var(--color-muted); }
-</style>

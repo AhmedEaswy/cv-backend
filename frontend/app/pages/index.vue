@@ -47,27 +47,3 @@ useHead({
     </div>
 </template>
 
-<style scoped>
-.landing-closing {
-    background: var(--color-paper-2);
-    padding: 2rem 1rem 0;
-}
-
-@media (min-width: 768px) {
-    .landing-closing {
-        padding: 0rem 1.25rem 0;
-    }
-}
-
-.landing-closing__shell {
-    max-width: 72rem;
-    margin-inline: auto;
-}
-
-@media (min-width: 768px) {
-    .landing-closing__shell {
-        padding: 3rem 1rem;
-        border-radius: 2rem;
-    }
-}
-</style>

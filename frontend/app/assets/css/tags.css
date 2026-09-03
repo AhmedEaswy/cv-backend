@@ -1,0 +1,24 @@
+.tag {
+    @apply inline-flex items-center gap-[0.35rem] border border-ink bg-ink px-[0.7rem] py-[0.35rem] text-[0.72rem] font-medium leading-none tracking-wide text-paper;
+    border-radius: var(--radius-pill);
+}
+
+.tag--outline {
+    @apply border-ink bg-transparent text-ink;
+}
+
+.tag--soft {
+    @apply border-line bg-paper-2 text-ink-soft;
+}
+
+.tag--success {
+    @apply border-success-soft bg-success-soft text-success;
+}
+
+.tag--warning {
+    @apply border-warning-soft bg-warning-soft text-warning;
+}
+
+.tag--danger {
+    @apply border-danger-soft bg-danger-soft text-danger;
+}

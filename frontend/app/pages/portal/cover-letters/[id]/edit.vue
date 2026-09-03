@@ -84,7 +84,7 @@ async function onDelete() {
         <p class="empty__title">{{ t('portal.common.loading') }}</p>
     </div>
 
-    <form v-else class="surface form-card" @submit.prevent="onSave">
+    <form v-else class="surface form-card form-card--wide" @submit.prevent="onSave">
         <div class="field">
             <label class="field-label" for="name">{{ t('portal.cover_letters.field.name') }}</label>
             <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" />
@@ -118,12 +118,3 @@ async function onDelete() {
     </form>
 </template>
 
-<style scoped>
-.back-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--color-ink-soft); text-decoration: none; font-size: 0.825rem; margin-bottom: 0.5rem; }
-.back-link:hover { color: var(--color-ink); }
-.form-card { padding: 1.75rem; max-width: 56rem; }
-.field { margin-bottom: 1rem; }
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
-.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-</style>

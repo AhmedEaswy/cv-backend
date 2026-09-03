@@ -43,8 +43,3 @@ async function onSubmit() {
     </form>
 </template>
 
-<style scoped>
-.form-card { padding: 1.75rem; max-width: 32rem; }
-.field { margin-bottom: 1rem; }
-.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-</style>

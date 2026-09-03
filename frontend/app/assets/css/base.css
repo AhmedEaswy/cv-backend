@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Thmanyah Sans — brand typeface for titles (self-hosted, all locales)
+   ========================================================================= */
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Thmanyah Sans';
+    src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =========================================================================
+   Design tokens — grayscale / paper aesthetic
+   Reference: clean SaaS landing (Notely / Scribblit pattern)
+   - Pure grayscale with one accent reserved for primary CTAs
+   - Generous radius (xl → 2xl), thin hairline borders, soft shadows
+   - Display font: Thmanyah Sans (all locales); body is Inter Tight / Thmanyah (ar)
+   ========================================================================= */
+@theme {
+    /* Neutrals */
+    --color-ink: #0a0a0a;
+    --color-ink-2: #1f1f1f;
+    --color-ink-soft: #4a4a4a;
+    --color-muted: #8a8a8a;
+    --color-line: #e7e7e7;
+    --color-line-2: #d4d4d4;
+    --color-paper: #fafaf9;
+    --color-paper-2: #f4f4f2;
+    --color-paper-3: #ecece9;
+    --color-white: #ffffff;
+    --color-black: #000000;
+
+    /* Accent — used sparingly for primary actions only */
+    --color-accent: #1a1a1a;
+    --color-accent-soft: #2a2a2a;
+
+    /* Semantic */
+    --color-success: #1f7a4f;
+    --color-success-soft: #e6f5ec;
+    --color-warning: #b27318;
+    --color-warning-soft: #fff4d6;
+    --color-danger: #c0392b;
+    --color-danger-soft: #fdecea;
+
+    /* Radii */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-pill: 9999px;
+
+    /* Shadows */
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-2: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
+    --shadow-3: 0 12px 32px -16px rgba(0, 0, 0, 0.16);
+
+    /* Type — Thmanyah Sans for titles; Inter Tight for body (LTR) */
+    --font-display: 'Thmanyah Sans', system-ui, sans-serif;
+    --font-sans: 'Inter Tight', 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+
+/* =========================================================================
+   Base
+   ========================================================================= */
+html, body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11", "calt";
+    letter-spacing: -0.005em;
+}
+
+html[lang="ar"],
+html[lang^="ar-"],
+html.locale-ar {
+    --font-sans: 'Thmanyah Sans', system-ui, sans-serif;
+    font-family: 'Thmanyah Sans', system-ui, sans-serif;
+}
+
+html[lang="ar"] body,
+html[lang^="ar-"] body,
+html.locale-ar body {
+    font-family: 'Thmanyah Sans', system-ui, sans-serif;
+    font-feature-settings: normal;
+    letter-spacing: 0;
+}
+
+html[dir="rtl"]:not([lang="ar"]):not([lang^="ar-"]):not(.locale-ar) body {
+    font-family: 'IBM Plex Sans Arabic', 'Cairo', 'Inter', system-ui, sans-serif;
+    letter-spacing: 0;
+}
+
+.font-display {
+    font-family: var(--font-display);
+    font-feature-settings: normal;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+}
+
+html[dir="rtl"] .font-display,
+html[dir="rtl"] :is(.display-1, .display-2, .display-3, h1, h2, h3, h4, h5, h6) {
+    letter-spacing: 0;
+}
+
+::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+}
+
+/* =========================================================================
+   Focus state
+   ========================================================================= */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+

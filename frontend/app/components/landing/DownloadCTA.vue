@@ -2,8 +2,7 @@
 /**
  * <DownloadCTA />
  *
- * Final section. App Store + Google Play store badges. Clicks ping
- * /api/v1/analytics/click via sendBeacon.
+ * Final section. App Store + Google Play store badges.
  */
 const { t } = useI18n();
 const config = useRuntimeConfig();
@@ -19,15 +18,15 @@ const onClick = (target: 'app_store' | 'play_store') => {
 </script>
 
 <template>
-    <section id="download" class="py-24 sm:py-32 hero-wash">
-        <div class="max-w-3xl mx-auto px-5 sm:px-8 text-center">
-            <h2 class="font-display text-3xl sm:text-5xl font-bold text-[#130e21] mb-5 leading-tight">
+    <section id="download" class="download-cta hero-wash">
+        <div class="download-cta__inner">
+            <h2 class="download-cta__title">
                 {{ t('landing.final_title') }}
             </h2>
-            <p class="text-lg text-[#4a4458] mb-8 max-w-xl mx-auto">
+            <p class="download-cta__subtitle">
                 {{ t('landing.final_subtitle') }}
             </p>
-            <div class="store-badges mb-5">
+            <div class="store-badges">
                 <a
                     :href="appStoreUrl"
                     class="store-badge store-badge-apple"
@@ -61,7 +60,7 @@ const onClick = (target: 'app_store' | 'play_store') => {
                     </span>
                 </a>
             </div>
-            <p class="mt-5 text-sm text-[#8a8499]">{{ t('landing.final_note') }}</p>
+            <p class="download-cta__note">{{ t('landing.final_note') }}</p>
         </div>
     </section>
 </template>

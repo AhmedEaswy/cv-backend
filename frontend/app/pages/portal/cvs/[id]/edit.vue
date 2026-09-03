@@ -122,7 +122,7 @@ const previewUrl = computed(() => {
         <p class="empty__title">{{ t('portal.common.loading') }}</p>
     </div>
 
-    <form v-else class="surface form-card" @submit.prevent="onSave">
+    <form v-else class="surface form-card form-card--xl" @submit.prevent="onSave">
         <div class="field">
             <label class="field-label" for="name">{{ t('portal.cvs.field.name') }}</label>
             <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" />
@@ -163,21 +163,3 @@ const previewUrl = computed(() => {
     <AtsModal v-if="cv" v-model:open="atsOpen" :cv-id="cv.id" />
 </template>
 
-<style scoped>
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    color: var(--color-ink-soft);
-    text-decoration: none;
-    font-size: 0.825rem;
-    margin-bottom: 0.5rem;
-    transition: color 0.15s ease;
-}
-.back-link:hover { color: var(--color-ink); }
-.form-card { padding: 1.75rem; max-width: 48rem; }
-.field { margin-bottom: 1rem; }
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
-.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-</style>
