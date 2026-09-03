@@ -20,7 +20,7 @@ const tier = computed(() => ({
 </script>
 
 <template>
-    <section id="pricing" class="section !pb-0">
+    <section id="pricing" class="section">
         <div class="container-narrow">
             <div class="pricing-head">
                 <h2 class="display-2">{{ t('landing.section_pricing_title') }}</h2>

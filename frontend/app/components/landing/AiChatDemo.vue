@@ -51,7 +51,7 @@ const playChip = (key: string) => play(key, transcript.value);
 </script>
 
 <template>
-    <div ref="root" class="ai-chat" dir="ltr">
+    <div ref="root" class="ai-chat">
         <div class="ai-chat__head">
             <span class="ai-chat__dot" aria-hidden="true" />
             <span class="ai-chat__title">{{ t('landing.ai_connect_cta') }}</span>
@@ -105,7 +105,7 @@ const playChip = (key: string) => play(key, transcript.value);
                     :class="{ 'has-caret': isTypingComposer }"
                 >{{ composerText }}</span>
             </p>
-            <span class="ai-chat__send" :class="{ 'is-pulse': isSending }">
+            <span class="ai-chat__send rtl:rotate-180" :class="{ 'is-pulse': isSending }">
                 <Icon name="arrow-right" :size="16" />
             </span>
         </div>

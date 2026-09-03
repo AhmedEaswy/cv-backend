@@ -85,13 +85,13 @@ export const useScriptedChat = (options: UseScriptedChatOptions) => {
                     for (const char of Array.from(turn.text)) {
                         if (!still(id)) return;
                         composerText.value += char;
-                        await wait(32, id, () => playId.value, reducedMotion.value);
+                        await wait(22, id, () => playId.value, reducedMotion.value);
                     }
-                    await wait(320, id, () => playId.value, reducedMotion.value);
+                    await wait(220, id, () => playId.value, reducedMotion.value);
                 }
 
                 isSending.value = true;
-                await wait(280, id, () => playId.value, reducedMotion.value);
+                await wait(180, id, () => playId.value, reducedMotion.value);
                 if (!still(id)) return;
                 composerText.value = '';
                 isTypingComposer.value = false;
@@ -107,17 +107,19 @@ export const useScriptedChat = (options: UseScriptedChatOptions) => {
                 scrollToEnd(transcript ?? null);
                 await wait(220, id, () => playId.value, reducedMotion.value);
             } else {
-                const message: ChatMessage = {
+                // Must be reactive so later mutations update the template
+                // (mutating a plain object after push does not update the UI).
+                const message = reactive<ChatMessage>({
                     id: `${id}-${messages.value.length}`,
                     role: 'bot',
                     text: turn.text,
                     visibleText: '',
                     typing: true,
-                };
+                });
                 messages.value.push(message);
                 await nextTick();
                 scrollToEnd(transcript ?? null);
-                await wait(700, id, () => playId.value, reducedMotion.value);
+                await wait(420, id, () => playId.value, reducedMotion.value);
                 if (!still(id)) return;
                 message.typing = false;
                 if (reducedMotion.value) {
@@ -130,9 +132,9 @@ export const useScriptedChat = (options: UseScriptedChatOptions) => {
                     if (!still(id)) return;
                     message.visibleText += char;
                     scrollToEnd(transcript ?? null);
-                    await wait(18, id, () => playId.value, reducedMotion.value);
+                    await wait(12, id, () => playId.value, reducedMotion.value);
                 }
-                await wait(380, id, () => playId.value, reducedMotion.value);
+                await wait(280, id, () => playId.value, reducedMotion.value);
             }
         }
     };
