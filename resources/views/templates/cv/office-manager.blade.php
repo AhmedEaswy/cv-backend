@@ -137,9 +137,9 @@
                         </a>
                     @endif
                     @if($portfolioUrl)
-                        <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="{{ $portfolioUrl }}" target="_blank">
+                        <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="{{ \App\Support\CvLink::href($portfolioUrl) ?? $portfolioUrl }}" target="_blank" rel="noopener noreferrer">
                             <span class="material-icons text-lg text-gray-400" aria-hidden="true">link</span>
-                                            <span>{{ $userData['address'] ?? __('Portfolio') }}</span>
+                            <span>{{ $portfolioUrl }}</span>
                         </a>
                     @elseif(!empty($userData['address']))
                         <div class="flex items-center gap-2 text-gray-700">
@@ -275,7 +275,7 @@
                                 {{ $project['title'] ?? '' }}
                             </h3>
                             @if(!empty($project['url']))
-                                <a href="{{ $project['url'] }}" class="text-primary hover:underline text-sm" target="_blank">{{ $project['url'] }}</a>
+                                {!! \App\Support\CvLink::tag($project['url'], 'text-primary hover:underline text-sm') !!}
                             @endif
                             @if(!empty($project['from']) || !empty($project['to']) || ($project['current'] ?? false))
                                 <span class="block text-xs font-semibold uppercase text-primary mt-1">

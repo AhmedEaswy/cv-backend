@@ -8,7 +8,7 @@ class AtsRulesEngine
      * Run weighted ATS checks against a normalized CV payload.
      *
      * @param  array<string, mixed>  $cv
-     * @return list<array{id: string, category: string, passed: bool, weight: int, message: string, tip: ?string}>
+     * @return list<array{id: string, category: string, passed: bool, weight: int, label: string, message: string, tip: ?string}>
      */
     public function evaluate(array $cv, string $source): array
     {
@@ -21,7 +21,7 @@ class AtsRulesEngine
 
     /**
      * @param  array<string, mixed>  $cv
-     * @return list<array{id: string, category: string, passed: bool, weight: int, message: string, tip: ?string}>
+     * @return list<array{id: string, category: string, passed: bool, weight: int, label: string, message: string, tip: ?string}>
      */
     private function evaluateStructured(array $cv): array
     {
@@ -99,7 +99,7 @@ class AtsRulesEngine
 
     /**
      * @param  array<string, mixed>  $cv
-     * @return list<array{id: string, category: string, passed: bool, weight: int, message: string, tip: ?string}>
+     * @return list<array{id: string, category: string, passed: bool, weight: int, label: string, message: string, tip: ?string}>
      */
     private function evaluatePdf(array $cv): array
     {
@@ -168,7 +168,7 @@ class AtsRulesEngine
     }
 
     /**
-     * @return array{id: string, category: string, passed: bool, weight: int, message: string, tip: ?string}
+     * @return array{id: string, category: string, passed: bool, weight: int, label: string, message: string, tip: ?string}
      */
     private function check(string $id, string $category, bool $passed): array
     {
@@ -179,6 +179,7 @@ class AtsRulesEngine
             'category' => $category,
             'passed' => $passed,
             'weight' => $weight,
+            'label' => __('ats.checks.'.$id.'.label'),
             'message' => __('ats.checks.'.$id.'.'.($passed ? 'pass' : 'fail')),
             'tip' => $passed ? null : __('ats.checks.'.$id.'.tip'),
         ];

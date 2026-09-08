@@ -4,25 +4,81 @@
  */
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { CVSummary } from '~/composables/usePortalApi';
+import type { DropdownMenuItem } from '~/components/ui/DropdownMenu.vue';
 
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 const portal = usePortalApi();
+const { refresh: refreshStats } = usePortalStats();
 const cvs = ref<CVSummary[]>([]);
 const loading = ref(true);
+const creating = ref(false);
+
+async function openCreate() {
+    if (creating.value) return;
+    creating.value = true;
+    try {
+        const created = await portal.createBlankCv();
+        if (created?.id) {
+            refreshStats();
+            await router.push(`/portal/cvs/${created.id}/edit`);
+            return;
+        }
+    } finally {
+        creating.value = false;
+    }
+}
 
 onMounted(async () => {
     cvs.value = await portal.list<CVSummary>('/cvs');
     loading.value = false;
+    if (route.query.create === '1') {
+        router.replace({ path: '/portal/cvs', query: {} });
+        await openCreate();
+    }
+});
+
+watch(() => route.query.create, async (v) => {
+    if (v === '1') {
+        router.replace({ path: '/portal/cvs', query: {} });
+        await openCreate();
+    }
 });
 
 async function onDelete(cv: CVSummary) {
     if (!confirm(t('portal.cvs.delete_confirm'))) return;
     const ok = await portal.destroy(`/cvs/${cv.id}`, t('portal.cvs.deleted'));
-    if (ok) cvs.value = cvs.value.filter((c) => c.id !== cv.id);
+    if (ok) {
+        cvs.value = cvs.value.filter((c) => c.id !== cv.id);
+        refreshStats();
+    }
 }
+
 async function onDuplicate(cv: CVSummary) {
     const r = await portal.duplicate(`/cvs/${cv.id}/duplicate`);
-    if (r?.id) cvs.value = [r, ...cvs.value];
+    if (r?.id) {
+        cvs.value = [r, ...cvs.value];
+        refreshStats();
+    }
+}
+
+function onEdit(cv: CVSummary) {
+    return router.push(`/portal/cvs/${cv.id}/edit`);
+}
+
+function menuItems(cv: CVSummary): DropdownMenuItem[] {
+    return [
+        { key: 'edit', label: t('portal.cvs.edit'), icon: 'edit', to: `/portal/cvs/${cv.id}/edit` },
+        { key: 'duplicate', label: t('portal.cvs.duplicate'), icon: 'copy' },
+        { key: 'delete', label: t('portal.cvs.delete'), icon: 'trash', danger: true },
+    ];
+}
+
+async function onAction(cv: CVSummary, key: string) {
+    if (key === 'edit') return onEdit(cv);
+    if (key === 'duplicate') return onDuplicate(cv);
+    if (key === 'delete') return onDelete(cv);
 }
 
 function languageName(code?: string) {
@@ -47,28 +103,27 @@ function timeAgo(iso?: string) {
             <p class="page-header__subtitle">{{ t('portal.cvs.subtitle') }}</p>
         </div>
         <div class="page-header__actions">
-            <NuxtLink to="/portal/cvs/create" class="btn btn--primary">
+            <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
                 <Icon name="plus" :size="15" />
-                {{ t('portal.cvs.new_cv') }}
-            </NuxtLink>
+                {{ creating ? t('portal.cvs.creating') : t('portal.cvs.new_cv') }}
+            </button>
         </div>
     </header>
 
-    <div v-if="loading" class="empty">
-        <span class="empty__icon"><Icon name="clock" :size="22" /></span>
-        <p class="empty__title">{{ t('portal.common.loading') }}</p>
-    </div>
+    <ListSkeleton v-if="loading" />
 
     <div v-else-if="cvs.length === 0" class="empty">
         <span class="empty__icon"><Icon name="file-plus" :size="22" /></span>
         <p class="empty__title">{{ t('portal.cvs.empty') }}</p>
         <p class="empty__text">{{ t('portal.cvs.empty_text') }}</p>
-        <NuxtLink to="/portal/cvs/create" class="btn btn--primary">{{ t('portal.cvs.create_first') }}</NuxtLink>
+        <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
+            {{ creating ? t('portal.cvs.creating') : t('portal.cvs.create_first') }}
+        </button>
     </div>
 
     <div v-else class="list">
         <article v-for="cv in cvs" :key="cv.id" class="list-card">
-            <span class="list-card__icon"><Icon name="file" :size="18" /></span>
+            <ScoreRing :score="cv.latest_ats_score" :grade="cv.latest_ats_grade" />
             <div class="list-card__body">
                 <p class="list-card__title">
                     <NuxtLink :to="`/portal/cvs/${cv.id}/edit`" class="list-card__link">{{ cv.name }}</NuxtLink>
@@ -80,17 +135,12 @@ function timeAgo(iso?: string) {
             <div class="list-card__actions">
                 <Tag v-if="cv.is_public" variant="success">{{ t('portal.cvs.status_published') }}</Tag>
                 <Tag v-else variant="soft">{{ t('portal.cvs.status_draft') }}</Tag>
-                <Button variant="ghost" size="sm" @click="onDuplicate(cv)" :aria-label="t('portal.cvs.duplicate')">
-                    <Icon name="copy" :size="14" />
-                </Button>
-                <NuxtLink :to="`/portal/cvs/${cv.id}/edit`" class="btn btn--secondary btn--sm">
-                    {{ t('portal.cvs.edit') }}
-                </NuxtLink>
-                <Button variant="danger" size="sm" @click="onDelete(cv)" :aria-label="t('portal.cvs.delete')">
-                    <Icon name="trash" :size="14" />
-                </Button>
+                <DropdownMenu
+                    :items="menuItems(cv)"
+                    :label="t('portal.cvs.actions')"
+                    @select="(key) => onAction(cv, key)"
+                />
             </div>
         </article>
     </div>
 </template>
-

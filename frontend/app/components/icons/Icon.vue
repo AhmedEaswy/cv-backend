@@ -88,6 +88,9 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
         <template v-else-if="name === 'chevron-down'">
             <polyline points="6 9 12 15 18 9" />
         </template>
+        <template v-else-if="name === 'chevron-up'">
+            <polyline points="18 15 12 9 6 15" />
+        </template>
         <template v-else-if="name === 'arrow-right'">
             <path d="M5 12h14M12 5l7 7-7 7" />
         </template>
@@ -100,6 +103,22 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
             <line x1="10" y1="14" x2="21" y2="3" />
         </template>
         <!-- Actions -->
+        <template v-else-if="name === 'grip'">
+            <circle cx="9" cy="6" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="6" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="12" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="12" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="18" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="18" r="1.15" fill="currentColor" stroke="none" />
+        </template>
+        <template v-else-if="name === 'to-top'">
+            <polyline points="17 11 12 6 7 11" />
+            <polyline points="17 18 12 13 7 18" />
+        </template>
+        <template v-else-if="name === 'to-bottom'">
+            <polyline points="7 6 12 11 17 6" />
+            <polyline points="7 13 12 18 17 13" />
+        </template>
         <template v-else-if="name === 'plus'">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
@@ -124,6 +143,11 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
+        </template>
+        <template v-else-if="name === 'more-vertical'">
+            <circle cx="12" cy="5" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="19" r="1.15" fill="currentColor" stroke="none" />
         </template>
         <!-- Status -->
         <template v-else-if="name === 'check'">

@@ -35,6 +35,10 @@ class PublicProfilePreviewController extends Controller
             abort(404, __('messages.template_view_not_found'));
         }
 
+        // Count each public visit.
+        $profile->increment('views_count');
+        $profile->refresh();
+
         $profileData = $this->dataMapper->formatPublicProfileResponse($profile);
         App::setLocale($profileData['language'] ?? 'en');
 

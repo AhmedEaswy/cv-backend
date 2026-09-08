@@ -163,4 +163,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->socialAccounts()->where('provider_name', 'google')->exists();
     }
+
+    public function aiSetting(): HasOne
+    {
+        return $this->hasOne(UserAiSetting::class);
+    }
 }

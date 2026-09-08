@@ -65,16 +65,37 @@ export const useAuthPages = () => {
  */
 export const useAuthSession = () => {
     const user = useState<any>('auth.user', () => null);
+    const checked = useState<boolean>('auth.checked', () => false);
     const api = useApi();
 
     async function refresh() {
+        if (import.meta.client && !api.getToken()) {
+            user.value = null;
+            checked.value = true;
+            return null;
+        }
+
         try {
             const res = await api<{ result: { user: any } }>('/auth/me');
             user.value = res.result?.user ?? null;
+            if (!user.value) {
+                api.setToken(null);
+            }
         } catch {
+            api.setToken(null);
             user.value = null;
+        } finally {
+            checked.value = true;
         }
         return user.value;
+    }
+
+    function postAuthRedirect() {
+        if (!import.meta.client) return;
+        const route = useRoute();
+        const raw = typeof route.query.redirect === 'string' ? route.query.redirect : '';
+        const safe = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/portal';
+        window.location.href = safe;
     }
 
     async function login(payload: { email: string; password: string; remember?: boolean }) {
@@ -82,8 +103,9 @@ export const useAuthSession = () => {
         const result = await auth.submit<{ user: any; token: string }>('/auth/login', payload);
         if (result.ok && result.data?.token) {
             api.setToken(result.data.token);
+            checked.value = false;
             await refresh();
-            if (import.meta.client) window.location.href = '/portal';
+            postAuthRedirect();
         }
         return result;
     }
@@ -93,8 +115,9 @@ export const useAuthSession = () => {
         const result = await auth.submit<{ user: any; token: string }>('/auth/register', payload);
         if (result.ok && result.data?.token) {
             api.setToken(result.data.token);
+            checked.value = false;
             await refresh();
-            if (import.meta.client) window.location.href = '/portal';
+            postAuthRedirect();
         }
         return result;
     }
@@ -115,6 +138,7 @@ export const useAuthSession = () => {
         } catch { /* ignore */ }
         api.setToken(null);
         user.value = null;
+        checked.value = true;
         if (import.meta.client) window.location.href = '/';
     }
 
@@ -122,6 +146,7 @@ export const useAuthSession = () => {
 
     return {
         user,
+        checked,
         refresh,
         login,
         register,

@@ -39,7 +39,7 @@ class ShareTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'result' => [
-                    '*' => ['id', 'name', 'preview', 'description', 'created_at', 'updated_at'],
+                    '*' => ['id', 'name', 'preview', 'description', 'is_default', 'created_at', 'updated_at'],
                 ],
             ]);
 
@@ -79,5 +79,37 @@ class ShareTest extends TestCase
         $this->assertEquals($template->id, $result['id']);
         $this->assertEquals('Test Template', $result['name']);
         $this->assertEquals('A test template', $result['description']);
+    }
+
+    public function test_templates_endpoint_supports_pagination(): void
+    {
+        foreach (range(1, 5) as $i) {
+            Template::create([
+                'name' => "Template {$i}",
+                'preview' => "t{$i}.png",
+                'is_active' => true,
+                'is_default' => $i === 1,
+            ]);
+        }
+
+        $page1 = $this->getJson('/api/v1/shares/templates?page=1&per_page=2');
+        $page1->assertStatus(200)
+            ->assertJsonPath('result.meta.current_page', 1)
+            ->assertJsonPath('result.meta.per_page', 2)
+            ->assertJsonPath('result.meta.total', 5)
+            ->assertJsonPath('result.meta.has_more', true);
+        $this->assertCount(2, $page1->json('result.data'));
+
+        $page2 = $this->getJson('/api/v1/shares/templates?page=2&per_page=2');
+        $page2->assertStatus(200)
+            ->assertJsonPath('result.meta.current_page', 2)
+            ->assertJsonPath('result.meta.has_more', true);
+        $this->assertCount(2, $page2->json('result.data'));
+
+        $page3 = $this->getJson('/api/v1/shares/templates?page=3&per_page=2');
+        $page3->assertStatus(200)
+            ->assertJsonPath('result.meta.current_page', 3)
+            ->assertJsonPath('result.meta.has_more', false);
+        $this->assertCount(1, $page3->json('result.data'));
     }
 }

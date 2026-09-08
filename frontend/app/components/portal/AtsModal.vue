@@ -8,7 +8,7 @@ import type { AtsResult } from '~/composables/usePortalApi';
 const props = defineProps<{ open: boolean; cvId?: number | null }>();
 const emit = defineEmits<{ 'update:open': [v: boolean] }>();
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 const portal = usePortalApi();
 const jobDescription = ref('');
 const result = ref<AtsResult | null>(null);
@@ -37,17 +37,19 @@ function onFileChange(e: Event) {
 }
 
 const categoryLabel = (key: string) => {
-    const map: Record<string, string> = {
-        contact: t('portal.ats.category.contact'),
-        summary: t('portal.ats.category.summary'),
-        experience: t('portal.ats.category.experience'),
-        education: t('portal.ats.category.education'),
-        skills: t('portal.ats.category.skills'),
-        formatting: t('portal.ats.category.formatting'),
-        keyword_fit: t('portal.ats.category.keyword_fit'),
-    };
-    return map[key] || key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    const k = `portal.ats.category.${key}`;
+    const translated = t(k);
+    return translated !== k ? translated : key.replace(/_/g, ' ');
 };
+
+function checkLabel(c: { id: string; label?: string; message?: string }) {
+    const k = `portal.ats.check.${c.id}`;
+    if (te(k)) return String(t(k));
+    const translated = t(k);
+    if (translated && translated !== k && !translated.startsWith('ats.')) return translated;
+    if (c.label && !c.label.startsWith('ats.') && c.label !== c.id) return c.label;
+    return c.id.replace(/_/g, ' ');
+}
 
 const scoreColor = computed(() => {
     if (!result.value) return 'var(--color-ink)';
@@ -96,7 +98,7 @@ const scoreColor = computed(() => {
                     v-model="jobDescription"
                     class="textarea"
                     rows="5"
-                    :placeholder="t('portal.ats.job_description')"
+                    :placeholder="t('portal.ats.job_description_placeholder')"
                 />
                 <span class="field-hint">{{ t('portal.ats.job_description_help') }}</span>
             </div>
@@ -144,11 +146,11 @@ const scoreColor = computed(() => {
                 </div>
 
                 <details class="ats__checks">
-                    <summary>{{ t('portal.ats.score') }} details</summary>
+                    <summary>{{ t('portal.ats.details') }}</summary>
                     <ul class="ats__check-list">
                         <li v-for="c in result.checks" :key="c.id" :class="['ats__check', c.passed ? 'ats__check--pass' : 'ats__check--fail']">
                             <Icon :name="c.passed ? 'check-circle' : 'alert'" :size="14" />
-                            <span>{{ c.label || c.id }}</span>
+                            <span>{{ checkLabel(c) }}</span>
                             <Tag v-if="c.passed" variant="success">{{ t('portal.ats.check.passed') }}</Tag>
                             <Tag v-else variant="warning">{{ t('portal.ats.check.failed') }}</Tag>
                         </li>

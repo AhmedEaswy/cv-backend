@@ -39,7 +39,8 @@ class CoverLetterController extends BaseApiController
     {
         $validated = $request->validated();
 
-        $userId = $request->user()?->id ?? $request->input('user_id');
+        $user = $request->user() ?? $request->user('sanctum');
+        $userId = $user?->id ?? $request->input('user_id');
 
         $userData = $request->input('user_data', []);
         $mappedData = $this->dataMapper->mapUserDataToCoverLetter($userData);
@@ -195,16 +196,19 @@ class CoverLetterController extends BaseApiController
         }
     }
 
-    public function templates()
+    public function templates(Request $request)
     {
-        $templates = $this->repository->getActiveTemplates()->map(fn ($t) => [
-            'id' => $t->id,
-            'name' => $t->name,
-            'preview' => $t->preview_url,
-            'description' => $t->description,
-            'is_default' => $t->is_default,
-        ]);
-
-        return $this->successResponse($templates, __('messages.templates_retrieved'));
+        return $this->paginatedOrAll(
+            $this->repository->activeTemplatesQuery(),
+            $request,
+            fn ($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'preview' => $t->preview_url,
+                'description' => $t->description,
+                'is_default' => $t->is_default,
+            ],
+            __('messages.templates_retrieved')
+        );
     }
 }

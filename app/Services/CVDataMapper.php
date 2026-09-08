@@ -68,9 +68,11 @@ class CVDataMapper
                 return [
                     'name' => $proj['title'] ?? null, // API: title -> Profile: name
                     'description' => $proj['description'] ?? null,
+                    'technologies' => $proj['technologies'] ?? null,
                     'url' => $proj['url'] ?? null,
                     'from' => $proj['from'] ?? null,
                     'to' => $proj['to'] ?? null,
+                    'currentlyWorkingHere' => $proj['current'] ?? false,
                 ];
             }, $userData['projects']);
         }
@@ -157,9 +159,11 @@ class CVDataMapper
                 return [
                     'title' => $proj['name'] ?? null, // Profile: name -> API: title
                     'description' => $proj['description'] ?? null,
+                    'technologies' => $proj['technologies'] ?? null,
                     'url' => $proj['url'] ?? null,
                     'from' => $proj['from'] ?? null,
                     'to' => $proj['to'] ?? null,
+                    'current' => $proj['currentlyWorkingHere'] ?? false,
                 ];
             }, $profile->projects);
         }
@@ -203,6 +207,8 @@ class CVDataMapper
             'user_id' => $profile->user_id,
             'name' => $profile->name,
             'language' => $profile->language,
+            'template_id' => $profile->template_id,
+            'is_public' => (bool) $profile->is_public,
             'sections_order' => $profile->sections_order,
             'user_data' => $this->mapProfileToUserData($profile),
             'created_at' => $profile->created_at?->toIso8601String(),

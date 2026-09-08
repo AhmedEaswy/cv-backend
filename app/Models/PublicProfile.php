@@ -18,6 +18,7 @@ class PublicProfile extends Model
         'public_profile_template_id',
         'slug',
         'is_public',
+        'views_count',
         'enable_contact_form',
         'contact_form_recipient',
         'language',
@@ -44,6 +45,7 @@ class PublicProfile extends Model
     {
         return [
             'is_public' => 'boolean',
+            'views_count' => 'integer',
             'enable_contact_form' => 'boolean',
             'info' => 'array',
             'social_links' => 'array',

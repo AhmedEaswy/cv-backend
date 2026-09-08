@@ -37,12 +37,12 @@ const onLanding = computed(() => route.path === '/' || route.path === '');
             <div class="landing-header__actions">
                 <LangSwitcher />
                 <template v-if="user">
-                    <NuxtLink :to="laravel + '/portal'" class="btn btn--secondary btn--sm">
+                    <NuxtLink to="/portal" class="btn btn--secondary btn--sm">
                         {{ t('landing.nav.dashboard') }}
                     </NuxtLink>
                 </template>
                 <template v-else>
-                    <NuxtLink :to="laravel + '/login'" class="btn btn--ghost btn--sm">
+                    <NuxtLink to="/auth/login" class="btn btn--ghost btn--sm">
                         {{ t('landing.nav.login') }}
                     </NuxtLink>
                     <NuxtLink to="#pricing" class="btn btn--primary btn--sm">

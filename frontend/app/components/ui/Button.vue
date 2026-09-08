@@ -12,6 +12,7 @@ withDefaults(defineProps<{
     loading?: boolean;
     disabled?: boolean;
     block?: boolean;
+    icon?: boolean;
     target?: string;
     rel?: string;
 }>(), {
@@ -28,7 +29,7 @@ const variantClass = (v: string) => v === 'primary' ? 'btn--primary' : v === 'se
     <NuxtLink
         v-if="to"
         :to="to"
-        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block']"
+        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block', icon && 'btn--icon']"
     >
         <slot />
     </NuxtLink>
@@ -37,7 +38,7 @@ const variantClass = (v: string) => v === 'primary' ? 'btn--primary' : v === 'se
         :href="href"
         :target="target"
         :rel="rel"
-        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block']"
+        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block', icon && 'btn--icon']"
     >
         <slot />
     </a>
@@ -46,10 +47,9 @@ const variantClass = (v: string) => v === 'primary' ? 'btn--primary' : v === 'se
         :type="type"
         :disabled="disabled || loading"
         :aria-busy="loading || undefined"
-        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block']"
+        :class="['btn', variantClass(variant), sizeClass(size), block && 'btn--block', icon && 'btn--icon']"
     >
         <span v-if="loading" class="btn-spinner" aria-hidden="true" />
         <slot />
     </button>
 </template>
-

@@ -2,15 +2,25 @@
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 const portal = usePortalApi();
 const loading = ref(false);
 
+const rawTemplateId = Array.isArray(route.query.cover_letter_template_id)
+    ? route.query.cover_letter_template_id[0]
+    : (route.query.cover_letter_template_id || route.query.template_id);
+const templateId = Number(rawTemplateId);
+const hasTemplate = Number.isFinite(templateId) && templateId > 0;
+
 const form = reactive({ name: '' });
+
 async function onSubmit() {
     if (!form.name.trim()) return;
     loading.value = true;
-    const created = await portal.create<any>('/cover-letters', { name: form.name });
+    const body: Record<string, unknown> = { name: form.name };
+    if (hasTemplate) body.cover_letter_template_id = templateId;
+    const created = await portal.create<any>('/cover-letters', body);
     loading.value = false;
     if (created?.id) router.push(`/portal/cover-letters/${created.id}/edit`);
 }
@@ -33,7 +43,7 @@ async function onSubmit() {
     <form class="surface form-card" @submit.prevent="onSubmit">
         <div class="field">
             <label class="field-label" for="name">{{ t('portal.cover_letters.field.name') }}</label>
-            <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" />
+            <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cover_letters.field.name_placeholder')" />
         </div>
         <div class="form-actions">
             <Button type="submit" variant="primary" :loading="loading">
@@ -42,4 +52,3 @@ async function onSubmit() {
         </div>
     </form>
 </template>
-

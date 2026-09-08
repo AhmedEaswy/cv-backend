@@ -127,6 +127,24 @@ class CoverLetterApiTest extends TestCase
         $this->assertCount(1, $response->json('result'));
     }
 
+    public function test_cover_letter_templates_support_pagination(): void
+    {
+        \App\Models\CoverLetterTemplate::create([
+            'name' => 'Second',
+            'preview' => 'second.png',
+            'is_active' => true,
+            'is_default' => false,
+        ]);
+
+        $response = $this->getJson('/api/v1/cover-letters/templates?page=1&per_page=1');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('result.meta.per_page', 1)
+            ->assertJsonPath('result.meta.total', 2)
+            ->assertJsonPath('result.meta.has_more', true);
+        $this->assertCount(1, $response->json('result.data'));
+    }
+
     public function test_creation_validates_required_name(): void
     {
         $response = $this->withHeaders($this->authHeader())

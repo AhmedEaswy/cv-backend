@@ -33,6 +33,7 @@ const section = (id: string) => (onHome.value ? `#${id}` : `/#${id}`);
                     <h4>{{ t('landing.footer_product') }}</h4>
                     <ul>
                         <li><a :href="section('platforms')">{{ t('landing.nav.platforms') }}</a></li>
+                        <li><NuxtLink to="/templates">{{ t('landing.nav.templates') }}</NuxtLink></li>
                         <li><a :href="section('mockup')">{{ t('landing.nav.mockup') }}</a></li>
                         <li><a :href="section('pricing')">{{ t('landing.nav.pricing') }}</a></li>
                         <li><a :href="section('download')">{{ t('landing.nav.download') }}</a></li>

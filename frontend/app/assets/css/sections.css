@@ -1017,6 +1017,144 @@
     color: var(--color-ink-soft);
 }
 
+/* Interactive public template cards (/templates) */
+.templates-page {
+    min-height: 100vh;
+    background: var(--color-paper);
+}
+.templates-page__hero {
+    padding-top: 7rem;
+}
+.templates-page__error,
+.templates-page__empty {
+    text-align: center;
+    color: var(--color-ink-soft);
+    margin: 2rem 0 0;
+}
+
+.templates-page__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    margin: 0 auto 2.25rem;
+    padding: 0.3rem;
+    width: fit-content;
+    max-width: 100%;
+    background: var(--color-paper-2);
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+}
+.templates-page__tabs button {
+    border: 0;
+    background: transparent;
+    padding: 0.5rem 1.15rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.templates-page__tabs button.is-active,
+.templates-page__tabs button[aria-selected='true'] {
+    background: var(--color-white);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-1);
+}
+.templates-page__more {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+}
+
+.tpl-tile--interactive {
+    cursor: default;
+}
+.tpl-tile--interactive:hover {
+    transform: translateY(-3px);
+}
+.tpl-tile--interactive:hover .tpl-preview {
+    border-color: var(--color-ink);
+    box-shadow: var(--shadow-3);
+}
+
+.tpl-preview--media {
+    position: relative;
+    padding: 0;
+    background: var(--color-white);
+}
+.tpl-preview__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+.tpl-preview__fallback {
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--color-paper-2);
+}
+
+.tpl-tile__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 1.25rem;
+    background: rgba(12, 12, 12, 0.58);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+.tpl-tile--interactive:hover .tpl-tile__overlay,
+.tpl-tile--interactive:focus-within .tpl-tile__overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+@media (hover: none) {
+    .tpl-tile__overlay {
+        opacity: 1;
+        pointer-events: auto;
+        justify-content: flex-end;
+        background: linear-gradient(to top, rgba(12, 12, 12, 0.78) 0%, rgba(12, 12, 12, 0.35) 45%, transparent 70%);
+    }
+}
+.tpl-tile__overlay .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.tpl-auth-modal__lead {
+    margin: 0 0 1rem;
+    color: var(--color-ink-soft);
+    line-height: 1.55;
+}
+.tpl-auth-modal__bullets {
+    margin: 0;
+    padding-inline-start: 1.2rem;
+    color: var(--color-ink);
+    display: grid;
+    gap: 0.45rem;
+    line-height: 1.45;
+}
+.tpl-auth-modal__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+}
+.tpl-auth-modal__auth {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 /* components/landing/AiConnectSection.vue */
 .ai-connect { background: var(--color-paper); }
 .ai-connect__grid {

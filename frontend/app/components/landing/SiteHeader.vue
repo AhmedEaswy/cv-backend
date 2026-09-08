@@ -12,9 +12,14 @@ const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const playStore = (config.public.playStoreUrl as string) || '#download';
 
 const { user } = await useAuth();
+const route = useRoute();
 
 const logoSrc = `${laravel}/images/logo-horizontal-white.png`;
 const scrolled = ref(false);
+const onHome = computed(() => route.path === '/' || route.path === '');
+
+/** Section anchors work from any page via `/#…`. */
+const section = (id: string) => (onHome.value ? `#${id}` : `/#${id}`);
 
 const onScroll = () => {
     scrolled.value = window.scrollY > 24;
@@ -41,7 +46,7 @@ const trackDownload = () => {
 <template>
     <header
         class="site-header"
-        :class="{ 'site-header--scrolled': scrolled }"
+        :class="{ 'site-header--scrolled': scrolled || !onHome }"
     >
         <div class="site-header__bar">
             <a :href="laravel + '/'" class="site-header__brand" :aria-label="`${appName} — home`">
@@ -54,11 +59,12 @@ const trackDownload = () => {
             </a>
 
             <nav class="site-header__nav" aria-label="Primary">
-                <a href="#platforms">{{ t('landing.nav.platforms') }}</a>
-                <a href="#ai-connect">{{ t('landing.nav.ai_connect') }}</a>
-                <a href="#mockup">{{ t('landing.nav.mockup') }}</a>
-                <a href="#pricing">{{ t('landing.nav.pricing') }}</a>
-                <a href="#download">{{ t('landing.nav.download') }}</a>
+                <a :href="section('platforms')">{{ t('landing.nav.platforms') }}</a>
+                <a :href="section('ai-connect')">{{ t('landing.nav.ai_connect') }}</a>
+                <NuxtLink to="/templates">{{ t('landing.nav.templates') }}</NuxtLink>
+                <a :href="section('mockup')">{{ t('landing.nav.mockup') }}</a>
+                <a :href="section('pricing')">{{ t('landing.nav.pricing') }}</a>
+                <a :href="section('download')">{{ t('landing.nav.download') }}</a>
             </nav>
 
             <div class="site-header__actions">

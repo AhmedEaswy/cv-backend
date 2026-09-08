@@ -21,14 +21,16 @@ class UpdateCVRequest extends BaseFormRequest
     {
         return [
             'name' => 'sometimes|string|max:255',
-            'language' => 'sometimes|string|max:10|in:en,ar,tr',
+            'language' => 'sometimes|string|max:10|in:en,ar,tr,es,fr,de,ur',
+            'template_id' => 'sometimes|nullable|exists:templates,id',
+            'is_public' => 'sometimes|boolean',
             'sections_order' => 'sometimes|array',
             'sections_order.*' => 'string',
             'user_data' => 'sometimes|array',
-            'user_data.firstName' => 'sometimes|string|max:255',
-            'user_data.lastName' => 'sometimes|string|max:255',
-            'user_data.jobTitle' => 'sometimes|string|max:255',
-            'user_data.email' => 'sometimes|email|max:255',
+            'user_data.firstName' => 'sometimes|nullable|string|max:255',
+            'user_data.lastName' => 'sometimes|nullable|string|max:255',
+            'user_data.jobTitle' => 'sometimes|nullable|string|max:255',
+            'user_data.email' => 'sometimes|nullable|email|max:255',
             'user_data.address' => 'sometimes|nullable|string|max:500',
             'user_data.portfolioUrl' => 'sometimes|nullable|url|max:500',
             'user_data.phone' => 'sometimes|nullable|string|max:50',
@@ -74,6 +76,13 @@ class UpdateCVRequest extends BaseFormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
+            if ($this->has('template_id') && $this->filled('template_id')) {
+                $template = \App\Models\Template::find($this->input('template_id'));
+                if (!$template || !$template->is_active) {
+                    $validator->errors()->add('template_id', __('messages.template_not_found_or_inactive'));
+                }
+            }
+
             $userData = $this->input('user_data', []);
 
             if (array_key_exists('photo', $userData)) {

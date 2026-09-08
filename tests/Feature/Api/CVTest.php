@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\AtsCheck;
 use App\Models\Profile;
 use App\Models\Template;
 use App\Models\User;
@@ -102,6 +103,19 @@ class CVTest extends TestCase
 
         $this->assertTrue($response->json('success'));
         $this->assertEquals('My Professional CV', $response->json('result.name'));
+        $this->assertEquals($this->template->id, $response->json('result.template_id'));
+    }
+
+    public function test_authenticated_create_assigns_default_template_when_omitted(): void
+    {
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson('/api/v1/cvs', [
+                'name' => 'Blank with default',
+                'language' => 'en',
+            ]);
+
+        $response->assertStatus(201);
+        $this->assertEquals($this->template->id, $response->json('result.template_id'));
     }
 
     public function test_unauthenticated_user_can_create_cv_with_template_id(): void
@@ -133,11 +147,59 @@ class CVTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'result' => [
-                    '*' => ['id', 'user_id', 'name', 'language', 'user_data'],
+                    '*' => [
+                        'id',
+                        'user_id',
+                        'name',
+                        'language',
+                        'template_id',
+                        'is_public',
+                        'user_data',
+                        'latest_ats_score',
+                        'latest_ats_grade',
+                    ],
                 ],
             ]);
 
         $this->assertCount(1, $response->json('result'));
+        $this->assertNull($response->json('result.0.latest_ats_score'));
+    }
+
+    public function test_cv_list_includes_latest_ats_score(): void
+    {
+        $profile = Profile::create([
+            'user_id' => $this->user->id,
+            'name' => 'CV with ATS',
+            'language' => 'en',
+        ]);
+
+        AtsCheck::create([
+            'user_id' => $this->user->id,
+            'profile_id' => $profile->id,
+            'source' => 'portal',
+            'score' => 61,
+            'grade' => 'C',
+            'language' => 'en',
+            'has_job_description' => false,
+            'created_at' => now()->subDay(),
+        ]);
+        AtsCheck::create([
+            'user_id' => $this->user->id,
+            'profile_id' => $profile->id,
+            'source' => 'portal',
+            'score' => 79,
+            'grade' => 'B',
+            'language' => 'en',
+            'has_job_description' => false,
+            'created_at' => now(),
+        ]);
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->getJson('/api/v1/cvs');
+
+        $response->assertOk()
+            ->assertJsonPath('result.0.latest_ats_score', 79)
+            ->assertJsonPath('result.0.latest_ats_grade', 'B');
     }
 
     public function test_unauthenticated_user_cannot_list_cvs(): void
@@ -302,5 +364,125 @@ class CVTest extends TestCase
         $this->assertCount(1, $userData['languages']);
         $this->assertNotEmpty($userData['interests']);
         $this->assertCount(1, $userData['interests']);
+    }
+
+    public function test_authenticated_create_seeds_user_identity_when_user_data_empty(): void
+    {
+        $this->user->forceFill([
+            'first_name' => 'Alex',
+            'last_name' => 'Rivers',
+        ])->save();
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson('/api/v1/cvs', [
+                'name' => 'Empty shell',
+                'language' => 'en',
+                'template_id' => $this->template->id,
+            ]);
+
+        $response->assertStatus(201);
+        $this->assertEquals($this->user->id, $response->json('result.user_id'));
+        $this->assertEquals($this->template->id, $response->json('result.template_id'));
+        $this->assertFalse($response->json('result.is_public'));
+        $this->assertEquals('Alex', $response->json('result.user_data.firstName'));
+        $this->assertEquals('Rivers', $response->json('result.user_data.lastName'));
+        $this->assertEquals($this->user->email, $response->json('result.user_data.email'));
+    }
+
+    public function test_authenticated_create_ignores_spoofed_user_id(): void
+    {
+        $other = User::factory()->create(['active' => true]);
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson('/api/v1/cvs', [
+                'name' => 'Owned CV',
+                'user_id' => $other->id,
+            ]);
+
+        $response->assertStatus(201);
+        $this->assertEquals($this->user->id, $response->json('result.user_id'));
+    }
+
+    public function test_authenticated_user_can_update_template_public_and_extended_language(): void
+    {
+        $profile = Profile::create([
+            'user_id' => $this->user->id,
+            'name' => 'My CV',
+            'language' => 'en',
+            'is_public' => false,
+        ]);
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->putJson("/api/v1/cvs/{$profile->id}", [
+                'language' => 'es',
+                'template_id' => $this->template->id,
+                'is_public' => true,
+            ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('es', $response->json('result.language'));
+        $this->assertEquals($this->template->id, $response->json('result.template_id'));
+        $this->assertTrue($response->json('result.is_public'));
+    }
+
+    public function test_authenticated_user_can_duplicate_own_cv(): void
+    {
+        $profile = Profile::create([
+            'user_id' => $this->user->id,
+            'name' => 'Original CV',
+            'language' => 'tr',
+            'template_id' => $this->template->id,
+            'is_public' => true,
+            'sections_order' => ['Personal Information', 'Skills'],
+            'info' => [
+                'firstName' => 'Sam',
+                'lastName' => 'Lee',
+                'email' => 'sam@example.com',
+                'skills' => [['name' => 'PHP']],
+            ],
+            'experiences' => [
+                ['position' => 'Dev', 'name' => 'Acme', 'currentlyWorkingHere' => true],
+            ],
+        ]);
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson("/api/v1/cvs/{$profile->id}/duplicate");
+
+        $response->assertStatus(201);
+        $this->assertEquals('Original CV (Copy)', $response->json('result.name'));
+        $this->assertEquals('tr', $response->json('result.language'));
+        $this->assertEquals($this->template->id, $response->json('result.template_id'));
+        $this->assertFalse($response->json('result.is_public'));
+        $this->assertEquals('Sam', $response->json('result.user_data.firstName'));
+        $this->assertEquals('PHP', $response->json('result.user_data.skills.0.name'));
+        $this->assertNotEquals($profile->id, $response->json('result.id'));
+        $this->assertEquals($this->user->id, $response->json('result.user_id'));
+    }
+
+    public function test_user_cannot_duplicate_others_cv(): void
+    {
+        $otherUser = User::factory()->create(['active' => true]);
+        $profile = Profile::create([
+            'user_id' => $otherUser->id,
+            'name' => 'Secret CV',
+            'language' => 'en',
+        ]);
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson("/api/v1/cvs/{$profile->id}/duplicate");
+
+        $response->assertStatus(404);
+    }
+
+    public function test_unauthenticated_user_cannot_duplicate_cv(): void
+    {
+        $profile = Profile::create([
+            'user_id' => $this->user->id,
+            'name' => 'My CV',
+            'language' => 'en',
+        ]);
+
+        $this->postJson("/api/v1/cvs/{$profile->id}/duplicate")
+            ->assertStatus(401);
     }
 }

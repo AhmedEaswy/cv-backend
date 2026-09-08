@@ -1,82 +1,122 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth', layout: 'portal' });
-import type { ProfileData } from '~/composables/usePortalApi';
+import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
 
 const { t } = useI18n();
+const { user } = useAuthSession();
 const portal = usePortalApi();
-const profile = ref<ProfileData | null>(null);
-const templates = ref<Array<{ id: number; name: string }>>([]);
+const toast = useToast();
+const { profile, refresh: refreshProfile, setProfile } = usePortalPublicProfile();
+
+const templates = ref<TemplateOption[]>([]);
 const loading = ref(true);
 const saving = ref(false);
-const publishing = ref(false);
+const toggling = ref(false);
 
-const form = reactive<ProfileData>({
+const form = reactive({
     name: '',
     headline: '',
     bio: '',
-    avatar: '',
     email: '',
     phone: '',
     website: '',
     location: '',
-    template_id: '' as any,
-    color: '#0a0a0a',
+    template_id: '' as string | number,
+    is_public: true,
 });
 
+function applyProfile(p: typeof profile.value) {
+    const ud = p?.user_data || {};
+    const fullName = [ud.firstName, ud.lastName].filter(Boolean).join(' ').trim();
+    form.name = fullName || user.value?.name || '';
+    form.headline = p?.headline || '';
+    form.bio = p?.about || '';
+    form.email = ud.email || user.value?.email || '';
+    form.phone = ud.phone || '';
+    form.website = ud.website || '';
+    form.location = ud.address || '';
+    const templateId = p?.public_profile_template_id
+        ?? templates.value.find((tpl) => tpl.is_default)?.id
+        ?? '';
+    // Only keep IDs that belong to public-profile templates (never CV templates).
+    const valid = templates.value.some((tpl) => String(tpl.id) === String(templateId));
+    form.template_id = valid ? templateId : (templates.value.find((tpl) => tpl.is_default)?.id ?? templates.value[0]?.id ?? '');
+    form.is_public = p ? !!p.is_public : true;
+}
+
+function payload() {
+    const parts = form.name.trim().split(/\s+/).filter(Boolean);
+    const templateId = form.template_id
+        && templates.value.some((tpl) => String(tpl.id) === String(form.template_id))
+        ? form.template_id
+        : null;
+    return {
+        headline: form.headline || null,
+        about: form.bio || null,
+        is_public: !!form.is_public,
+        public_profile_template_id: templateId,
+        user_data: {
+            firstName: parts[0] || '',
+            lastName: parts.slice(1).join(' ') || '',
+            email: form.email || null,
+            phone: form.phone || null,
+            website: form.website || null,
+            address: form.location || null,
+        },
+    };
+}
+
 onMounted(async () => {
-    const [p, t1, t2] = await Promise.all([
-        portal.show<ProfileData>('/public-profiles'),
-        portal.list<any>('/public-profiles/templates').catch(() => []),
-        portal.list<any>('/shares/templates').catch(() => []),
+    const [p, tpls] = await Promise.all([
+        refreshProfile(),
+        portal.list<TemplateOption>('/public-profiles/templates'),
     ]);
-    profile.value = p;
-    templates.value = (t1 && t1.length ? t1 : t2) as any;
-    Object.assign(form, p || {});
+    templates.value = tpls;
+    applyProfile(p);
     loading.value = false;
 });
 
 async function onSave() {
     saving.value = true;
-    const url = profile.value?.id ? '/public-profiles' : '/public-profiles';
-    const method = profile.value?.id ? 'PUT' : 'POST';
-    const api = useApi();
-    const toast = useToast();
-    try {
-        const res = await api<{ data: ProfileData }>(url, { method, body: { ...form, template_id: form.template_id || null } });
-        profile.value = res.data;
-        Object.assign(form, res.data);
-        toast.success(t('portal.public_profile.saved'));
-    } catch (e: any) {
-        toast.error(e?.data?.message || 'Could not save');
-    } finally {
-        saving.value = false;
+    const body = payload();
+    const updated = profile.value?.id
+        ? await portal.update<NonNullable<typeof profile.value>>('/public-profiles', body, t('portal.public_profile.saved'))
+        : await portal.create<NonNullable<typeof profile.value>>('/public-profiles', body);
+    if (updated?.id) {
+        setProfile(updated);
+        applyProfile(updated);
     }
+    saving.value = false;
 }
 
-async function togglePublish() {
+async function onTogglePublic(value: boolean | number | string | null) {
+    const next = !!value;
+    form.is_public = next;
     if (!profile.value?.id) return;
-    publishing.value = true;
-    const updated = await portal.update('/public-profiles', {
-        ...form,
-        is_published: !profile.value.is_published,
-    });
-    if (updated) {
-        profile.value = updated;
-        Object.assign(form, updated);
+    toggling.value = true;
+    const updated = await portal.update<NonNullable<typeof profile.value>>('/public-profiles', {
+        is_public: next,
+    }, next ? t('portal.public_profile.published') : t('portal.public_profile.unpublished'));
+    if (updated?.id) {
+        setProfile(updated);
+        form.is_public = !!updated.is_public;
+    } else {
+        form.is_public = !!profile.value.is_public;
     }
-    publishing.value = false;
+    toggling.value = false;
 }
 
 async function onCopyLink() {
-    if (!profile.value?.slug) return;
-    const url = `${window.location.origin}/u/${profile.value.slug}`;
+    const url = profile.value?.public_url || (profile.value?.slug ? `${window.location.origin}/u/${profile.value.slug}` : '');
+    if (!url) return;
     try {
         await navigator.clipboard.writeText(url);
-        useToast().success(t('portal.public_profile.link_copied'));
+        toast.success(t('portal.public_profile.link_copied'));
     } catch { /* ignore */ }
 }
 
 const previewUrl = computed(() => {
+    if (profile.value?.public_url) return profile.value.public_url;
     if (!profile.value?.slug) return '#';
     return `/u/${profile.value.slug}`;
 });
@@ -89,82 +129,82 @@ const previewUrl = computed(() => {
             <h1 class="page-header__title">{{ t('portal.public_profile.title') }}</h1>
             <p class="page-header__subtitle">{{ t('portal.public_profile.subtitle') }}</p>
         </div>
-        <div class="page-header__actions">
-            <a v-if="profile?.slug" :href="previewUrl" target="_blank" rel="noopener" class="btn btn--secondary">
+        <div v-if="profile?.id" class="page-header__actions page-header__actions--profile">
+            <a v-if="profile.slug" :href="previewUrl" target="_blank" rel="noopener" class="btn btn--secondary">
                 <Icon name="eye" :size="14" /> {{ t('portal.public_profile.preview') }}
             </a>
-            <Button v-if="profile?.slug" variant="secondary" @click="onCopyLink">
+            <Button v-if="profile.slug" variant="secondary" @click="onCopyLink">
                 <Icon name="copy" :size="14" /> {{ t('portal.public_profile.copy_link') }}
             </Button>
-            <Button v-if="profile?.id" :variant="profile.is_published ? 'secondary' : 'primary'" :loading="publishing" @click="togglePublish">
-                {{ profile.is_published ? t('portal.public_profile.unpublish') : t('portal.public_profile.publish') }}
-            </Button>
+            <Switch
+                :model-value="form.is_public"
+                size="sm"
+                :disabled="toggling || saving"
+                @update:model-value="onTogglePublic"
+            >
+                <span>{{ t('portal.public_profile.field.public') }}</span>
+            </Switch>
         </div>
     </header>
 
-    <div v-if="loading" class="empty">
-        <span class="empty__icon"><Icon name="clock" :size="22" /></span>
-        <p class="empty__title">{{ t('portal.common.loading') }}</p>
-    </div>
+    <FormSkeleton v-if="loading" :fields="6" wide />
 
-    <form v-else class="surface form-card form-card--wide" @submit.prevent="onSave">
-        <div class="field-grid">
-            <div class="field">
-                <label class="field-label" for="name">{{ t('portal.public_profile.field.name') }}</label>
-                <input id="name" v-model="form.name" class="input" />
-            </div>
-            <div class="field">
-                <label class="field-label" for="headline">{{ t('portal.public_profile.field.headline') }}</label>
-                <input id="headline" v-model="form.headline" class="input" />
+    <form v-else class="cv-builder" @submit.prevent="onSave">
+        <div class="cv-builder__main">
+            <div class="surface form-card">
+                <div class="field-grid">
+                    <div class="field">
+                        <label class="field-label" for="name">{{ t('portal.public_profile.field.name') }}</label>
+                        <input id="name" v-model="form.name" class="input" :placeholder="t('portal.public_profile.field.name_placeholder')" />
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="headline">{{ t('portal.public_profile.field.headline') }}</label>
+                        <input id="headline" v-model="form.headline" class="input" :placeholder="t('portal.public_profile.field.headline_placeholder')" />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="field-label" for="bio">{{ t('portal.public_profile.field.about') }}</label>
+                    <textarea id="bio" v-model="form.bio" class="textarea" rows="4" :placeholder="t('portal.public_profile.field.about_placeholder')" />
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label class="field-label" for="email">{{ t('portal.public_profile.field.email') }}</label>
+                        <input id="email" v-model="form.email" type="email" class="input" :placeholder="t('portal.public_profile.field.email_placeholder')" />
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="phone">{{ t('portal.public_profile.field.phone') }}</label>
+                        <input id="phone" v-model="form.phone" type="tel" class="input" :placeholder="t('portal.public_profile.field.phone_placeholder')" />
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label class="field-label" for="website">{{ t('portal.public_profile.field.website') }}</label>
+                        <input id="website" v-model="form.website" type="url" class="input" :placeholder="t('portal.public_profile.field.website_placeholder')" />
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="location">{{ t('portal.public_profile.field.location') }}</label>
+                        <input id="location" v-model="form.location" class="input" :placeholder="t('portal.public_profile.field.location_placeholder')" />
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="field">
-            <label class="field-label" for="bio">{{ t('portal.public_profile.field.bio') }}</label>
-            <textarea id="bio" v-model="form.bio" class="textarea" rows="4" />
-        </div>
+        <aside class="cv-builder__side">
+            <div class="surface form-card cv-builder__meta">
+                <div class="field">
+                    <span class="field-label">{{ t('portal.public_profile.field.template') }}</span>
+                    <CvTemplateSlider v-model="form.template_id" :templates="templates" kind="public-profile" />
+                </div>
+            </div>
+        </aside>
 
-        <div class="field-grid">
-            <div class="field">
-                <label class="field-label" for="email">{{ t('portal.public_profile.field.email') }}</label>
-                <input id="email" v-model="form.email" type="email" class="input" />
-            </div>
-            <div class="field">
-                <label class="field-label" for="phone">{{ t('portal.public_profile.field.phone') }}</label>
-                <input id="phone" v-model="form.phone" type="tel" class="input" />
-            </div>
-        </div>
-
-        <div class="field-grid">
-            <div class="field">
-                <label class="field-label" for="website">{{ t('portal.public_profile.field.website') }}</label>
-                <input id="website" v-model="form.website" type="url" class="input" />
-            </div>
-            <div class="field">
-                <label class="field-label" for="location">{{ t('portal.public_profile.field.location') }}</label>
-                <input id="location" v-model="form.location" class="input" />
-            </div>
-        </div>
-
-        <div class="field-grid">
-            <div class="field">
-                <label class="field-label" for="template">{{ t('portal.public_profile.field.template') }}</label>
-                <select id="template" v-model="form.template_id" class="select">
-                    <option value="">{{ t('portal.public_profile.field.template_none') }}</option>
-                    <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id">{{ tpl.name }}</option>
-                </select>
-            </div>
-            <div class="field">
-                <label class="field-label" for="color">{{ t('portal.public_profile.field.color') }}</label>
-                <input id="color" v-model="form.color" type="color" class="input" style="height: 44px; padding: 4px;" />
-            </div>
-        </div>
-
-        <div class="form-actions">
+        <div class="cv-builder__save">
             <Button type="submit" variant="primary" :loading="saving">
-                {{ saving ? t('portal.common.loading') : t('portal.public_profile.save') }}
+                {{ saving ? t('portal.public_profile.saving') : t('portal.public_profile.save') }}
             </Button>
         </div>
     </form>
 </template>
-

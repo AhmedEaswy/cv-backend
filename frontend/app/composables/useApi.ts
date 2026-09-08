@@ -6,7 +6,8 @@
  *     sessions (set during the same request) are visible.
  *   - On the client, attaches the Authorization: Bearer <token> header
  *     if a Sanctum token is stored in localStorage. The token comes
- *     from /auth/login's response.data.token and is cleared on logout.
+ *     from /auth/login's response.data.token and is cleared on logout
+ *     or when /auth/me (or any call) returns 401.
  */
 const TOKEN_KEY = 'cv.auth.token';
 
@@ -32,27 +33,44 @@ export const useApi = () => {
         baseURL: `${base}${prefix}`,
 
         onRequest({ options }) {
+            const headers = new Headers(options.headers as HeadersInit | undefined);
+            headers.set('Accept', 'application/json');
+
             const locale = useNuxtApp().$i18n?.locale?.value;
             if (locale) {
-                options.headers = { ...(options.headers || {}), 'Accept-Language': locale };
+                headers.set('Accept-Language', locale);
             }
 
             // Server: forward the cookie so /auth/me works during SSR
             if (import.meta.server) {
-                const headers = useRequestHeaders(['cookie']);
-                if (headers.cookie) {
-                    options.headers = { ...(options.headers || {}), cookie: headers.cookie };
+                const incoming = useRequestHeaders(['cookie']);
+                if (incoming.cookie) {
+                    headers.set('cookie', incoming.cookie);
                 }
-                return;
+            } else {
+                // Client: bearer token from localStorage
+                const token = getToken();
+                if (token) {
+                    headers.set('Authorization', `Bearer ${token}`);
+                }
             }
-            // Client: bearer token from localStorage
-            const token = getToken();
-            if (token) {
-                options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
-            }
+
             // For FormData uploads let the browser set Content-Type
             if (options.body instanceof FormData) {
-                delete (options.headers as any)['Content-Type'];
+                headers.delete('Content-Type');
+            }
+
+            options.headers = headers;
+        },
+
+        onResponseError({ response }) {
+            // Invalid / expired token: drop it so we don't keep auto-retrying.
+            if (response.status === 401 && import.meta.client) {
+                setToken(null);
+                const checked = useState<boolean>('auth.checked', () => false);
+                const user = useState<AuthUser | null>('auth.user', () => null);
+                user.value = null;
+                checked.value = true;
             }
         },
     });
@@ -66,3 +84,11 @@ export const useApi = () => {
  * signature is identical to $fetch.
  */
 export const useRawFetch = () => $fetch;
+
+// Local type alias so onResponseError can clear auth state without circular imports.
+interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at?: string | null;
+}

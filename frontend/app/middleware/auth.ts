@@ -1,14 +1,24 @@
 /**
  * Auth middleware — gates the /portal/* and other authenticated routes.
- * On the server, forwards the cookie so /auth/me can run during SSR.
+ * Bearer token lives in localStorage (client only). Invalid tokens are
+ * cleared by useApi / refresh and are not retried until the user logs in again.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
-    // Bearer token is stored in localStorage — only available in the browser.
     if (import.meta.server) return;
 
-    const { user, refresh } = useAuthSession();
+    const { user, checked, refresh } = useAuthSession();
+    const api = useApi();
 
-    if (user.value === null) {
+    if (!api.getToken()) {
+        user.value = null;
+        checked.value = true;
+        return navigateTo({
+            path: '/auth/login',
+            query: { redirect: to.fullPath },
+        });
+    }
+
+    if (!checked.value || user.value === null) {
         await refresh();
     }
 

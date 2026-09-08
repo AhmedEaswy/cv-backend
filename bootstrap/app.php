@@ -37,7 +37,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => RedirectIfAuthenticated::class,
             'verified' => EnsureEmailIsVerified::class,
         ]);
+
+        // Nuxt owns the public login UI at /auth/login (not Laravel /login).
+        $middleware->redirectGuestsTo('/auth/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request, \Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();

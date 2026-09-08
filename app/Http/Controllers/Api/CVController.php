@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\PrintCVRequest;
 use App\Http\Requests\Api\StoreCVRequest;
 use App\Http\Requests\Api\UpdateCVRequest;
+use App\Models\AtsCheck;
+use App\Models\Template;
 use App\Repositories\CVRepositoryInterface;
 use App\Services\CVDataMapper;
 use App\Services\CVPDFService;
 use App\Services\CvPhotoService;
 use App\Services\TrackingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CVController extends BaseApiController
 {
@@ -35,7 +38,25 @@ class CVController extends BaseApiController
             $request->input('language')
         );
 
-        $cvs = $profiles->map(fn ($profile) => $this->dataMapper->formatProfileResponse($profile));
+        $profileIds = $profiles->pluck('id');
+        $latestAtsByProfile = $profileIds->isEmpty()
+            ? collect()
+            : AtsCheck::query()
+                ->whereIn('profile_id', $profileIds)
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->get(['profile_id', 'score', 'grade', 'created_at'])
+                ->unique('profile_id')
+                ->keyBy('profile_id');
+
+        $cvs = $profiles->map(function ($profile) use ($latestAtsByProfile) {
+            $data = $this->dataMapper->formatProfileResponse($profile);
+            $check = $latestAtsByProfile->get($profile->id);
+            $data['latest_ats_score'] = $check?->score !== null ? (int) $check->score : null;
+            $data['latest_ats_grade'] = $check?->grade;
+
+            return $data;
+        });
 
         return $this->successResponse($cvs, __('messages.cvs_retrieved'));
     }
@@ -47,24 +68,43 @@ class CVController extends BaseApiController
     {
         $validated = $request->validated();
 
+        // Public routes still accept Bearer tokens — resolve sanctum when present.
+        $user = $request->user() ?? $request->user('sanctum');
+
         // If unauthenticated user provides template_id, generate PDF instead of creating profile
-        if (!$request->user() && $request->has('template_id')) {
+        if (!$user && $request->has('template_id')) {
             return $this->generatePdfFromRequest($request);
         }
 
-        // Get user_id from authenticated user or request
-        $userId = $request->user()?->id ?? $request->input('user_id');
+        // Authenticated callers always own the CV; guests may still pass user_id.
+        $userId = $user?->id ?? $request->input('user_id');
 
         // Map user_data to Profile structure
         $userData = $this->photoService->processUserDataPhoto($request->input('user_data', []));
         $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
+        if ($user && $this->isUserDataEmpty($userData)) {
+            $mappedData['info'] = [
+                'firstName' => $user->first_name,
+                'lastName' => $user->last_name,
+                'email' => $user->email,
+            ];
+        }
+
         $tracking = $this->trackingService->capture($request);
+
+        $templateId = $validated['template_id']
+            ?? Template::query()
+                ->where('is_active', true)
+                ->where('is_default', true)
+                ->value('id');
 
         $profile = $this->cvRepository->create(array_merge([
             'user_id' => $userId,
             'name' => $validated['name'],
             'language' => $validated['language'] ?? 'en',
+            'template_id' => $templateId,
+            'is_public' => false,
             'sections_order' => $validated['sections_order'] ?? null,
             'info' => $mappedData['info'] ?? null,
             'interests' => $mappedData['interests'] ?? null,
@@ -130,6 +170,14 @@ class CVController extends BaseApiController
             $updateData['sections_order'] = $validated['sections_order'];
         }
 
+        if (array_key_exists('template_id', $validated)) {
+            $updateData['template_id'] = $validated['template_id'];
+        }
+
+        if (array_key_exists('is_public', $validated)) {
+            $updateData['is_public'] = $validated['is_public'];
+        }
+
         // Handle user_data updates
         if (isset($validated['user_data'])) {
             $userData = $this->photoService->processUserDataPhoto($validated['user_data']);
@@ -186,6 +234,41 @@ class CVController extends BaseApiController
         $this->cvRepository->delete($profile);
 
         return $this->successResponse(null, __('messages.cv_deleted'));
+    }
+
+    /**
+     * Duplicate an owned CV.
+     */
+    public function duplicate(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $original = $this->cvRepository->findByIdForUser($id, $user->id);
+
+        if (!$original) {
+            return $this->errorResponse(__('messages.cv_not_found'), 404);
+        }
+
+        $copy = $this->cvRepository->create(array_merge([
+            'user_id' => $user->id,
+            'name' => $this->nextCopyName((string) $original->name),
+            'language' => $original->language,
+            'template_id' => $original->template_id,
+            'is_public' => false,
+            'sections_order' => $original->sections_order,
+            'info' => $original->info,
+            'experiences' => $original->experiences,
+            'educations' => $original->educations,
+            'projects' => $original->projects,
+            'interests' => $original->interests,
+            'languages' => $original->languages,
+        ], $this->trackingService->capture($request)));
+
+        return $this->successResponse(
+            $this->dataMapper->formatProfileResponse($copy),
+            __('messages.cv_duplicated'),
+            201
+        );
     }
 
     /**
@@ -314,5 +397,32 @@ class CVController extends BaseApiController
 
             return $this->errorResponse($errorMessage, 500);
         }
+    }
+
+    private function isUserDataEmpty(array $userData): bool
+    {
+        foreach ($userData as $value) {
+            if (is_array($value) && $value !== []) {
+                return false;
+            }
+            if (is_string($value) && trim($value) !== '') {
+                return false;
+            }
+            if ($value !== null && $value !== '' && $value !== []) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function nextCopyName(string $original): string
+    {
+        if (Str::contains($original, ' (Copy')) {
+            return preg_replace('/\(Copy( \d+)?\)$/', '(Copy '.((int) (Str::afterLast($original, ' ')) + 1 ?: 2).')', $original)
+                ?: $original.' (Copy)';
+        }
+
+        return $original.' (Copy)';
     }
 }

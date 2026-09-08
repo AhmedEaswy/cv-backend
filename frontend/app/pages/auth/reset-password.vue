@@ -37,16 +37,16 @@ async function onSubmit() {
         <form v-if="!success && form.token && form.email" @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.email') }}</label>
-                <input id="email" v-model="form.email" type="email" class="input" required />
+                <input id="email" v-model="form.email" type="email" class="input" required :placeholder="t('auth.email_placeholder')" />
             </div>
             <div class="field">
                 <label class="field-label" for="password">{{ t('auth.reset.password') }}</label>
-                <input id="password" v-model="form.password" type="password" class="input" autocomplete="new-password" required :aria-invalid="!!fieldError('password')" />
+                <input id="password" v-model="form.password" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_new_placeholder')" :aria-invalid="!!fieldError('password')" />
                 <span v-if="fieldError('password')" class="field-error">{{ fieldError('password') }}</span>
             </div>
             <div class="field">
                 <label class="field-label" for="password_confirmation">{{ t('auth.reset.password_confirm') }}</label>
-                <input id="password_confirmation" v-model="form.password_confirmation" type="password" class="input" autocomplete="new-password" required />
+                <input id="password_confirmation" v-model="form.password_confirmation" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_confirm_placeholder')" />
             </div>
             <Button type="submit" variant="primary" :loading="loading" block>
                 {{ loading ? t('auth.reset.submitting') : t('auth.reset.action') }}

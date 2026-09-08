@@ -47,7 +47,7 @@
             <h1 class="name">{{ $fullName }}</h1>
             @if($jobTitle)<p class="title">{{ $jobTitle }}</p>@endif
             @if(!empty($contactParts))
-                <p class="contact">@foreach($contactParts as $part)<span>{{ $part }}</span>@endforeach</p>
+                <p class="contact">@foreach($contactParts as $part)<span>{!! \App\Support\CvLink::tag($part) !!}</span>@endforeach</p>
             @endif
         </div>
         @if($photo)
@@ -104,6 +104,7 @@
             @foreach($projects as $project)
                 <div class="entry">
                     <h3 class="entry-title">{{ $project['title'] ?? '' }}</h3>
+                    @if(!empty($project['url']))<p>{!! \App\Support\CvLink::tag($project['url']) !!}</p>@endif
                     @if(!empty($project['description']))<p>{{ $project['description'] }}</p>@endif
                 </div>
             @endforeach

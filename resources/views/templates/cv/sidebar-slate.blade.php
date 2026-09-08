@@ -52,7 +52,7 @@
 
         <h2 class="side-h">{{ __('Contact') }}</h2>
         @foreach(array_filter([$userData['email'] ?? null, $userData['phone'] ?? null, $userData['address'] ?? null, $userData['portfolioUrl'] ?? null]) as $c)
-            <p class="side-item">{{ $c }}</p>
+            <p class="side-item">{!! \App\Support\CvLink::tag($c) !!}</p>
         @endforeach
 
         @if(!empty($skills))
@@ -115,6 +115,7 @@
                 @foreach($projects as $project)
                     <div class="entry">
                         <h3 class="entry-title">{{ $project['title'] ?? '' }}</h3>
+                        @if(!empty($project['url']))<p>{!! \App\Support\CvLink::tag($project['url']) !!}</p>@endif
                         @if(!empty($project['description']))<p>{{ $project['description'] }}</p>@endif
                     </div>
                 @endforeach

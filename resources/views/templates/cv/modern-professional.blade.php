@@ -90,7 +90,7 @@
             @if(!empty($contactInfo))
                 <div class="flex flex-wrap gap-4 text-sm text-gray-700">
                     @foreach($contactInfo as $info)
-                        <span>{{ $info }}</span>
+                        {!! \App\Support\CvLink::tag($info) !!}
                         @if(!$loop->last)
                             <span class="text-gray-400">•</span>
                         @endif
@@ -210,7 +210,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">{{ $project['title'] ?? '' }}</h3>
                                     @if(!empty($project['url']))
-                                        <a href="{{ $project['url'] }}" class="text-blue-600 hover:underline text-sm">{{ $project['url'] }}</a>
+                                        {!! \App\Support\CvLink::tag($project['url'], 'text-blue-600 hover:underline text-sm') !!}
                                     @endif
                                 </div>
                                 <div class="text-end text-sm text-gray-600 shrink-0">

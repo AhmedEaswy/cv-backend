@@ -141,6 +141,78 @@ html[dir="rtl"] .select {
     @apply size-4 cursor-pointer rounded accent-ink;
 }
 
+/* shadcn-style switch */
+.ui-switch-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.ui-switch-field__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+    line-height: 1.4;
+}
+.ui-switch-field__copy .field-hint {
+    margin-top: 0;
+}
+.ui-switch {
+    --switch-w: 2rem;
+    --switch-h: 1.15rem;
+    position: relative;
+    flex-shrink: 0;
+    width: var(--switch-w);
+    height: var(--switch-h);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-line-2);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    transition: background 180ms ease;
+}
+.ui-switch--sm {
+    --switch-w: 1.75rem;
+    --switch-h: 1.05rem;
+}
+.ui-switch[data-state="checked"] {
+    background: var(--color-ink);
+}
+.ui-switch:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+}
+.ui-switch:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.ui-switch__thumb {
+    position: absolute;
+    top: 2px;
+    inset-inline-start: 2px;
+    width: calc(var(--switch-h) - 4px);
+    height: calc(var(--switch-h) - 4px);
+    border-radius: var(--radius-pill);
+    background: var(--color-white);
+    box-shadow: var(--shadow-1);
+    transition: transform 180ms ease;
+    pointer-events: none;
+}
+.ui-switch[data-state="checked"] .ui-switch__thumb {
+    transform: translateX(calc(var(--switch-w) - var(--switch-h)));
+}
+html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
+    transform: translateX(calc(var(--switch-h) - var(--switch-w)));
+}
+@media (prefers-reduced-motion: reduce) {
+    .ui-switch,
+    .ui-switch__thumb { transition: none; }
+}
+
 /* AI access token UI */
 .token-form {
     @apply flex flex-wrap items-end gap-3;
@@ -177,4 +249,86 @@ html[dir="rtl"] .select {
 .tabs a,
 .tabs span {
     @apply inline-flex px-[0.9rem] py-[0.45rem];
+}
+
+/* Flatpickr + Tom Select — same radius as .input */
+.flatpickr-input.input,
+.flatpickr-input {
+    border-radius: var(--radius-md) !important;
+}
+.flatpickr-calendar {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-3);
+    font-family: inherit;
+}
+.flatpickr-months,
+.flatpickr-weekdays,
+.flatpickr-days {
+    border-radius: var(--radius-md);
+}
+
+.ts-wrapper,
+.ts-wrapper.select,
+.ts-wrapper.ts-select {
+    width: 100%;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0;
+    min-height: 0;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-radius: 0;
+}
+.ts-wrapper.single .ts-control,
+.ts-wrapper .ts-control {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-white);
+    padding: 0.45rem 0.95rem;
+    padding-inline-end: 2.5rem !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: none;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+    --ts-pr-caret: 2.25rem;
+}
+.ts-wrapper.single .ts-control::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 0.85rem;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    transform: translateY(-50%);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat center / 14px;
+}
+.ts-wrapper.single.dropdown-active .ts-control::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+.ts-wrapper.focus .ts-control,
+.ts-wrapper.single.input-active .ts-control {
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+.ts-wrapper .ts-control > input {
+    font-size: 0.9rem;
+}
+.ts-dropdown {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-3);
+    z-index: 80;
+}
+.ts-dropdown .option {
+    padding: 0.5rem 0.85rem;
+}
+.ts-dropdown .option.active,
+.ts-dropdown .option.selected {
+    background: var(--color-paper-2);
+    color: var(--color-ink);
 }

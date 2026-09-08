@@ -45,6 +45,7 @@ class AtsRulesEngineTest extends TestCase
         $byId = collect($checks)->keyBy('id');
 
         $this->assertTrue($byId['has_name']['passed']);
+        $this->assertSame('Name', $byId['has_name']['label']);
         $this->assertTrue($byId['has_email']['passed']);
         $this->assertTrue($byId['has_skills']['passed']);
         $this->assertTrue($byId['action_verbs']['passed']);

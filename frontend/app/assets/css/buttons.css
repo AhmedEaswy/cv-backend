@@ -23,8 +23,27 @@
     @apply px-7 py-[0.95rem] text-[0.95rem];
 }
 
-.btn--icon {
-    @apply aspect-square p-2;
+.btn.btn--icon {
+    box-sizing: border-box;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    max-width: 2.5rem;
+    max-height: 2.5rem;
+    padding: 0 !important;
+    aspect-ratio: 1;
+    gap: 0;
+}
+
+.btn.btn--sm.btn--icon {
+    width: 2.125rem;
+    height: 2.125rem;
+    min-width: 2.125rem;
+    min-height: 2.125rem;
+    max-width: 2.125rem;
+    max-height: 2.125rem;
 }
 
 .btn--block {
@@ -56,7 +75,7 @@
 }
 
 .btn--danger {
-    @apply border-line bg-transparent text-danger;
+    @apply border-danger bg-transparent text-danger;
 }
 
 .btn--danger:hover {

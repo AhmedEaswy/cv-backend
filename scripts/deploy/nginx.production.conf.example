@@ -1,0 +1,65 @@
+# Production nginx sketch for cv.edgesgate.com
+# Laravel (API / admin / public previews) + Nuxt SSR (landing, auth, portal).
+#
+# Adapt paths/ssl to your host. After editing:
+#   nginx -t && systemctl reload nginx
+#
+# Requires Nuxt running on 127.0.0.1:3000 (pm2 — see ecosystem.config.cjs).
+
+server {
+    listen 80;
+    listen 443 ssl http2;
+    server_name cv.edgesgate.com;
+
+    root /var/www/edgesgate_co_usr/data/www/cv.edgesgate.com/public;
+    index index.php;
+
+    # ssl_certificate     /path/to/fullchain.pem;
+    # ssl_certificate_key /path/to/privkey.pem;
+
+    charset utf-8;
+    client_max_body_size 32M;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    # Laravel-owned routes
+    location ~ ^/(api|admin|u/|profile/|cover-letter/|test/|lang/|up|sanctum) {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ ^/auth/google/ {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock; # adjust PHP version
+    }
+
+    location ^~ /storage/ {
+        alias /var/www/edgesgate_co_usr/data/www/cv.edgesgate.com/storage/app/public/;
+        access_log off;
+        expires 7d;
+    }
+
+    location ^~ /build/ { try_files $uri =404; expires 7d; }
+    location ^~ /images/ { try_files $uri =404; expires 7d; }
+    location ^~ /fonts/ { try_files $uri =404; expires 7d; }
+    location ^~ /css/ { try_files $uri =404; expires 7d; }
+    location ^~ /js/ { try_files $uri =404; expires 7d; }
+
+    # Nuxt SSR (landing, auth, portal)
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+}

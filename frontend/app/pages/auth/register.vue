@@ -59,6 +59,7 @@ const onSubmit = () => register({ ...form });
                     class="input"
                     autocomplete="name"
                     required
+                    :placeholder="t('auth.name_placeholder')"
                     :aria-invalid="!!fieldError('name')"
                 />
                 <span v-if="fieldError('name')" class="field-error">{{ fieldError('name') }}</span>
@@ -74,6 +75,7 @@ const onSubmit = () => register({ ...form });
                     autocomplete="email"
                     inputmode="email"
                     required
+                    :placeholder="t('auth.email_placeholder')"
                     :aria-invalid="!!fieldError('email')"
                 />
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>
@@ -88,6 +90,7 @@ const onSubmit = () => register({ ...form });
                     class="input"
                     autocomplete="new-password"
                     required
+                    :placeholder="t('auth.password_new_placeholder')"
                     :aria-invalid="!!fieldError('password')"
                 />
                 <span class="field-hint">
@@ -108,6 +111,7 @@ const onSubmit = () => register({ ...form });
                     class="input"
                     autocomplete="new-password"
                     required
+                    :placeholder="t('auth.password_confirm_placeholder')"
                 />
             </div>
 

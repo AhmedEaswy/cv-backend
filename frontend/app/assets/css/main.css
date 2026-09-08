@@ -10,5 +10,8 @@
 @import "./footer.css";
 @import "./auth.css";
 @import "./portal.css";
+@import "./skeletons.css";
 @import "./components.css";
 @import "./legacy-features.css";
+@import "flatpickr/dist/flatpickr.css";
+@import "tom-select/dist/css/tom-select.css";

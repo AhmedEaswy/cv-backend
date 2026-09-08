@@ -7,6 +7,7 @@ import type { CoverLetterSummary } from '~/composables/usePortalApi';
 
 const { t } = useI18n();
 const portal = usePortalApi();
+const { refresh: refreshStats } = usePortalStats();
 const letters = ref<CoverLetterSummary[]>([]);
 const loading = ref(true);
 
@@ -18,11 +19,17 @@ onMounted(async () => {
 async function onDelete(l: CoverLetterSummary) {
     if (!confirm(t('portal.cover_letters.delete_confirm'))) return;
     const ok = await portal.destroy(`/cover-letters/${l.id}`, t('portal.cover_letters.deleted'));
-    if (ok) letters.value = letters.value.filter((x) => x.id !== l.id);
+    if (ok) {
+        letters.value = letters.value.filter((x) => x.id !== l.id);
+        refreshStats();
+    }
 }
 async function onDuplicate(l: CoverLetterSummary) {
     const r = await portal.duplicate(`/cover-letters/${l.id}/duplicate`);
-    if (r?.id) letters.value = [r, ...letters.value];
+    if (r?.id) {
+        letters.value = [r, ...letters.value];
+        refreshStats();
+    }
 }
 
 function timeAgo(iso?: string) {
@@ -45,10 +52,7 @@ function timeAgo(iso?: string) {
         </div>
     </header>
 
-    <div v-if="loading" class="empty">
-        <span class="empty__icon"><Icon name="clock" :size="22" /></span>
-        <p class="empty__title">{{ t('portal.common.loading') }}</p>
-    </div>
+    <ListSkeleton v-if="loading" />
 
     <div v-else-if="letters.length === 0" class="empty">
         <span class="empty__icon"><Icon name="mail" :size="22" /></span>
@@ -69,13 +73,13 @@ function timeAgo(iso?: string) {
                 </p>
             </div>
             <div class="list-card__actions">
-                <Button variant="ghost" size="sm" @click="onDuplicate(l)" :aria-label="t('portal.common.duplicate')">
+                <Button variant="ghost" size="sm" icon @click="onDuplicate(l)" :aria-label="t('portal.common.duplicate')">
                     <Icon name="copy" :size="14" />
                 </Button>
                 <NuxtLink :to="`/portal/cover-letters/${l.id}/edit`" class="btn btn--secondary btn--sm">
                     {{ t('portal.common.edit') }}
                 </NuxtLink>
-                <Button variant="danger" size="sm" @click="onDelete(l)" :aria-label="t('portal.common.delete')">
+                <Button variant="danger" size="sm" icon @click="onDelete(l)" :aria-label="t('portal.common.delete')">
                     <Icon name="trash" :size="14" />
                 </Button>
             </div>

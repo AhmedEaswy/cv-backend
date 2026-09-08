@@ -13,7 +13,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Deploy over SSH
@@ -24,11 +24,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script_stop: true
-          command_timeout: 15m
+          command_timeout: 25m
           script: |
             set -euo pipefail
 
             APP_DIR="/var/www/edgesgate_co_usr/data/www/cv.edgesgate.com"
+            APP_URL="${APP_URL:-https://cv.edgesgate.com}"
             cd "$APP_DIR"
 
             echo "==> Fetching production"
@@ -39,7 +40,7 @@ jobs:
             echo "==> Installing PHP dependencies"
             composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-            echo "==> Building frontend assets"
+            echo "==> Building Laravel Vite assets (Filament / public)"
             if [ -f package-lock.json ]; then
               npm ci
             else
@@ -47,12 +48,37 @@ jobs:
             fi
             npm run build
 
+            echo "==> Building Nuxt frontend"
+            export NVM_DIR="$HOME/.nvm"
+            # Prefer nvm Node 20+ when available; fall back to system node.
+            if [ -s "$NVM_DIR/nvm.sh" ]; then
+              # shellcheck disable=SC1090
+              . "$NVM_DIR/nvm.sh"
+              nvm install 20 >/dev/null
+              nvm use 20 >/dev/null
+            fi
+            node -v
+            corepack enable
+            corepack prepare pnpm@latest --activate
+
+            cd frontend
+            if [ -f pnpm-lock.yaml ]; then
+              pnpm install --frozen-lockfile
+            else
+              pnpm install
+            fi
+            NUXT_PUBLIC_LARAVEL_URL="$APP_URL" \
+            NUXT_PUBLIC_APP_NAME="${NUXT_PUBLIC_APP_NAME:-CV}" \
+              pnpm build
+            cd "$APP_DIR"
+
             echo "==> Running migrations"
             php artisan migrate --force
 
             echo "==> Seeding missing templates"
             php artisan db:seed --class=TemplateSeeder --force
             php artisan db:seed --class=CoverLetterTemplateSeeder --force
+            php artisan db:seed --class=PublicProfileTemplateSeeder --force
 
             echo "==> Filament & caches"
             php artisan filament:upgrade
@@ -62,5 +88,16 @@ jobs:
             php artisan route:cache
             php artisan view:cache
 
+            echo "==> Restarting Nuxt (pm2)"
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 startOrReload scripts/deploy/ecosystem.config.cjs --update-env
+              pm2 save
+            else
+              echo "WARN: pm2 not found — start Nuxt manually:"
+              echo "  cd $APP_DIR && node frontend/.output/server/index.mjs"
+              exit 1
+            fi
+
             echo "==> Deploy complete"
             php artisan about --only=environment
+            pm2 status

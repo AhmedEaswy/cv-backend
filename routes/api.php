@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\AgentTokenController;
+use App\Http\Controllers\Api\AiSettingController;
 use App\Http\Controllers\Api\AnalyticsClickController;
 use App\Http\Controllers\Api\AtsCheckController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
+use App\Http\Controllers\Api\PortalStatsController;
 use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
@@ -58,6 +60,7 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     // Protected CV routes (authenticated users only)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/cvs', [CVController::class, 'index']);
+        Route::post('/cvs/{id}/duplicate', [CVController::class, 'duplicate']);
         Route::get('/cvs/{id}', [CVController::class, 'show']);
         Route::put('/cvs/{id}', [CVController::class, 'update']);
         Route::delete('/cvs/{id}', [CVController::class, 'destroy']);
@@ -80,8 +83,13 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/portal/stats', PortalStatsController::class);
+
         Route::get('/agent-tokens', [AgentTokenController::class, 'index']);
         Route::post('/agent-tokens', [AgentTokenController::class, 'store']);
         Route::delete('/agent-tokens/{id}', [AgentTokenController::class, 'destroy']);
+
+        Route::get('/ai-settings', [AiSettingController::class, 'show']);
+        Route::put('/ai-settings', [AiSettingController::class, 'update']);
     });
 });

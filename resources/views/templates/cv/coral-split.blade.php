@@ -47,7 +47,7 @@
             @if($jobTitle)<p class="title">{{ $jobTitle }}</p>@endif
             <div class="contact">
                 @foreach(array_filter([$userData['email'] ?? null, $userData['phone'] ?? null, $userData['address'] ?? null, $userData['portfolioUrl'] ?? null]) as $c)
-                    <p>{{ $c }}</p>
+                    <p>{!! \App\Support\CvLink::tag($c) !!}</p>
                 @endforeach
             </div>
         </div>
@@ -104,6 +104,7 @@
                 @foreach($projects as $project)
                     <div class="entry">
                         <h3 class="entry-title">{{ $project['title'] ?? '' }}</h3>
+                        @if(!empty($project['url']))<p>{!! \App\Support\CvLink::tag($project['url']) !!}</p>@endif
                         @if(!empty($project['description']))<p>{{ $project['description'] }}</p>@endif
                     </div>
                 @endforeach

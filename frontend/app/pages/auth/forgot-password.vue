@@ -37,6 +37,7 @@ async function onSubmit() {
                     class="input"
                     autocomplete="email"
                     required
+                    :placeholder="t('auth.email_placeholder')"
                     :aria-invalid="!!fieldError('email')"
                 />
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>

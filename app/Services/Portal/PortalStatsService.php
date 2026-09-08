@@ -2,6 +2,7 @@
 
 namespace App\Services\Portal;
 
+use App\Models\AtsCheck;
 use App\Models\ContactMessage;
 use App\Models\CoverLetter;
 use App\Models\Profile;
@@ -11,7 +12,7 @@ use App\Models\User;
 class PortalStatsService
 {
     /**
-     * Aggregate counts and last-activity data used by the dashboard.
+     * Aggregate counts and last-activity data used by the dashboard / sidebar.
      *
      * @return array<string, mixed>
      */
@@ -27,6 +28,8 @@ class PortalStatsService
                 ->count()
             : 0;
 
+        $topAtsScore = AtsCheck::where('user_id', $user->id)->max('score');
+
         $latestCv = Profile::where('user_id', $user->id)
             ->latest('updated_at')
             ->first();
@@ -38,6 +41,8 @@ class PortalStatsService
         return [
             'cvs_count' => $cvsCount,
             'cover_letters_count' => $coverLettersCount,
+            'top_ats_score' => $topAtsScore !== null ? (int) $topAtsScore : null,
+            'views_count' => (int) ($publicProfile?->views_count ?? 0),
             'unread_messages' => $unreadMessages,
             'has_public_profile' => $publicProfile !== null,
             'public_profile_is_published' => $publicProfile?->is_public ?? false,

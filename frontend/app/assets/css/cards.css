@@ -21,20 +21,51 @@
 
 /* pages/portal/index.vue */
 .stats-grid {
-    @apply mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4;
+    @apply mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4;
 }
 
 .stats-grid .stat__value {
     @apply inline-flex min-h-10 items-center;
 }
 
+.dash-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+    align-items: start;
+}
+@media (min-width: 1100px) {
+    .dash-layout {
+        grid-template-columns: minmax(0, 1fr) 19.5rem;
+        gap: 1.35rem;
+    }
+}
+
 .dash-grid {
     @apply mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2;
 }
 
-.dash-card { padding: 1.5rem; }
-.dash-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.dash-card__title { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; margin: 0; letter-spacing: -0.02em; }
+.dash-card { padding: 1.35rem 1.4rem 1.15rem; }
+.dash-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.dash-card__title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+.dash-card__sub {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: var(--color-muted);
+}
+.dash-filters { margin-bottom: 1rem; }
 
 .dash-list-item {
     display: flex;
@@ -45,19 +76,143 @@
     border-radius: var(--radius-md);
     border: 1px solid var(--color-line);
 }
+
+.recent-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+.recent-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 0.15rem;
+    border-bottom: 1px solid var(--color-line);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s ease;
+}
+.recent-list li:last-child .recent-row { border-bottom: 0; }
+.recent-row:hover { background: var(--color-paper-2); }
+.recent-row__tag {
+    display: none;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-paper-2);
+    border: 1px solid var(--color-line);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+}
+.recent-row__status {
+    display: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.recent-row__status--success { color: var(--color-success); }
+.recent-row__status--warning { color: var(--color-warning); }
+.recent-row__status--muted { color: var(--color-muted); }
+.recent-row__chevron {
+    color: var(--color-muted);
+    flex-shrink: 0;
+    margin-inline-start: auto;
+}
+@media (min-width: 640px) {
+    .recent-row__tag,
+    .recent-row__status { display: inline-flex; }
+    .recent-row__chevron { margin-inline-start: 0; }
+}
+
+.dash-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.dash-widget { padding: 1.2rem 1.25rem; }
+.dash-widget__title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin: 0 0 0.45rem;
+    color: var(--color-ink);
+}
+.dash-widget__text {
+    margin: 0 0 0.85rem;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--color-ink-soft);
+}
+.dash-widget__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.95rem;
+}
+.dash-widget__slug {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.65rem 0.35rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-ink);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.12s ease;
+    background: transparent;
+    border: 0;
+    width: 100%;
+    cursor: pointer;
+    text-align: start;
+    font-family: inherit;
+}
+.quick-action > span:nth-child(2) { flex: 1; }
+.quick-action:hover { background: var(--color-paper-2); }
+.quick-action__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: var(--color-paper-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-ink-soft);
+}
+.quick-action svg:last-child { color: var(--color-muted); }
+
 .dash-tip {
     display: flex;
     align-items: flex-start;
     gap: 0.85rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1.15rem 1.25rem;
     background: var(--color-ink);
     color: var(--color-paper);
     border: 1px solid var(--color-ink);
     border-radius: var(--radius-lg);
 }
+.dash-tip--light {
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    border-color: var(--color-line);
+}
 .dash-tip__icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: var(--radius-md);
     background: rgba(255,255,255,0.12);
     color: var(--color-paper);
@@ -66,8 +221,31 @@
     justify-content: center;
     flex-shrink: 0;
 }
+.dash-tip--light .dash-tip__icon {
+    background: var(--color-white);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+}
 .dash-tip__title { font-size: 0.9rem; font-weight: 600; margin: 0 0 0.2rem; }
-.dash-tip__text { font-size: 0.85rem; margin: 0; color: rgba(250,250,249,0.78); line-height: 1.5; }
+.dash-tip__text { font-size: 0.84rem; margin: 0; color: rgba(250,250,249,0.78); line-height: 1.5; }
+.dash-tip--light .dash-tip__text { color: var(--color-ink-soft); }
+.dash-tip__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: none;
+}
+.dash-tip__link:hover { text-decoration: underline; }
+
+.empty--soft {
+    background: transparent;
+    border-style: dashed;
+    padding: 2.25rem 1rem;
+}
 
 /* pages/portal/inbox.vue */
 .filter-pill {

@@ -113,15 +113,6 @@ const titleLines = computed(() => {
 
                     <div class="hero-orbit__cta">
                         <Button
-                            :to="registerTo"
-                            variant="secondary"
-                            size="md"
-                            class="hero-orbit__btn hero-orbit__btn--register"
-                        >
-                            {{ registerLabel }}
-                            <Icon name="arrow-right" :size="16" class="rtl:rotate-180 ltr:rotate-0" />
-                        </Button>
-                        <Button
                             type="button"
                             variant="ghost"
                             size="md"
@@ -130,6 +121,15 @@ const titleLines = computed(() => {
                         >
                             <Icon name="sparkles" :size="16" />
                             {{ t('landing.hero_cta_ai') }}
+                        </Button>
+                        <Button
+                            :to="registerTo"
+                            variant="secondary"
+                            size="md"
+                            class="hero-orbit__btn hero-orbit__btn--register"
+                        >
+                            {{ registerLabel }}
+                            <Icon name="arrow-right" :size="16" class="rtl:rotate-180 ltr:rotate-0" />
                         </Button>
                     </div>
                 </div>

@@ -61,6 +61,7 @@ const onSubmit = () => login({ ...form });
                     autocomplete="email"
                     inputmode="email"
                     required
+                    :placeholder="t('auth.email_placeholder')"
                     :aria-invalid="!!fieldError('email')"
                 />
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>
@@ -76,6 +77,7 @@ const onSubmit = () => login({ ...form });
                         class="input"
                         autocomplete="current-password"
                         required
+                        :placeholder="t('auth.password_placeholder')"
                         :aria-invalid="!!fieldError('password')"
                     />
                     <button type="button" class="pwd-toggle" @click="showPwd = !showPwd" :aria-label="showPwd ? 'Hide password' : 'Show password'">
@@ -85,10 +87,9 @@ const onSubmit = () => login({ ...form });
                 <span v-if="fieldError('password')" class="field-error">{{ fieldError('password') }}</span>
             </div>
 
-            <label class="checkbox checkbox--remember">
-                <input v-model="form.remember" type="checkbox" name="remember" />
-                <span>{{ t('auth.login.remember') }}</span>
-            </label>
+            <Switch v-model="form.remember" name="remember">
+                {{ t('auth.login.remember') }}
+            </Switch>
 
             <Button type="submit" variant="primary" :loading="loading" block>
                 {{ loading ? t('auth.login.submitting') : t('auth.login.action') }}

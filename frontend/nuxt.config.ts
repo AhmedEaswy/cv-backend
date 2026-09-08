@@ -38,6 +38,7 @@ export default defineNuxtConfig({
     components: [
         { path: '~/components/ui', pathPrefix: false },
         { path: '~/components/icons', pathPrefix: false },
+        { path: '~/components/portal', pathPrefix: false },
         { path: '~/components', pathPrefix: true },
     ],
 

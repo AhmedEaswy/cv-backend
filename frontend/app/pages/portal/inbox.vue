@@ -12,9 +12,8 @@ const selected = ref<InboxMessage | null>(null);
 async function load() {
     loading.value = true;
     try {
-        // The inbox endpoint lives behind the public-profile inbox route.
-        const res = await api<{ data: InboxMessage[] }>('/public-profiles/inbox');
-        messages.value = res.data ?? [];
+        const res = await api<{ result?: InboxMessage[]; data?: InboxMessage[] }>('/public-profiles/inbox');
+        messages.value = res.result ?? res.data ?? [];
     } catch {
         messages.value = [];
     } finally {
@@ -60,10 +59,7 @@ const filtered = computed(() => {
         </div>
     </header>
 
-    <div v-if="loading" class="empty">
-        <span class="empty__icon"><Icon name="clock" :size="22" /></span>
-        <p class="empty__title">{{ t('portal.common.loading') }}</p>
-    </div>
+    <InboxSkeleton v-if="loading" />
 
     <div v-else-if="messages.length === 0" class="empty">
         <span class="empty__icon"><Icon name="inbox" :size="22" /></span>

@@ -125,7 +125,11 @@
             <p class="job-title">{{ $jobTitle }}</p>
         @endif
         @if(!empty($contactParts))
-            <p class="contact-line">{{ implode(' | ', $contactParts) }}</p>
+            <p class="contact-line">
+                @foreach($contactParts as $part)
+                    {!! \App\Support\CvLink::tag($part) !!}@if(!$loop->last) | @endif
+                @endforeach
+            </p>
         @endif
     </header>
 
@@ -220,7 +224,7 @@
                         <div>
                             <h3>{{ $project['title'] ?? '' }}</h3>
                             @if(!empty($project['url']))
-                                <p class="entry-subtitle"><a href="{{ $project['url'] }}">{{ $project['url'] }}</a></p>
+                                <p class="entry-subtitle">{!! \App\Support\CvLink::tag($project['url']) !!}</p>
                             @endif
                         </div>
                         <p class="entry-dates">

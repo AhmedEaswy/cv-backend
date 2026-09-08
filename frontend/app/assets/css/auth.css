@@ -90,6 +90,7 @@
     @apply text-[0.85rem] text-ink underline decoration-1 underline-offset-[3px] hover:decoration-2;
 }
 
-.auth-form .checkbox--remember {
+.auth-form .checkbox--remember,
+.auth-form .ui-switch-field {
     @apply mb-5;
 }

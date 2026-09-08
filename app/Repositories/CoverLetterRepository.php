@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\CoverLetter;
 use App\Models\CoverLetterTemplate;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CoverLetterRepository
@@ -58,6 +59,18 @@ class CoverLetterRepository
 
     public function getActiveTemplates(): Collection
     {
-        return CoverLetterTemplate::where('is_active', true)->get();
+        return CoverLetterTemplate::query()
+            ->where('is_active', true)
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function activeTemplatesQuery(): Builder
+    {
+        return CoverLetterTemplate::query()
+            ->where('is_active', true)
+            ->orderByDesc('is_default')
+            ->orderBy('name');
     }
 }
