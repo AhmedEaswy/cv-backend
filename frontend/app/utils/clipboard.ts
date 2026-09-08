@@ -1,5 +1,5 @@
 /**
- * Copy text even after an await (fetch) has consumed the user-activation token.
+ * Copy text even after an await has consumed the user-activation token.
  * Prefer Clipboard API; fall back to a hidden textarea + execCommand.
  */
 export async function copyToClipboard(text: string): Promise<void> {
@@ -19,18 +19,12 @@ export async function copyToClipboard(text: string): Promise<void> {
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed';
-    ta.style.top = '0';
-    ta.style.left = '0';
-    ta.style.width = '1px';
-    ta.style.height = '1px';
-    ta.style.padding = '0';
-    ta.style.border = 'none';
-    ta.style.outline = 'none';
-    ta.style.boxShadow = 'none';
-    ta.style.background = 'transparent';
-    ta.style.opacity = '0';
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0;';
     document.body.appendChild(ta);
+
+    const selection = document.getSelection();
+    const previous = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
     ta.focus();
     ta.select();
     ta.setSelectionRange(0, ta.value.length);
@@ -40,6 +34,10 @@ export async function copyToClipboard(text: string): Promise<void> {
         ok = document.execCommand('copy');
     } finally {
         document.body.removeChild(ta);
+        if (previous && selection) {
+            selection.removeAllRanges();
+            selection.addRange(previous);
+        }
     }
 
     if (!ok) {
