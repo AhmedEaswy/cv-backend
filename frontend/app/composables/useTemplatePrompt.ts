@@ -19,8 +19,10 @@ export async function loadCvSkillText(): Promise<string> {
     const laravel = String(config.public.laravelUrl || '').replace(/\/+$/, '');
     const origin = laravel || (import.meta.client ? window.location.origin : '');
     const res = await fetch(`${origin}/skill.md`);
-    const body = await res.text();
-    skillCache = body;
+    if (!res.ok) {
+        throw new Error(`Failed to load skill.md (${res.status})`);
+    }
+    skillCache = await res.text();
     return skillCache;
 }
 

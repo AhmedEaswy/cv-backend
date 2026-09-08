@@ -22,6 +22,9 @@ const loadSkill = async () => {
     if (skillText.value) return skillText.value;
     const origin = laravel || (import.meta.client ? window.location.origin : '');
     const res = await fetch(`${origin}/skill.md`);
+    if (!res.ok) {
+        throw new Error(`Failed to load skill.md (${res.status})`);
+    }
     const body = await res.text();
     skillText.value = `Origin: ${origin}\n\n${body}`;
     return skillText.value;
