@@ -1,7 +1,12 @@
 /**
  * Builds a clipboard prompt that teaches an external AI how to use the
  * anonymous CV / cover-letter API with a specific template (outside this website).
+ *
+ * skill.md is embedded at build time so copy-prompt stays inside the user gesture
+ * (fetch latency was causing Clipboard API failures in Chrome).
  */
+import embeddedSkill from '~/assets/agent/skill.md?raw';
+
 export type TemplateKind = 'cv' | 'cover-letter';
 
 export type TemplatePromptInput = {
@@ -15,7 +20,7 @@ export type TemplatePromptInput = {
     blurb?: string | null;
 };
 
-let skillCache = '';
+let skillCache = String(embeddedSkill || '').trim();
 let skillPromise: Promise<string> | null = null;
 
 function skillOrigin(): string {
@@ -43,12 +48,21 @@ export async function loadCvSkillText(): Promise<string> {
     return skillPromise;
 }
 
-/** Warm the skill.md cache so copy-prompt stays inside the user gesture. */
+/** Optionally refresh embedded skill from Laravel (non-blocking). */
 export function prefetchCvSkill(): void {
-    if (!import.meta.client || skillCache || skillPromise) return;
-    void loadCvSkillText().catch(() => {
-        // Ignore — click handler will surface the error.
-    });
+    if (!import.meta.client || skillPromise) return;
+    const origin = skillOrigin();
+    skillPromise = fetch(`${origin}/skill.md`)
+        .then(async (res) => {
+            if (!res.ok) return skillCache;
+            const body = (await res.text()).trim();
+            if (body) skillCache = body;
+            return skillCache;
+        })
+        .catch(() => skillCache)
+        .finally(() => {
+            skillPromise = null;
+        });
 }
 
 export function templateDisplayName(name: string): string {
@@ -59,7 +73,7 @@ export function templateDisplayName(name: string): string {
         .join(' ');
 }
 
-function resolveDisplay(template: TemplatePromptInput, kind: TemplateKind): { display: string; blurb: string } {
+function resolveDisplay(template: TemplatePromptInput): { display: string; blurb: string } {
     const display = (template.displayName || '').trim()
         || templateDisplayName(String(template.name));
     const blurb = (template.blurb ?? template.description ?? '').trim();
@@ -77,7 +91,7 @@ export async function buildTemplatePrompt(template: TemplatePromptInput): Promis
 async function buildCvPrompt(template: TemplatePromptInput): Promise<string> {
     const origin = skillOrigin();
     const skill = await loadCvSkillText();
-    const { display, blurb } = resolveDisplay(template, 'cv');
+    const { display, blurb } = resolveDisplay(template);
 
     return [
         `# CV template: ${display}`,
@@ -125,7 +139,7 @@ async function buildCvPrompt(template: TemplatePromptInput): Promise<string> {
 async function buildCoverLetterPrompt(template: TemplatePromptInput): Promise<string> {
     const origin = skillOrigin();
     const skill = await loadCvSkillText();
-    const { display, blurb } = resolveDisplay(template, 'cover-letter');
+    const { display, blurb } = resolveDisplay(template);
 
     return [
         `# Cover letter template: ${display}`,
@@ -141,7 +155,7 @@ async function buildCoverLetterPrompt(template: TemplatePromptInput): Promise<st
         '## Quick start for this template',
         '',
         `1. GET ${origin}/api/v1/cover-letters/templates — confirm id **${template.id}** (\`${template.name}\`).`,
-        '2. Collect the user\'s real details into letter fields (company, role, body).',
+        '2. Collect the user\'s real letter details (company, role, body).',
         `3. POST ${origin}/api/v1/cover-letters with JSON body:`,
         '```json',
         JSON.stringify({
