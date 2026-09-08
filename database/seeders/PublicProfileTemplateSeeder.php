@@ -83,7 +83,8 @@ class PublicProfileTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            PublicProfileTemplate::updateOrCreate(
+            // Insert missing templates only — never overwrite existing rows.
+            PublicProfileTemplate::firstOrCreate(
                 ['name' => $template['name']],
                 $template,
             );

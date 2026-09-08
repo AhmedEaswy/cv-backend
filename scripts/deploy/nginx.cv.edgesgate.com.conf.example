@@ -1,0 +1,97 @@
+# Production nginx for cv.edgesgate.com (FastPanel-compatible sketch).
+# Laravel: /api /admin /u /profile /cover-letter /test /lang /storage /images ...
+# Nuxt SSR: everything else → 127.0.0.1:3000 (pm2 cv-nuxt).
+#
+# Apply carefully (FastPanel may overwrite available conf):
+#   1. Backup current:
+#      cp /etc/nginx/fastpanel2-available/edgesgate_co_usr/cv.edgesgate.com.conf \
+#         /etc/nginx/fastpanel2-available/edgesgate_co_usr/cv.edgesgate.com.conf.bak.$(date +%Y%m%d%H%M%S)
+#   2. Merge SSL paths / listen IP from the live file into this sketch.
+#   3. nginx -t && systemctl reload nginx
+#
+# CRITICAL: do NOT keep FastPanel's catch-all static regex
+#   location ~* ^.+\.(js|css|...)$ { try_files ... /index.php }
+# It steals Nuxt /_nuxt/* assets and breaks the SSR UI.
+
+server {
+    server_name cv.edgesgate.com;
+
+    listen 176.223.138.70:443 ssl http2;
+
+    # Keep the real cert paths from the live FastPanel conf.
+    # ssl_certificate     "...";
+    # ssl_certificate_key "...";
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    charset utf-8;
+    client_max_body_size 32M;
+
+    gzip on;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/css text/xml application/javascript text/plain application/json image/svg+xml image/x-icon;
+    gzip_comp_level 1;
+
+    set $root_path /var/www/edgesgate_co_usr/data/www/cv.edgesgate.com/public;
+    root $root_path;
+    disable_symlinks if_not_owner from=$root_path;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    # Laravel-owned routes
+    location ~ ^/(api|admin|u/|profile/|cover-letter/|test/|lang/|up|sanctum) {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ ^/auth/google/ {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass unix:/var/run/cv.edgesgate.com.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+    }
+
+    location ^~ /storage/ {
+        alias /var/www/edgesgate_co_usr/data/www/cv.edgesgate.com/storage/app/public/;
+        access_log off;
+        expires 7d;
+    }
+
+    location ^~ /build/ { try_files $uri =404; expires 7d; }
+    location ^~ /images/ { try_files $uri =404; expires 7d; }
+    location ^~ /fonts/ { try_files $uri =404; expires 7d; }
+    location ^~ /css/ { try_files $uri =404; expires 7d; }
+    location ^~ /js/ { try_files $uri =404; expires 7d; }
+
+    # Nuxt SSR (landing, auth, portal) + /_nuxt assets
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    include "/etc/nginx/fastpanel2-sites/edgesgate_co_usr/cv.edgesgate.com.includes";
+    include /etc/nginx/fastpanel2-includes/*.conf;
+
+    error_log /var/www/edgesgate_co_usr/data/logs/cv.edgesgate.com-frontend.error.log;
+    access_log /var/www/edgesgate_co_usr/data/logs/cv.edgesgate.com-frontend.access.log;
+}
+
+server {
+    server_name cv.edgesgate.com;
+    listen 176.223.138.70:80;
+    return 301 https://$host$request_uri;
+
+    error_log /var/www/edgesgate_co_usr/data/logs/cv.edgesgate.com-frontend.error.log;
+    access_log /var/www/edgesgate_co_usr/data/logs/cv.edgesgate.com-frontend.access.log;
+}

@@ -83,7 +83,8 @@ class CoverLetterTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            CoverLetterTemplate::updateOrCreate(
+            // Insert missing templates only — never overwrite existing rows.
+            CoverLetterTemplate::firstOrCreate(
                 ['name' => $template['name']],
                 $template,
             );

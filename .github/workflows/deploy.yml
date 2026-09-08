@@ -13,7 +13,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - name: Deploy over SSH
@@ -24,13 +24,22 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script_stop: true
-          command_timeout: 25m
+          command_timeout: 35m
           script: |
             set -euo pipefail
 
             APP_DIR="/var/www/edgesgate_co_usr/data/www/cv.edgesgate.com"
+            APP_USER="edgesgate_co_usr"
             APP_URL="${APP_URL:-https://cv.edgesgate.com}"
+            NGINX_CONF="/etc/nginx/fastpanel2-available/edgesgate_co_usr/cv.edgesgate.com.conf"
+
             cd "$APP_DIR"
+
+            # Preserve runtime env + uploaded media across git reset.
+            if [ ! -f .env ]; then
+              echo "ERROR: missing .env in $APP_DIR"
+              exit 1
+            fi
 
             echo "==> Fetching production"
             git fetch origin production
@@ -49,13 +58,15 @@ jobs:
             npm run build
 
             echo "==> Building Nuxt frontend"
-            export NVM_DIR="$HOME/.nvm"
-            # Prefer nvm Node 20+ when available; fall back to system node.
-            if [ -s "$NVM_DIR/nvm.sh" ]; then
-              # shellcheck disable=SC1090
-              . "$NVM_DIR/nvm.sh"
-              nvm install 20 >/dev/null
-              nvm use 20 >/dev/null
+            # Prefer system Node 20+; fall back to nvm when available.
+            if ! node -v | grep -Eq 'v(2[0-9]|[3-9][0-9])'; then
+              export NVM_DIR="$HOME/.nvm"
+              if [ -s "$NVM_DIR/nvm.sh" ]; then
+                # shellcheck disable=SC1090
+                . "$NVM_DIR/nvm.sh"
+                nvm install 20 >/dev/null
+                nvm use 20 >/dev/null
+              fi
             fi
             node -v
             corepack enable
@@ -67,15 +78,17 @@ jobs:
             else
               pnpm install
             fi
+            # Same-origin behind nginx — public API calls hit /api on this host.
             NUXT_PUBLIC_LARAVEL_URL="$APP_URL" \
             NUXT_PUBLIC_APP_NAME="${NUXT_PUBLIC_APP_NAME:-CV}" \
               pnpm build
+            test -f .output/server/index.mjs
             cd "$APP_DIR"
 
             echo "==> Running migrations"
             php artisan migrate --force
 
-            echo "==> Seeding missing templates"
+            echo "==> Seeding missing templates only (firstOrCreate — no deletes)"
             php artisan db:seed --class=TemplateSeeder --force
             php artisan db:seed --class=CoverLetterTemplateSeeder --force
             php artisan db:seed --class=PublicProfileTemplateSeeder --force
@@ -88,15 +101,42 @@ jobs:
             php artisan route:cache
             php artisan view:cache
 
+            echo "==> Fixing ownership for PHP-FPM ($APP_USER)"
+            # Keep uploaded media + Laravel writable dirs owned by the pool user.
+            # Do not wipe storage/app/public — only repair ownership/perms.
+            chown -R "$APP_USER:$APP_USER" storage bootstrap/cache
+            chmod -R ug+rwx storage bootstrap/cache
+            if [ -L public/storage ] || [ -d public/storage ]; then
+              chown -h "$APP_USER:$APP_USER" public/storage || true
+            fi
+            # Code + built assets readable; avoid leaving root-only trees that
+            # break FastPanel disable_symlinks / PHP reads.
+            chown -R "$APP_USER:$APP_USER" app bootstrap config database public resources routes lang
+            chown "$APP_USER:$APP_USER" artisan composer.json composer.lock package.json package-lock.json vite.config.js 2>/dev/null || true
+            if [ -d frontend/.output ]; then
+              chown -R "$APP_USER:$APP_USER" frontend/.output
+            fi
+
+            echo "==> Checking nginx Nuxt proxy"
+            if [ -f "$NGINX_CONF" ] && ! grep -q '127.0.0.1:3000' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF has no Nuxt proxy yet."
+              echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
+            fi
+
             echo "==> Restarting Nuxt (pm2)"
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 startOrReload scripts/deploy/ecosystem.config.cjs --update-env
-              pm2 save
-            else
-              echo "WARN: pm2 not found — start Nuxt manually:"
-              echo "  cd $APP_DIR && node frontend/.output/server/index.mjs"
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "ERROR: pm2 not found — install with: npm i -g pm2"
               exit 1
             fi
+            pm2 startOrReload scripts/deploy/ecosystem.config.cjs --update-env
+            pm2 save
+
+            echo "==> Smoke checks"
+            sleep 2
+            curl -fsS --max-time 10 "http://127.0.0.1:3000/" >/dev/null
+            curl -fsS --max-time 15 -o /dev/null -w "landing:%{http_code}\n" "$APP_URL/" || true
+            curl -fsS --max-time 15 -o /dev/null -w "api:%{http_code}\n" "$APP_URL/api/v1/templates" || true
+            curl -fsS --max-time 15 -o /dev/null -w "admin:%{http_code}\n" "$APP_URL/admin/login" || true
 
             echo "==> Deploy complete"
             php artisan about --only=environment

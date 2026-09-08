@@ -96,7 +96,8 @@ class TemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            Template::updateOrCreate(
+            // Insert missing templates only — never overwrite existing rows.
+            Template::firstOrCreate(
                 ['name' => $template['name']],
                 $template,
             );
