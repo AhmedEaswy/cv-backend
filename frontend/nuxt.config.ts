@@ -98,6 +98,9 @@ export default defineNuxtConfig({
     i18n: {
         strategy: 'no_prefix',
         defaultLocale: 'en',
+        // Locales are flat JSON keys ("auth.login.title"), not nested objects.
+        // Without flatJson, vue-i18n throws CompileError 10 on dotted keys.
+        vueI18n: './i18n.config.ts',
         // No langDir/file: messages are merged by app/plugins/i18n-messages.ts.
         // Empty `_empty/*.json` stubs used to wipe translations on setLocale().
         locales: [

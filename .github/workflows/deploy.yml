@@ -28,6 +28,9 @@ jobs:
           script: |
             set -euo pipefail
 
+            export COMPOSER_ALLOW_SUPERUSER=1
+            export PUPPETEER_SKIP_DOWNLOAD=1
+
             APP_DIR="/var/www/edgesgate_co_usr/data/www/cv.edgesgate.com"
             APP_USER="edgesgate_co_usr"
             APP_URL="${APP_URL:-https://cv.edgesgate.com}"
@@ -69,8 +72,11 @@ jobs:
               fi
             fi
             node -v
-            corepack enable
-            corepack prepare pnpm@latest --activate
+            # corepack pnpm is unreliable on this VPS; install a pinned global pnpm.
+            if ! command -v pnpm >/dev/null 2>&1 || ! pnpm -v | grep -Eq '^10\.'; then
+              npm install -g pnpm@10
+            fi
+            pnpm -v
 
             cd frontend
             if [ -f pnpm-lock.yaml ]; then
@@ -118,8 +124,8 @@ jobs:
             fi
 
             echo "==> Checking nginx Nuxt proxy"
-            if [ -f "$NGINX_CONF" ] && ! grep -q '127.0.0.1:3000' "$NGINX_CONF"; then
-              echo "WARN: $NGINX_CONF has no Nuxt proxy yet."
+            if [ -f "$NGINX_CONF" ] && ! grep -q '127.0.0.1:3001' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF has no Nuxt proxy on :3001 yet."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
 
@@ -133,10 +139,12 @@ jobs:
 
             echo "==> Smoke checks"
             sleep 2
-            curl -fsS --max-time 10 "http://127.0.0.1:3000/" >/dev/null
+            curl -fsS --max-time 10 "http://127.0.0.1:3001/" >/dev/null
+            # Soft checks against public URL (do not fail deploy on upstream CDN quirks)
             curl -fsS --max-time 15 -o /dev/null -w "landing:%{http_code}\n" "$APP_URL/" || true
-            curl -fsS --max-time 15 -o /dev/null -w "api:%{http_code}\n" "$APP_URL/api/v1/templates" || true
+            curl -fsS --max-time 15 -o /dev/null -w "api:%{http_code}\n" "$APP_URL/api/v1/shares/templates" || true
             curl -fsS --max-time 15 -o /dev/null -w "admin:%{http_code}\n" "$APP_URL/admin/login" || true
+            curl -fsS --max-time 15 -o /dev/null -w "images:%{http_code}\n" "$APP_URL/images/cv-logo.png" || true
 
             echo "==> Deploy complete"
             php artisan about --only=environment

@@ -1,6 +1,8 @@
+packages:
+  - '.'
+
+# pnpm 10+ / 11+ install script allowlist (esbuild native binary).
 allowBuilds:
   esbuild: true
-# pnpm 11+ configuration. The `pnpm` field in package.json is no longer
-# supported; the onlyBuiltDependencies allowlist lives here.
 onlyBuiltDependencies:
   - esbuild

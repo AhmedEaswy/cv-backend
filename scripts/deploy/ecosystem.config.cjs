@@ -20,11 +20,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         HOST: '127.0.0.1',
-        PORT: 3000,
+        PORT: 3001,
         // Same-origin behind nginx — Nuxt public config was baked at build time
         // via NUXT_PUBLIC_LARAVEL_URL. Keep NITRO_PORT for Nitro compatibility.
+        // Port 3001: 3000 is already used by another site on this VPS (gcschool).
         NITRO_HOST: '127.0.0.1',
-        NITRO_PORT: 3000,
+        NITRO_PORT: 3001,
       },
       max_memory_restart: '512M',
       time: true,

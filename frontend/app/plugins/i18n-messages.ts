@@ -54,6 +54,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     const i18n = nuxtApp.$i18n as any;
     if (!i18n?.mergeLocaleMessage) return;
 
+    // Ensure dotted keys stay flat even if vueI18n config is skipped in a build.
+    if (i18n.flatJson !== true) {
+        i18n.flatJson = true;
+    }
+
     for (const [code, messages] of Object.entries(locales)) {
         i18n.mergeLocaleMessage(code, toVueI18nPlaceholders(messages) as any);
     }

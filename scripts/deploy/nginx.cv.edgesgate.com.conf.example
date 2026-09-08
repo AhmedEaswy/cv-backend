@@ -1,6 +1,6 @@
 # Production nginx for cv.edgesgate.com (FastPanel-compatible sketch).
 # Laravel: /api /admin /u /profile /cover-letter /test /lang /storage /images ...
-# Nuxt SSR: everything else → 127.0.0.1:3000 (pm2 cv-nuxt).
+# Nuxt SSR: everything else → 127.0.0.1:3001 (pm2 cv-nuxt; 3000 used by gcschool).
 #
 # Apply carefully (FastPanel may overwrite available conf):
 #   1. Backup current:
@@ -68,7 +68,7 @@ server {
 
     # Nuxt SSR (landing, auth, portal) + /_nuxt assets
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
