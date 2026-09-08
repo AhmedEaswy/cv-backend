@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Template;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class TemplateSeeder extends Seeder
 {
@@ -15,7 +16,7 @@ class TemplateSeeder extends Seeder
         $templates = [
             [
                 'name' => 'modern-professional',
-                'preview' => 'templates/previews/modern-professional.svg',
+                'preview' => 'images/cv-templates/modern-professional.svg',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
                 'is_active' => true,
                 'is_default' => true,
@@ -23,7 +24,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'office-manager',
-                'preview' => 'templates/previews/office-manager.svg',
+                'preview' => 'images/cv-templates/office-manager.svg',
                 'description' => 'A template for office managers and administrators.',
                 'is_active' => true,
                 'is_default' => false,
@@ -31,7 +32,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'ats-classic',
-                'preview' => 'templates/previews/ats-classic.svg',
+                'preview' => 'images/cv-templates/ats-classic.svg',
                 'description' => 'ATS-friendly single-column layout with clear sections, optimized for English and Arabic.',
                 'is_active' => true,
                 'is_default' => false,
@@ -39,7 +40,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'portrait-modern',
-                'preview' => 'templates/previews/portrait-modern.svg',
+                'preview' => 'images/cv-templates/portrait-modern.svg',
                 'description' => 'Airy teal-accent CV with a circular portrait photo top-right.',
                 'is_active' => true,
                 'is_default' => false,
@@ -47,7 +48,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'sidebar-slate',
-                'preview' => 'templates/previews/sidebar-slate.svg',
+                'preview' => 'images/cv-templates/sidebar-slate.svg',
                 'description' => 'Dark slate sidebar with photo, contact, and skills; white main column.',
                 'is_active' => true,
                 'is_default' => false,
@@ -55,7 +56,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'metro-grid',
-                'preview' => 'templates/previews/metro-grid.svg',
+                'preview' => 'images/cv-templates/metro-grid.svg',
                 'description' => 'Magazine-style grid layout with large photo beside the name block.',
                 'is_active' => true,
                 'is_default' => false,
@@ -63,7 +64,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'midnight-banner',
-                'preview' => 'templates/previews/midnight-banner.svg',
+                'preview' => 'images/cv-templates/midnight-banner.svg',
                 'description' => 'Near-black header banner with inset photo and gold accents.',
                 'is_active' => true,
                 'is_default' => false,
@@ -71,7 +72,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'coral-split',
-                'preview' => 'templates/previews/coral-split.svg',
+                'preview' => 'images/cv-templates/coral-split.svg',
                 'description' => 'Warm coral and cream split header with rounded portrait photo.',
                 'is_active' => true,
                 'is_default' => false,
@@ -79,7 +80,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'forest-folio',
-                'preview' => 'templates/previews/forest-folio.svg',
+                'preview' => 'images/cv-templates/forest-folio.svg',
                 'description' => 'Earth-toned green sidebar folio with serif headings and soft cream paper.',
                 'is_active' => true,
                 'is_default' => false,
@@ -87,7 +88,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'ink-editorial',
-                'preview' => 'templates/previews/ink-editorial.svg',
+                'preview' => 'images/cv-templates/ink-editorial.svg',
                 'description' => 'Black-and-white editorial masthead with a small formal portrait.',
                 'is_active' => true,
                 'is_default' => false,
@@ -95,12 +96,34 @@ class TemplateSeeder extends Seeder
             ],
         ];
 
-        foreach ($templates as $template) {
-            // Insert missing templates only — never overwrite existing rows.
-            Template::firstOrCreate(
-                ['name' => $template['name']],
-                $template,
+        foreach ($templates as $data) {
+            // Insert missing templates only — never overwrite existing rows wholesale.
+            $template = Template::firstOrCreate(
+                ['name' => $data['name']],
+                $data,
             );
+
+            // Repair broken preview paths (e.g. old storage/*.svg that were never shipped).
+            if ($this->previewMissing($template->preview) && ! $this->previewMissing($data['preview'])) {
+                $template->update(['preview' => $data['preview']]);
+            }
         }
+    }
+
+    private function previewMissing(?string $preview): bool
+    {
+        if (! $preview) {
+            return true;
+        }
+
+        if (str_starts_with($preview, 'http://') || str_starts_with($preview, 'https://')) {
+            return false;
+        }
+
+        if (str_starts_with($preview, 'images/')) {
+            return ! is_file(public_path($preview));
+        }
+
+        return ! Storage::disk('public')->exists($preview);
     }
 }

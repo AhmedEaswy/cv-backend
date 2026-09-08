@@ -5,7 +5,6 @@ namespace App\Mcp\Tools;
 use App\Mcp\Tools\Concerns\InteractsWithToolPayload;
 use App\Models\Template;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -26,7 +25,7 @@ class ListCvTemplatesTool extends Tool
             ->map(fn (Template $template) => [
                 'id' => $template->id,
                 'name' => $template->name,
-                'preview' => $template->preview ? Storage::disk('public')->url($template->preview) : null,
+                'preview' => $template->preview_url,
                 'description' => $template->description,
                 'supports_image' => (bool) $template->supports_image,
             ]);

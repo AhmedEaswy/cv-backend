@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Template;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ShareController extends BaseApiController
 {
@@ -27,7 +26,7 @@ class ShareController extends BaseApiController
                 return [
                     'id' => $template->id,
                     'name' => $template->name,
-                    'preview' => $template->preview ? Storage::disk('public')->url($template->preview) : null,
+                    'preview' => $template->preview_url,
                     'description' => $template->description,
                     'supports_image' => (bool) $template->supports_image,
                     'is_default' => (bool) $template->is_default,
