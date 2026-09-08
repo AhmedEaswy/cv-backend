@@ -9,21 +9,46 @@ export type TemplatePromptInput = {
     name: string;
     description?: string | null;
     kind?: TemplateKind;
+    /** Pre-resolved label (prefer passing from a Vue setup context). */
+    displayName?: string | null;
+    /** Pre-resolved description blurb. */
+    blurb?: string | null;
 };
 
 let skillCache = '';
+let skillPromise: Promise<string> | null = null;
+
+function skillOrigin(): string {
+    const config = useRuntimeConfig();
+    const laravel = String(config.public.laravelUrl || '').replace(/\/+$/, '');
+    return laravel || (import.meta.client ? window.location.origin : '');
+}
 
 export async function loadCvSkillText(): Promise<string> {
     if (skillCache) return skillCache;
-    const config = useRuntimeConfig();
-    const laravel = String(config.public.laravelUrl || '').replace(/\/+$/, '');
-    const origin = laravel || (import.meta.client ? window.location.origin : '');
-    const res = await fetch(`${origin}/skill.md`);
-    if (!res.ok) {
-        throw new Error(`Failed to load skill.md (${res.status})`);
-    }
-    skillCache = await res.text();
-    return skillCache;
+    if (skillPromise) return skillPromise;
+
+    skillPromise = (async () => {
+        const origin = skillOrigin();
+        const res = await fetch(`${origin}/skill.md`);
+        if (!res.ok) {
+            throw new Error(`Failed to load skill.md (${res.status})`);
+        }
+        skillCache = await res.text();
+        return skillCache;
+    })().finally(() => {
+        skillPromise = null;
+    });
+
+    return skillPromise;
+}
+
+/** Warm the skill.md cache so copy-prompt stays inside the user gesture. */
+export function prefetchCvSkill(): void {
+    if (!import.meta.client || skillCache || skillPromise) return;
+    void loadCvSkillText().catch(() => {
+        // Ignore — click handler will surface the error.
+    });
 }
 
 export function templateDisplayName(name: string): string {
@@ -32,6 +57,13 @@ export function templateDisplayName(name: string): string {
         .filter(Boolean)
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+}
+
+function resolveDisplay(template: TemplatePromptInput, kind: TemplateKind): { display: string; blurb: string } {
+    const display = (template.displayName || '').trim()
+        || templateDisplayName(String(template.name));
+    const blurb = (template.blurb ?? template.description ?? '').trim();
+    return { display, blurb };
 }
 
 export async function buildTemplatePrompt(template: TemplatePromptInput): Promise<string> {
@@ -43,13 +75,9 @@ export async function buildTemplatePrompt(template: TemplatePromptInput): Promis
 }
 
 async function buildCvPrompt(template: TemplatePromptInput): Promise<string> {
-    const config = useRuntimeConfig();
-    const laravel = String(config.public.laravelUrl || '').replace(/\/+$/, '');
-    const origin = laravel || (import.meta.client ? window.location.origin : '');
+    const origin = skillOrigin();
     const skill = await loadCvSkillText();
-    const { label, description } = useLocalizedTemplate();
-    const display = label('cv', String(template.name));
-    const blurb = description('cv', String(template.name), template.description);
+    const { display, blurb } = resolveDisplay(template, 'cv');
 
     return [
         `# CV template: ${display}`,
@@ -95,13 +123,9 @@ async function buildCvPrompt(template: TemplatePromptInput): Promise<string> {
 }
 
 async function buildCoverLetterPrompt(template: TemplatePromptInput): Promise<string> {
-    const config = useRuntimeConfig();
-    const laravel = String(config.public.laravelUrl || '').replace(/\/+$/, '');
-    const origin = laravel || (import.meta.client ? window.location.origin : '');
+    const origin = skillOrigin();
     const skill = await loadCvSkillText();
-    const { label, description } = useLocalizedTemplate();
-    const display = label('cover-letter', String(template.name));
-    const blurb = description('cover-letter', String(template.name), template.description);
+    const { display, blurb } = resolveDisplay(template, 'cover-letter');
 
     return [
         `# Cover letter template: ${display}`,
@@ -117,7 +141,7 @@ async function buildCoverLetterPrompt(template: TemplatePromptInput): Promise<st
         '## Quick start for this template',
         '',
         `1. GET ${origin}/api/v1/cover-letters/templates — confirm id **${template.id}** (\`${template.name}\`).`,
-        '2. Collect the user\'s real letter details (company, role, body).',
+        '2. Collect the user\'s real details into letter fields (company, role, body).',
         `3. POST ${origin}/api/v1/cover-letters with JSON body:`,
         '```json',
         JSON.stringify({

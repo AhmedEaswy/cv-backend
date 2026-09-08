@@ -4,7 +4,9 @@
  * Offers register / login, or copy the AI prompt as an alternative.
  */
 import type { PublicTemplate } from '~/components/landing/TemplateCard.vue';
-import { buildTemplatePrompt, type TemplateKind } from '~/composables/useTemplatePrompt';
+import { buildTemplatePrompt, prefetchCvSkill, type TemplateKind } from '~/composables/useTemplatePrompt';
+import { copyToClipboard } from '~/utils/clipboard';
+import { useLocalizedTemplate } from '~/composables/useLocalizedTemplate';
 
 const open = defineModel<boolean>('open', { default: false });
 
@@ -17,8 +19,13 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n();
 const toast = useToast();
+const { label, description } = useLocalizedTemplate();
 
 const copying = ref(false);
+
+watch(open, (isOpen) => {
+    if (isOpen) prefetchCvSkill();
+});
 
 function customizePath(template: PublicTemplate) {
     if (props.kind === 'cover-letter') {
@@ -43,8 +50,14 @@ async function copyPrompt() {
     if (!props.template || copying.value) return;
     copying.value = true;
     try {
-        const text = await buildTemplatePrompt({ ...props.template, kind: props.kind });
-        await navigator.clipboard.writeText(text);
+        const tpl = props.template;
+        const text = await buildTemplatePrompt({
+            ...tpl,
+            kind: props.kind,
+            displayName: label(props.kind, tpl.name),
+            blurb: description(props.kind, tpl.name, tpl.description),
+        });
+        await copyToClipboard(text);
         toast.success(t('landing.templates_page.prompt_copied'));
     } catch {
         toast.error(t('landing.templates_page.prompt_copy_failed'));

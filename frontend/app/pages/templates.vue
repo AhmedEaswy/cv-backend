@@ -4,7 +4,7 @@
  * preview, AI prompt copy, load-more pagination, and auth-gated customize.
  */
 import type { PublicTemplate } from '~/components/landing/TemplateCard.vue';
-import type { TemplateKind } from '~/composables/useTemplatePrompt';
+import { prefetchCvSkill, type TemplateKind } from '~/composables/useTemplatePrompt';
 
 type PaginatedTemplates = {
     data: PublicTemplate[];
@@ -80,6 +80,10 @@ async function fetchPage(pageNum: number, append: boolean) {
 }
 
 await fetchPage(1, false);
+
+onMounted(() => {
+    prefetchCvSkill();
+});
 
 watch(kind, async (next, prev) => {
     if (next === prev) return;

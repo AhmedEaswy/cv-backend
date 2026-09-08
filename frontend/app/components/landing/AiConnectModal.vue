@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { loadCvSkillText, prefetchCvSkill } from '~/composables/useTemplatePrompt';
+import { copyToClipboard } from '~/utils/clipboard';
+
 const { t } = useI18n();
 const { user } = await useAuth();
 const { platforms, laravel } = useAiPlatforms();
@@ -11,6 +14,10 @@ const copied = ref(false);
 const copiedUrl = ref(false);
 const skillText = ref('');
 
+watch(open, (isOpen) => {
+    if (isOpen) prefetchCvSkill();
+});
+
 const mcpUrl = computed(() => `${laravel}/mcp/cv`);
 const mcpConfig = computed(() => JSON.stringify({
     mcpServers: {
@@ -21,18 +28,14 @@ const mcpConfig = computed(() => JSON.stringify({
 const loadSkill = async () => {
     if (skillText.value) return skillText.value;
     const origin = laravel || (import.meta.client ? window.location.origin : '');
-    const res = await fetch(`${origin}/skill.md`);
-    if (!res.ok) {
-        throw new Error(`Failed to load skill.md (${res.status})`);
-    }
-    const body = await res.text();
+    const body = await loadCvSkillText();
     skillText.value = `Origin: ${origin}\n\n${body}`;
     return skillText.value;
 };
 
 const copySkill = async () => {
     const text = await loadSkill();
-    await navigator.clipboard.writeText(text);
+    await copyToClipboard(text);
     copied.value = true;
     track('ai_connect_copy_skill', 'landing');
     toast.success(t('landing.ai_connect_copied'));
@@ -40,13 +43,13 @@ const copySkill = async () => {
 };
 
 const copyMcpUrl = async () => {
-    await navigator.clipboard.writeText(mcpUrl.value);
+    await copyToClipboard(mcpUrl.value);
     copiedUrl.value = true;
     window.setTimeout(() => { copiedUrl.value = false; }, 2000);
 };
 
 const copyMcpConfig = async () => {
-    await navigator.clipboard.writeText(mcpConfig.value);
+    await copyToClipboard(mcpConfig.value);
     toast.success(t('landing.ai_connect_copied'));
 };
 

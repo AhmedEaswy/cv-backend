@@ -6,9 +6,11 @@
 import { resolvePublicFileUrl } from '~/composables/usePortalApi';
 import {
     buildTemplatePrompt,
+    prefetchCvSkill,
     type TemplateKind,
 } from '~/composables/useTemplatePrompt';
 import { useLocalizedTemplate } from '~/composables/useLocalizedTemplate';
+import { copyToClipboard } from '~/utils/clipboard';
 
 export type PublicTemplate = {
     id: number;
@@ -42,6 +44,10 @@ const imgFailed = ref(false);
 
 watch(() => props.template.id, () => { imgFailed.value = false; });
 
+onMounted(() => {
+    prefetchCvSkill();
+});
+
 const title = computed(() => label(props.kind, props.template.name));
 const blurb = computed(() => description(props.kind, props.template.name, props.template.description));
 
@@ -57,8 +63,13 @@ async function onCopyPrompt() {
     if (copying.value) return;
     copying.value = true;
     try {
-        const text = await buildTemplatePrompt({ ...props.template, kind: props.kind });
-        await navigator.clipboard.writeText(text);
+        const text = await buildTemplatePrompt({
+            ...props.template,
+            kind: props.kind,
+            displayName: title.value,
+            blurb: blurb.value,
+        });
+        await copyToClipboard(text);
         copied.value = true;
         toast.success(t('landing.templates_page.prompt_copied'));
         window.setTimeout(() => { copied.value = false; }, 2000);
