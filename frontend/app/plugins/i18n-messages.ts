@@ -19,7 +19,11 @@ import ur from '../../locales/ur.json';
 /** Convert Laravel `:param` placeholders to vue-i18n `{param}`. */
 function toVueI18nPlaceholders(value: unknown): unknown {
     if (typeof value === 'string') {
-        return value.replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix: string, name: string) => `${prefix}{${name}}`);
+        return value
+            // Laravel ":name" → vue-i18n "{name}"
+            .replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix: string, name: string) => `${prefix}{${name}}`)
+            // Literal "@" (emails etc.) must not be parsed as linked messages.
+            .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}");
     }
     if (Array.isArray(value)) {
         return value.map(toVueI18nPlaceholders);

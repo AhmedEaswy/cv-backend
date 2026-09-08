@@ -23,12 +23,15 @@ const targetDir = resolve(__dirname, '..', 'locales');
 
 const LOCALES = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'];
 
-/** Convert Laravel `:param` placeholders to vue-i18n `{param}`. */
+/** Convert Laravel placeholders and escape vue-i18n specials. */
 function toVueI18nPlaceholders(value) {
     if (typeof value !== 'string') return value;
     // Use a function replacer — string `$1{$2}` is fragile across shells/engines.
     // Skip protocol-like sequences (http:) and already-braced tokens.
-    return value.replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix, name) => `${prefix}{${name}}`);
+    return value
+        .replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix, name) => `${prefix}{${name}}`)
+        // Literal "@" in emails must not be parsed as linked messages.
+        .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}");
 }
 
 function transformMessages(input) {
