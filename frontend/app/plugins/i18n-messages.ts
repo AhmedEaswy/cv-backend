@@ -22,8 +22,10 @@ function toVueI18nPlaceholders(value: unknown): unknown {
         return value
             // Laravel ":name" → vue-i18n "{name}"
             .replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix: string, name: string) => `${prefix}{${name}}`)
-            // Literal "@" (emails etc.) must not be parsed as linked messages.
-            .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}");
+            // Literal "@" (emails) — idempotent so sync + plugin can both run.
+            .replace(/\{'@'\}/g, '\u0000')
+            .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}")
+            .replace(/\u0000/g, "{'@'}");
     }
     if (Array.isArray(value)) {
         return value.map(toVueI18nPlaceholders);

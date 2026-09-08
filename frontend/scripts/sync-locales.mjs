@@ -30,8 +30,10 @@ function toVueI18nPlaceholders(value) {
     // Skip protocol-like sequences (http:) and already-braced tokens.
     return value
         .replace(/(^|[^:{]):([A-Za-z_][A-Za-z0-9_]*)\b/g, (_m, prefix, name) => `${prefix}{${name}}`)
-        // Literal "@" in emails must not be parsed as linked messages.
-        .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}");
+        // Literal "@" in emails — idempotent if run more than once.
+        .replace(/\{'@'\}/g, '\u0000')
+        .replace(/@(?!\.?[A-Za-z_][\w-]*:)/g, "{'@'}")
+        .replace(/\u0000/g, "{'@'}");
 }
 
 function transformMessages(input) {
