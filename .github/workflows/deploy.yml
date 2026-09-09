@@ -89,6 +89,14 @@ jobs:
             NUXT_PUBLIC_APP_NAME="${NUXT_PUBLIC_APP_NAME:-CV}" \
               pnpm build
             test -f .output/server/index.mjs
+            test -d .output/public/_nuxt
+
+            echo "==> Syncing Nuxt /_nuxt assets into Laravel public/"
+            # nginx serves these as static files (location ^~ /_nuxt/) so FastPanel's
+            # catch-all *.js → index.php rule cannot 500 the client bundle.
+            rm -rf "$APP_DIR/public/_nuxt"
+            mkdir -p "$APP_DIR/public/_nuxt"
+            cp -a .output/public/_nuxt/. "$APP_DIR/public/_nuxt/"
             cd "$APP_DIR"
 
             echo "==> Running migrations"
@@ -122,10 +130,17 @@ jobs:
             if [ -d frontend/.output ]; then
               chown -R "$APP_USER:$APP_USER" frontend/.output
             fi
+            if [ -d public/_nuxt ]; then
+              chown -R "$APP_USER:$APP_USER" public/_nuxt
+            fi
 
-            echo "==> Checking nginx Nuxt proxy"
+            echo "==> Checking nginx Nuxt proxy + /_nuxt static"
             if [ -f "$NGINX_CONF" ] && ! grep -q '127.0.0.1:3001' "$NGINX_CONF"; then
               echo "WARN: $NGINX_CONF has no Nuxt proxy on :3001 yet."
+              echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
+            fi
+            if [ -f "$NGINX_CONF" ] && ! grep -q 'location ^~ /_nuxt/' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF missing location ^~ /_nuxt/ — hashed JS may 500 via FastPanel static→PHP."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
 
@@ -145,6 +160,12 @@ jobs:
             curl -fsS --max-time 15 -o /dev/null -w "api:%{http_code}\n" "$APP_URL/api/v1/shares/templates" || true
             curl -fsS --max-time 15 -o /dev/null -w "admin:%{http_code}\n" "$APP_URL/admin/login" || true
             curl -fsS --max-time 15 -o /dev/null -w "images:%{http_code}\n" "$APP_URL/images/cv-logo.png" || true
+            # Prefer a real hashed chunk from disk so we catch FastPanel/PHP theft.
+            NUXT_SAMPLE="$(find public/_nuxt -type f -name '*.js' | head -n 1 || true)"
+            if [ -n "$NUXT_SAMPLE" ]; then
+              NUXT_PATH="/_nuxt/$(basename "$NUXT_SAMPLE")"
+              curl -fsS --max-time 15 -o /dev/null -w "nuxt_asset:%{http_code}\n" "$APP_URL$NUXT_PATH" || true
+            fi
 
             echo "==> Deploy complete"
             php artisan about --only=environment

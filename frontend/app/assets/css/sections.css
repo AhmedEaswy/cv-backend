@@ -1067,6 +1067,35 @@
     margin-top: 2.5rem;
 }
 
+.templates-page__skeleton {
+    margin-top: 0.25rem;
+}
+
+.tpl-tile--skeleton {
+    pointer-events: none;
+}
+
+.tpl-preview--skeleton {
+    padding: 1.5rem;
+    background: var(--color-paper-2);
+}
+
+.tpl-mock--skeleton {
+    background: rgba(255, 255, 255, 0.55);
+    gap: 0.45rem;
+}
+
+.tpl-mock--skeleton .tpl-mock__section-skel {
+    margin-block: 0.35rem;
+    opacity: 0.5;
+}
+
+.tpl-meta--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
 .tpl-tile--interactive {
     cursor: default;
 }
@@ -1101,7 +1130,7 @@
     inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
     gap: 0.55rem;
     padding: 1.25rem;
@@ -1125,6 +1154,7 @@
 }
 .tpl-tile__overlay .btn {
     width: 100%;
+    max-width: 70%;
     justify-content: center;
 }
 

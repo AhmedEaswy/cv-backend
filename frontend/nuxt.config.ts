@@ -129,6 +129,15 @@ export default defineNuxtConfig({
     nitro: {
         routeRules: {
             '/**': { headers: { 'X-Frame-Options': 'SAMEORIGIN' } },
+            // Document HTML should revalidate so clients never keep a stale
+            // chunk manifest that points at deleted /_nuxt hashes.
+            '/': { headers: { 'Cache-Control': 'no-cache' } },
+            '/templates': { headers: { 'Cache-Control': 'no-cache' } },
+            '/_nuxt/**': {
+                headers: {
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+            },
         },
     },
 

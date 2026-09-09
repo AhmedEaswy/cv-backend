@@ -157,9 +157,7 @@ function onCustomize(template: PublicTemplate) {
                         {{ t('landing.templates_page.load_error') }}
                     </p>
 
-                    <div v-else-if="loading" class="templates-page__empty">
-                        {{ t('landing.templates_page.loading') }}
-                    </div>
+                    <LandingTemplatesGallerySkeleton v-else-if="loading" :count="PER_PAGE" />
 
                     <div v-else-if="!templates.length" class="templates-page__empty">
                         {{ t('landing.templates_page.empty') }}
