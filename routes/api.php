@@ -37,6 +37,7 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     });
 
     // Social auth routes
+    Route::post('/auth/google', [SocialAuthController::class, 'google'])->middleware('throttle:10,1');
     Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect']);
     Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback']);
 

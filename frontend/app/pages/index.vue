@@ -6,7 +6,7 @@
  * the reference image. Each section is a self-contained component.
  *
  * SSR is enabled globally in nuxt.config.ts, so this page is server-
- * rendered for crawlers. Auth state is fetched in useAuth(), which
+ * rendered for crawlers. Auth state is fetched in useAuthUser(), which
  * forwards the request cookie on the server.
  */
 const { t } = useI18n();

@@ -9,7 +9,7 @@
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
-const { user } = await useAuth();
+const { user } = await useAuthUser();
 
 /** Template / profile previews mounted around the ring. */
 const orbitImages = [

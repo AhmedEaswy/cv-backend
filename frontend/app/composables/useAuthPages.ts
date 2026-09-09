@@ -139,7 +139,13 @@ export const useAuthSession = () => {
         api.setToken(null);
         user.value = null;
         checked.value = true;
-        if (import.meta.client) window.location.href = '/';
+        if (import.meta.client) {
+            try {
+                const { signOut } = useAuth();
+                await signOut({ redirect: false });
+            } catch { /* ignore */ }
+            window.location.href = '/';
+        }
     }
 
     const pages = useAuthPages();

@@ -3,10 +3,7 @@
  * /auth/login
  */
 const { t } = useI18n();
-const config = useRuntimeConfig();
 const route = useRoute();
-const requestURL = useRequestURL();
-const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const { login, loading, fieldError, generalError } = useAuthSession();
 
 const form = reactive({
@@ -17,11 +14,6 @@ const form = reactive({
 
 const showPwd = ref(false);
 const onSubmit = () => login({ ...form });
-
-const googleHref = computed(() => {
-    const returnTo = `${requestURL.origin}/portal`;
-    return `${laravel}/auth/google/redirect?return_to=${encodeURIComponent(returnTo)}`;
-});
 
 const socialError = computed(() =>
     route.query.error === 'social' ? t('auth.login.social_failed') : '',
@@ -54,10 +46,7 @@ const socialError = computed(() =>
 
         <Alert v-if="generalError || socialError" variant="error">{{ generalError || socialError }}</Alert>
 
-        <a :href="googleHref" class="btn btn--secondary btn--block">
-            <Icon name="google" :size="18" />
-            {{ t('auth.login.continue_google') }}
-        </a>
+        <AuthGoogleAuthButton />
 
         <div class="auth-divider">{{ t('auth.or') }}</div>
 
@@ -114,4 +103,3 @@ const socialError = computed(() =>
         </div>
     </NuxtLayout>
 </template>
-

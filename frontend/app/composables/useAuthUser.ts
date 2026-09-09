@@ -1,7 +1,9 @@
 /**
- * useAuth — landing-page auth state. Resolves once per session (deduped),
- * caches via useState, and does not re-hit /auth/me after a known guest
- * or after an invalid token was cleared.
+ * useAuthUser — landing-page auth state (Sanctum bearer). Resolves once per
+ * session (deduped), caches via useState, and does not re-hit /auth/me after
+ * a known guest or after an invalid token was cleared.
+ *
+ * Named separately from sidebase's useAuth() (Auth.js Google session).
  */
 export interface AuthUser {
     id: number;
@@ -12,7 +14,7 @@ export interface AuthUser {
 
 type AuthPending = Promise<void> | null;
 
-export const useAuth = async () => {
+export const useAuthUser = async () => {
     const user = useState<AuthUser | null>('auth.user', () => null);
     const checked = useState<boolean>('auth.checked', () => false);
     const pending = useState<AuthPending>('auth.pending', () => null);

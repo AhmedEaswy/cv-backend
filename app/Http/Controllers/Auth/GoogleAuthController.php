@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Laravel\Socialite\Facades\Socialite;
 use Throwable;
 
@@ -30,7 +31,7 @@ class GoogleAuthController extends Controller
             ->redirect();
     }
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request): RedirectResponse|View
     {
         $intended = $this->safeReturnTo(
             $request->session()->pull('url.intended')
@@ -58,7 +59,14 @@ class GoogleAuthController extends Controller
             $user->forceFill(['email_verified_at' => now()])->save();
         }
 
-        return redirect()->to($intended);
+        // Nuxt portal auth uses a Sanctum bearer token in localStorage, not the
+        // Laravel web session — hand the token off on the same origin.
+        $token = $user->createToken('google_auth')->plainTextToken;
+
+        return view('auth.google-handoff', [
+            'token' => $token,
+            'redirect' => $intended,
+        ]);
     }
 
     private function callbackUrl(): string

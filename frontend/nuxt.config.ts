@@ -23,7 +23,23 @@ export default defineNuxtConfig({
         '@nuxtjs/i18n',
         '@pinia/nuxt',
         '@vueuse/nuxt',
+        '@sidebase/nuxt-auth',
     ],
+
+    // Sidebase Auth.js (Google) — digi-pedia pattern. Sanctum token is issued
+    // via /api/auth/google-exchange after Google OIDC completes.
+    auth: {
+        isEnabled: true,
+        origin: process.env.NUXT_AUTH_ORIGIN || process.env.AUTH_ORIGIN || 'https://cv.test/api/auth',
+        baseURL: process.env.NUXT_SITE_URL || 'https://cv.test',
+        provider: {
+            type: 'authjs',
+            trustHost: true,
+            defaultProvider: 'google',
+            addDefaultCallbackUrl: true,
+        },
+        globalAppMiddleware: false,
+    },
 
     plugins: [
         '~/plugins/i18n-messages.ts',
@@ -79,12 +95,19 @@ export default defineNuxtConfig({
     // Public runtime config — these end up in the client bundle and are safe
     // to expose. The Laravel base URL is the only thing Nuxt needs to call.
     runtimeConfig: {
+        authSecret: process.env.NUXT_AUTH_SECRET || process.env.AUTH_SECRET || '',
+        googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '',
+        private: {
+            googleClientSecret:
+                process.env.NUXT_GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || '',
+        },
         public: {
             laravelUrl: process.env.NUXT_PUBLIC_LARAVEL_URL || 'http://localhost:8000',
             appName: process.env.NUXT_PUBLIC_APP_NAME || 'CV',
             appStoreUrl: process.env.NUXT_PUBLIC_APP_STORE_URL || '',
             playStoreUrl: process.env.NUXT_PUBLIC_PLAY_STORE_URL || '',
             apiPrefix: '/api/v1',
+            googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '',
         },
     },
 

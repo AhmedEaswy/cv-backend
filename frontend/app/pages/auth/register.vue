@@ -3,9 +3,6 @@
  * /auth/register
  */
 const { t } = useI18n();
-const config = useRuntimeConfig();
-const requestURL = useRequestURL();
-const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const { register, loading, fieldError, generalError } = useAuthSession();
 
 const form = reactive({
@@ -15,11 +12,6 @@ const form = reactive({
     password_confirmation: '',
 });
 const onSubmit = () => register({ ...form });
-
-const googleHref = computed(() => {
-    const returnTo = `${requestURL.origin}/portal`;
-    return `${laravel}/auth/google/redirect?return_to=${encodeURIComponent(returnTo)}`;
-});
 </script>
 
 <template>
@@ -48,10 +40,7 @@ const googleHref = computed(() => {
 
         <Alert v-if="generalError" variant="error">{{ generalError }}</Alert>
 
-        <a :href="googleHref" class="btn btn--secondary btn--block">
-            <Icon name="google" :size="18" />
-            {{ t('auth.register.continue_google') }}
-        </a>
+        <AuthGoogleAuthButton />
 
         <div class="auth-divider">{{ t('auth.or') }}</div>
 

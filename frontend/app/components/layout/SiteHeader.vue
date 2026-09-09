@@ -9,7 +9,7 @@ const config = useRuntimeConfig();
 const appName = config.public.appName as string;
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 
-const { user } = await useAuth();
+const { user } = await useAuthUser();
 const route = useRoute();
 const onLanding = computed(() => route.path === '/' || route.path === '');
 </script>

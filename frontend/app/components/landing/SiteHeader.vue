@@ -11,7 +11,7 @@ const appName = config.public.appName as string;
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const playStore = (config.public.playStoreUrl as string) || '#download';
 
-const { user } = await useAuth();
+const { user } = await useAuthUser();
 const route = useRoute();
 
 const logoSrc = `${laravel}/images/logo-horizontal-white.png`;

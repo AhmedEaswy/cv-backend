@@ -3,7 +3,7 @@ import { loadCvSkillText, prefetchCvSkill } from '~/composables/useTemplatePromp
 import { copyToClipboard } from '~/utils/clipboard';
 
 const { t } = useI18n();
-const { user } = await useAuth();
+const { user } = await useAuthUser();
 const { platforms, laravel } = useAiPlatforms();
 const { open } = useAiConnectModal();
 const track = useClickTracker();
