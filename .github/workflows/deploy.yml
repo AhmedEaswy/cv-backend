@@ -95,18 +95,17 @@ jobs:
             NUXT_AUTH_SECRET="$(env_get "$APP_DIR/frontend/.env" NUXT_AUTH_SECRET)"
             NUXT_AUTH_SECRET="${NUXT_AUTH_SECRET:-$(env_get "$APP_DIR/.env" NUXT_AUTH_SECRET)}"
             NUXT_AUTH_SECRET="${NUXT_AUTH_SECRET:-$(env_get "$APP_DIR/.env" AUTH_SECRET)}"
-            if [ -z "$NUXT_AUTH_SECRET" ]; then
-              echo "WARN: NUXT_AUTH_SECRET / AUTH_SECRET missing — Google Auth.js will fail until set in .env"
-            fi
-
             NUXT_AUTH_ORIGIN_VALUE="$(env_get "$APP_DIR/frontend/.env" NUXT_AUTH_ORIGIN)"
             NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$(env_get "$APP_DIR/.env" NUXT_AUTH_ORIGIN)}"
             NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$APP_URL/api/auth}"
             # Guard against site-root values that cause sidebase /session recursion.
-            case "$NUXT_AUTH_ORIGIN_VALUE" in
-              */api/auth|*/api/auth/) ;;
-              *) NUXT_AUTH_ORIGIN_VALUE="$APP_URL/api/auth" ;;
-            esac
+            if ! printf '%s' "$NUXT_AUTH_ORIGIN_VALUE" | grep -Eq '/api/auth/?$'; then
+              NUXT_AUTH_ORIGIN_VALUE="$APP_URL/api/auth"
+            fi
+
+            if [ -z "$NUXT_AUTH_SECRET" ]; then
+              echo "WARN: NUXT_AUTH_SECRET / AUTH_SECRET missing - Google Auth.js will fail until set in .env"
+            fi
 
             cd frontend
             if [ -f pnpm-lock.yaml ]; then
