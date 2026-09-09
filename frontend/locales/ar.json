@@ -1941,6 +1941,7 @@
     "auth.login.aside.bullet_2": "أجرِ فحص ATS على أي سيرة ذاتية في ثوانٍ",
     "auth.login.aside.bullet_3": "شارك ملفك الشخصي العام برابط واحد",
     "auth.login.continue_google": "المتابعة مع Google",
+    "auth.login.social_failed": "فشل تسجيل الدخول عبر Google. يُرجى المحاولة مرة أخرى.",
     "auth.register.name": "الاسم الكامل",
     "auth.register.email": "البريد الإلكتروني",
     "auth.register.password": "كلمة المرور",

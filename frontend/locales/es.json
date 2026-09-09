@@ -1931,6 +1931,7 @@
     "auth.login.aside.bullet_2": "Realice una verificación ATS en cualquier CV en segundos",
     "auth.login.aside.bullet_3": "Comparta un perfil público con un solo enlace",
     "auth.login.continue_google": "Continuar con Google",
+    "auth.login.social_failed": "Error al iniciar sesión con Google. Inténtalo de nuevo.",
     "auth.register.name": "Nombre completo",
     "auth.register.email": "Correo electrónico",
     "auth.register.password": "Contraseña",

@@ -1931,6 +1931,7 @@
     "auth.login.aside.bullet_2": "کسی بھی CV پر چند سیکنڈ میں ATS چیک چلائیں",
     "auth.login.aside.bullet_3": "ایک لنک سے عوامی پروفائل شیئر کریں",
     "auth.login.continue_google": "Google کے ساتھ جاری رکھیں",
+    "auth.login.social_failed": "Google سائن ان ناکام۔ دوبارہ کوشش کریں۔",
     "auth.register.name": "پورا نام",
     "auth.register.email": "ای میل",
     "auth.register.password": "پاس ورڈ",

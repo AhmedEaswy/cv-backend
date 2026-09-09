@@ -4,6 +4,8 @@
  */
 const { t } = useI18n();
 const config = useRuntimeConfig();
+const route = useRoute();
+const requestURL = useRequestURL();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const { login, loading, fieldError, generalError } = useAuthSession();
 
@@ -15,6 +17,15 @@ const form = reactive({
 
 const showPwd = ref(false);
 const onSubmit = () => login({ ...form });
+
+const googleHref = computed(() => {
+    const returnTo = `${requestURL.origin}/portal`;
+    return `${laravel}/auth/google/redirect?return_to=${encodeURIComponent(returnTo)}`;
+});
+
+const socialError = computed(() =>
+    route.query.error === 'social' ? t('auth.login.social_failed') : '',
+);
 </script>
 
 <template>
@@ -41,9 +52,9 @@ const onSubmit = () => login({ ...form });
         <h1 class="auth-form__title">{{ t('auth.login.title') }}</h1>
         <p class="auth-form__subtitle">{{ t('auth.login.subtitle') }}</p>
 
-        <Alert v-if="generalError" variant="error">{{ generalError }}</Alert>
+        <Alert v-if="generalError || socialError" variant="error">{{ generalError || socialError }}</Alert>
 
-        <a :href="laravel + '/auth/google/redirect'" class="btn btn--secondary btn--block">
+        <a :href="googleHref" class="btn btn--secondary btn--block">
             <Icon name="google" :size="18" />
             {{ t('auth.login.continue_google') }}
         </a>

@@ -19,27 +19,34 @@ class GoogleAuthController extends Controller
 
     public function redirect(Request $request): RedirectResponse
     {
-        $request->session()->put('url.intended', $request->query('return_to', route('portal.dashboard')));
+        $request->session()->put(
+            'url.intended',
+            $this->safeReturnTo($request->query('return_to'))
+        );
 
         return Socialite::driver('google')
             ->stateless()
-            ->redirectUrl(route('auth.google.callback'))
+            ->redirectUrl($this->callbackUrl())
             ->redirect();
     }
 
     public function callback(Request $request): RedirectResponse
     {
-        $intended = (string) $request->session()->pull('url.intended', route('portal.dashboard'));
+        $intended = $this->safeReturnTo(
+            $request->session()->pull('url.intended')
+        );
 
         try {
+            // redirectUrl MUST match the authorize step or Google returns
+            // redirect_uri_mismatch / invalid_grant and login silently fails.
             $socialUser = Socialite::driver('google')
                 ->stateless()
+                ->redirectUrl($this->callbackUrl())
                 ->user();
         } catch (Throwable $e) {
             Log::warning('Google social auth failed', ['error' => $e->getMessage()]);
 
-            return redirect()->route('login')
-                ->withErrors(['email' => __('messages.social_auth_failed')]);
+            return redirect()->to($this->frontendUrl('/auth/login?error=social'));
         }
 
         $user = $this->socialAccounts->findOrCreateUser('google', $socialUser);
@@ -51,7 +58,40 @@ class GoogleAuthController extends Controller
             $user->forceFill(['email_verified_at' => now()])->save();
         }
 
-        return redirect()->to($intended)
-            ->with('status', __('messages.welcome_back', ['name' => $user->full_name]));
+        return redirect()->to($intended);
+    }
+
+    private function callbackUrl(): string
+    {
+        return route('auth.google.callback');
+    }
+
+    private function frontendUrl(string $path = '/'): string
+    {
+        return rtrim((string) config('app.frontend_url'), '/').'/'.ltrim($path, '/');
+    }
+
+    /**
+     * Only allow same-origin (frontend) absolute URLs or relative paths.
+     */
+    private function safeReturnTo(mixed $candidate): string
+    {
+        $default = $this->frontendUrl('/portal');
+        $value = is_string($candidate) ? trim($candidate) : '';
+
+        if ($value === '') {
+            return $default;
+        }
+
+        if (str_starts_with($value, '/') && ! str_starts_with($value, '//')) {
+            return $this->frontendUrl($value);
+        }
+
+        $frontend = rtrim((string) config('app.frontend_url'), '/');
+        if (str_starts_with($value, $frontend.'/') || $value === $frontend) {
+            return $value;
+        }
+
+        return $default;
     }
 }

@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL (Nuxt)
+    |--------------------------------------------------------------------------
+    |
+    | Used for post-auth redirects (Google OAuth, etc.) after the UI moved
+    | to Nuxt. Falls back to APP_URL when unset (same-origin deployments).
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

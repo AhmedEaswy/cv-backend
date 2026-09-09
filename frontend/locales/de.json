@@ -1931,6 +1931,7 @@
     "auth.login.aside.bullet_2": "ATS-Prüfung für jeden Lebenslauf in Sekunden durchführen",
     "auth.login.aside.bullet_3": "Öffentliches Profil mit einem einzigen Link teilen",
     "auth.login.continue_google": "Mit Google fortfahren",
+    "auth.login.social_failed": "Google-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
     "auth.register.name": "Vollständiger Name",
     "auth.register.email": "E-Mail",
     "auth.register.password": "Passwort",
