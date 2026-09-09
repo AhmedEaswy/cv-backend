@@ -99,6 +99,15 @@ jobs:
               echo "WARN: NUXT_AUTH_SECRET / AUTH_SECRET missing — Google Auth.js will fail until set in .env"
             fi
 
+            NUXT_AUTH_ORIGIN_VALUE="$(env_get "$APP_DIR/frontend/.env" NUXT_AUTH_ORIGIN)"
+            NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$(env_get "$APP_DIR/.env" NUXT_AUTH_ORIGIN)}"
+            NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$APP_URL/api/auth}"
+            # Guard against site-root values that cause sidebase /session recursion.
+            case "$NUXT_AUTH_ORIGIN_VALUE" in
+              */api/auth|*/api/auth/) ;;
+              *) NUXT_AUTH_ORIGIN_VALUE="$APP_URL/api/auth" ;;
+            esac
+
             cd frontend
             if [ -f pnpm-lock.yaml ]; then
               pnpm install --frozen-lockfile
@@ -109,7 +118,7 @@ jobs:
             NUXT_PUBLIC_LARAVEL_URL="$APP_URL" \
             NUXT_PUBLIC_APP_NAME="${NUXT_PUBLIC_APP_NAME:-CV}" \
             NUXT_SITE_URL="$APP_URL" \
-            NUXT_AUTH_ORIGIN="${NUXT_AUTH_ORIGIN:-$APP_URL/api/auth}" \
+            NUXT_AUTH_ORIGIN="$NUXT_AUTH_ORIGIN_VALUE" \
             NUXT_AUTH_SECRET="$NUXT_AUTH_SECRET" \
             NUXT_GOOGLE_CLIENT_ID="$NUXT_GOOGLE_CLIENT_ID" \
             NUXT_GOOGLE_CLIENT_SECRET="$NUXT_GOOGLE_CLIENT_SECRET" \

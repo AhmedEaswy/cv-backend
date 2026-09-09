@@ -26,12 +26,15 @@ export default defineNuxtConfig({
         '@sidebase/nuxt-auth',
     ],
 
-    // Sidebase Auth.js (Google) — digi-pedia pattern. Sanctum token is issued
-    // via /api/auth/google-exchange after Google OIDC completes.
+    // Sidebase Auth.js (Google OIDC only). Sanctum bearer token remains the app session.
+    // baseURL MUST include /api/auth or sidebase recurses on /session (hangs SSR / smoke).
     auth: {
         isEnabled: true,
-        origin: process.env.NUXT_AUTH_ORIGIN || process.env.AUTH_ORIGIN || 'https://cv.test/api/auth',
-        baseURL: process.env.NUXT_SITE_URL || 'https://cv.test',
+        baseURL: process.env.NUXT_AUTH_ORIGIN || 'https://cv.test/api/auth',
+        originEnvKey: 'NUXT_AUTH_ORIGIN',
+        // Auth.js is only used for the Google hop; portal auth is Sanctum/localStorage.
+        // Skipping SSR session fetch avoids /session recursion when curling :3001 in deploy.
+        disableServerSideAuth: true,
         provider: {
             type: 'authjs',
             trustHost: true,
@@ -95,6 +98,8 @@ export default defineNuxtConfig({
     // Public runtime config — these end up in the client bundle and are safe
     // to expose. The Laravel base URL is the only thing Nuxt needs to call.
     runtimeConfig: {
+        // Used by sidebase originEnvKey / getToken at runtime (NUXT_AUTH_ORIGIN overrides).
+        authOrigin: process.env.NUXT_AUTH_ORIGIN || 'https://cv.test/api/auth',
         authSecret: process.env.NUXT_AUTH_SECRET || process.env.AUTH_SECRET || '',
         googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '',
         private: {
