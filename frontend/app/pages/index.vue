@@ -36,6 +36,7 @@ useHead({
             <!-- <LandingMarqueeStrip /> -->
             <LandingMockupSection />
             <!-- <LandingTemplatesSection /> -->
+             
             <LandingPricingSection />
             <div class="landing-closing">
                 <div class="landing-closing__shell">
