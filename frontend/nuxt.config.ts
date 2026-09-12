@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     // convention; doing it now means `~` and `@` resolve under app/ —
     // e.g. `~/components/Foo.vue` → `app/components/Foo.vue`.
     srcDir: 'app/',
+    // With srcDir=app/, Nuxt defaults serverDir to app/server. Keep API
+    // handlers at frontend/server (Auth.js, google-exchange, storage).
+    serverDir: 'server',
 
     // Static assets (fonts, etc.) live in app/public/ with srcDir set.
     dir: {
