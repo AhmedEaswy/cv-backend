@@ -90,21 +90,49 @@
 }
 
 .btn--primary {
-    @apply border-ink bg-ink text-paper;
+    @apply border-ink text-paper;
     --btn-spot-color: color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        var(--color-ink);
 }
 
 .btn--primary:hover {
-    @apply -translate-y-px border-ink-2 bg-ink-2;
+    @apply -translate-y-px border-ink-2;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        var(--color-ink-2);
 }
 
 .btn--secondary {
-    @apply border-line-2 bg-white text-ink;
+    @apply border-line-2 text-ink;
     --btn-spot-color: color-mix(in srgb, var(--color-brand-primary) 32%, transparent);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        var(--color-white);
 }
 
 .btn--secondary:hover {
-    @apply border-ink bg-paper-2;
+    @apply border-ink;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        var(--color-paper-2);
 }
 
 .btn--ghost {

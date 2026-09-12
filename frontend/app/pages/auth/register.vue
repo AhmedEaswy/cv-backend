@@ -19,18 +19,24 @@ const onSubmit = () => register({ ...form });
         <template #aside>
             <h2>{{ t('auth.register.aside.title') }}</h2>
             <p>{{ t('auth.register.aside.text') }}</p>
-            <ul>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.register.aside.bullet_1') }}</span>
+            <ul class="auth-aside__features">
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="sparkles" :size="18" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.register.aside.bullet_1') }}</span>
                 </li>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.register.aside.bullet_2') }}</span>
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="file" :size="18" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.register.aside.bullet_2') }}</span>
                 </li>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.register.aside.bullet_3') }}</span>
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="shield" :size="18" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.register.aside.bullet_3') }}</span>
                 </li>
             </ul>
         </template>

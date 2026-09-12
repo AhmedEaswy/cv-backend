@@ -194,32 +194,56 @@
 }
 
 .hero-orbit__btn--register {
-    background: #f4f4f2 !important;
     color: #0a0a0a !important;
     border-color: transparent !important;
     box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
     padding-inline: 1.25rem 1.15rem !important;
     font-weight: 600;
     gap: 0.45rem;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #f4f4f2 !important;
 }
 
 .hero-orbit__btn--register:hover {
-    background: #ffffff !important;
     transform: translateY(-1px);
     box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.6);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #ffffff !important;
 }
 
 .hero-orbit__btn--ai {
-    background: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
     padding-inline: 1.05rem 1.3rem !important;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        rgba(255, 255, 255, 0.08) !important;
 }
 
 .hero-orbit__btn--ai:hover {
-    background: rgba(255, 255, 255, 0.14) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
     transform: translateY(-1px);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        rgba(255, 255, 255, 0.14) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

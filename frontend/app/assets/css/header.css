@@ -24,9 +24,24 @@
     @apply hidden items-center gap-[1.6rem] text-sm text-white/70 md:flex;
 }
 
-.site-header__nav a,
-.site-header__nav .router-link-active {
-    @apply text-inherit no-underline transition-colors duration-150 hover:text-white;
+.site-header__nav a {
+    @apply relative text-inherit no-underline transition-colors duration-150 hover:text-white;
+}
+
+.site-header__nav a.is-active,
+.site-header__nav a.router-link-active {
+    @apply text-white;
+}
+
+.site-header__nav a.is-active::after,
+.site-header__nav a.router-link-active::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.1rem;
+    bottom: -0.35rem;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-brand-primary);
 }
 
 .site-header__actions {
@@ -38,7 +53,54 @@
 }
 
 .site-header__cta {
-    @apply inline-flex items-center justify-center rounded-full bg-[#f4f4f2] px-4 py-[0.55rem] text-[0.85rem] font-medium whitespace-nowrap text-ink no-underline transition duration-150 hover:-translate-y-px hover:bg-white;
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full px-4 py-[0.55rem] text-[0.85rem] font-medium whitespace-nowrap text-ink no-underline transition duration-150 hover:-translate-y-px;
+    isolation: isolate;
+    --btn-spot-x: 50%;
+    --btn-spot-y: 50%;
+    --btn-spot-color: color-mix(in srgb, var(--color-brand-primary) 32%, transparent);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #f4f4f2;
+}
+
+.site-header__cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        90px circle at var(--btn-spot-x) var(--btn-spot-y),
+        var(--btn-spot-color),
+        transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 160ms ease-out;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.site-header__cta:hover {
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #ffffff;
+}
+
+.site-header__cta:hover::before,
+.site-header__cta:focus-visible::before {
+    opacity: 1;
+}
+
+.site-header__cta > * {
+    position: relative;
+    z-index: 1;
 }
 
 .site-header__actions .lang-trigger {
