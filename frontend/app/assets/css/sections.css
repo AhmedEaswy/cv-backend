@@ -1184,7 +1184,7 @@
     margin-bottom: 1rem;
     border-radius: 1.25rem;
     background:
-        radial-gradient(circle at 30% 20%, rgba(56, 122, 223, 0.12), transparent 55%),
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-brand-primary) 18%, transparent), transparent 55%),
         var(--color-paper-2);
     border: 1px solid var(--color-line);
 }

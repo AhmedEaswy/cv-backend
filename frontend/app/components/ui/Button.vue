@@ -30,33 +30,65 @@ const variantClass = computed(() => {
                 : v === 'danger' ? 'btn--danger'
                     : v === 'link' ? 'btn--link' : '';
 });
+
+const btnClass = computed(() => [
+    'btn',
+    variantClass.value,
+    sizeClass.value,
+    props.block && 'btn--block',
+    props.icon && 'btn--icon',
+]);
+
+const spotEnabled = computed(() => !props.disabled && !props.loading);
+
+function onPointerMove(e: PointerEvent) {
+    if (!spotEnabled.value) return;
+    const el = e.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty('--btn-spot-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+    el.style.setProperty('--btn-spot-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+}
+
+function onPointerLeave(e: PointerEvent) {
+    const el = e.currentTarget as HTMLElement;
+    el.style.removeProperty('--btn-spot-x');
+    el.style.removeProperty('--btn-spot-y');
+}
 </script>
 
 <template>
     <NuxtLink
         v-if="to"
         :to="to"
-        :class="['btn', variantClass, sizeClass, block && 'btn--block', icon && 'btn--icon']"
+        :class="btnClass"
+        @pointermove="onPointerMove"
+        @pointerleave="onPointerLeave"
     >
-        <slot />
+        <span class="btn__content"><slot /></span>
     </NuxtLink>
     <a
         v-else-if="href"
         :href="href"
         :target="target"
         :rel="rel"
-        :class="['btn', variantClass, sizeClass, block && 'btn--block', icon && 'btn--icon']"
+        :class="btnClass"
+        @pointermove="onPointerMove"
+        @pointerleave="onPointerLeave"
     >
-        <slot />
+        <span class="btn__content"><slot /></span>
     </a>
     <button
         v-else
         :type="type"
         :disabled="disabled || loading"
         :aria-busy="loading || undefined"
-        :class="['btn', variantClass, sizeClass, block && 'btn--block', icon && 'btn--icon']"
+        :class="btnClass"
+        @pointermove="onPointerMove"
+        @pointerleave="onPointerLeave"
     >
-        <span v-if="loading" class="btn-spinner" aria-hidden="true" />
-        <slot />
+        <span class="btn__content">
+            <span v-if="loading" class="btn-spinner" aria-hidden="true" />
+            <slot />
+        </span>
     </button>
 </template>

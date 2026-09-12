@@ -60,9 +60,12 @@
     --color-white: #ffffff;
     --color-black: #000000;
 
-    /* Accent — used sparingly for primary actions only */
-    --color-accent: #1a1a1a;
-    --color-accent-soft: #2a2a2a;
+    /* Accent — sky blue, used sparingly for brand & primary CTAs */
+    --color-accent: #38bdf8;
+    --color-accent-soft: #e0f2fe;
+    --color-brand-primary: #38bdf8;
+    --color-brand-primary-dark: #0ea5e9;
+    --color-brand-midnight: #0c1222;
 
     /* Semantic */
     --color-success: #1f7a4f;
