@@ -27,3 +27,16 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.zip
+*.rar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.lzma
+*.tar.lz
+*.tar.Z
+*.tar.gz.part
+*.tar.bz2.part
+*.tar.xz.part
+*.tar.lzma.part
+*.tar.lz.part
