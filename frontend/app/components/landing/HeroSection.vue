@@ -11,6 +11,8 @@ const config = useRuntimeConfig();
 const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
 const { user } = await useAuthUser();
 
+const asideBgSrc = `${laravel}/images/cover-papers.jpg`;
+
 /** Template / profile previews mounted around the ring. */
 const orbitImages = [
     `${laravel}/images/templates/professional.png`,
@@ -70,6 +72,12 @@ const titleLines = computed(() => {
 <template>
     <section class="hero-orbit" aria-labelledby="hero-orbit-title">
         <div class="hero-orbit__frame">
+
+            <div class="absolute z-0 size-full inset-0">
+                <img :src="asideBgSrc" alt="Logo" class="absolute inset w-full z-0 max-h-full max-w-full opacity-10 object-cover" />
+                <div class="bg-gradient-to-b from-black to-transparent absolute inset-0 z-10 pointer-events-none h-full w-full"></div>
+            </div>
+
             <div class="hero-orbit__beams" aria-hidden="true" />
             <div class="hero-orbit__glow" aria-hidden="true" />
 

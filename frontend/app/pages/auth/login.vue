@@ -25,18 +25,24 @@ const socialError = computed(() =>
         <template #aside>
             <h2>{{ t('auth.login.aside.title') }}</h2>
             <p>{{ t('auth.login.aside.text') }}</p>
-            <ul>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.login.aside.bullet_1') }}</span>
+            <ul class="auth-aside__features">
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="clock" :size="32" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.login.aside.bullet_1') }}</span>
                 </li>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.login.aside.bullet_2') }}</span>
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="shield" :size="32" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.login.aside.bullet_2') }}</span>
                 </li>
-                <li>
-                    <Icon name="check" :size="16" />
-                    <span>{{ t('auth.login.aside.bullet_3') }}</span>
+                <li class="auth-aside__feature">
+                    <span class="auth-aside__feature-icon" aria-hidden="true">
+                        <Icon name="globe" :size="32" />
+                    </span>
+                    <span class="auth-aside__feature-text">{{ t('auth.login.aside.bullet_3') }}</span>
                 </li>
             </ul>
         </template>

@@ -20,11 +20,23 @@ const props = withDefaults(defineProps<{
 const { t } = useI18n();
 const toast = useToast();
 const { label, description } = useLocalizedTemplate();
+const config = useRuntimeConfig();
+const laravel = (config.public.laravelUrl as string).replace(/\/+$/, '');
+const authIconSrc = `${laravel}/images/auth.svg`;
 
 const copying = ref(false);
+const copied = ref(false);
+
+const templateLabel = computed(() => {
+    if (!props.template) return '';
+    return label(props.kind, props.template.name);
+});
 
 watch(open, (isOpen) => {
-    if (isOpen) prefetchCvSkill();
+    if (isOpen) {
+        copied.value = false;
+        prefetchCvSkill();
+    }
 });
 
 function customizePath(template: PublicTemplate) {
@@ -58,6 +70,7 @@ async function copyPrompt() {
             blurb: description(props.kind, tpl.name, tpl.description),
         });
         await copyToClipboard(text);
+        copied.value = true;
         toast.success(t('landing.templates_page.prompt_copied'));
     } catch {
         toast.error(t('landing.templates_page.prompt_copy_failed'));
@@ -68,31 +81,72 @@ async function copyPrompt() {
 </script>
 
 <template>
-    <Modal v-model:open="open" :title="t('landing.templates_page.auth_modal_title')" size="md">
-        <p class="tpl-auth-modal__lead">
-            {{ t('landing.templates_page.auth_modal_lead') }}
-        </p>
-
-        <ul class="tpl-auth-modal__bullets">
-            <li>{{ t('landing.templates_page.auth_modal_bullet_account') }}</li>
-            <li>{{ t('landing.templates_page.auth_modal_bullet_prompt') }}</li>
-        </ul>
-
-        <template #footer>
-            <div class="tpl-auth-modal__actions">
-                <Button variant="ghost" size="sm" :loading="copying" @click="copyPrompt">
-                    <Icon name="copy" :size="15" />
-                    {{ t('landing.templates_page.copy_prompt') }}
-                </Button>
-                <div class="tpl-auth-modal__auth">
-                    <Button :to="loginUrl" variant="secondary" size="sm" @click="open = false">
-                        {{ t('landing.nav.login') }}
-                    </Button>
-                    <Button :to="createUrl" variant="primary" size="sm" @click="open = false">
-                        {{ t('landing.footer_create_account') }}
-                    </Button>
-                </div>
-            </div>
+    <Modal v-model:open="open" size="sm">
+        <template #header>
+            <span class="sr-only">{{ t('landing.templates_page.auth_modal_title') }}</span>
         </template>
+
+        <div class="tpl-auth-modal">
+            <div class="tpl-auth-modal__hero">
+                <div class="tpl-auth-modal__icon-wrap" aria-hidden="true">
+                    <img
+                        class="tpl-auth-modal__icon"
+                        :src="authIconSrc"
+                        alt=""
+                        width="72"
+                        height="72"
+                        decoding="async"
+                    >
+                </div>
+                <h3 class="tpl-auth-modal__title">
+                    {{ t('landing.templates_page.auth_modal_title') }}
+                </h3>
+                <!-- <p v-if="templateLabel" class="tpl-auth-modal__template">
+                    {{ templateLabel }}
+                </p> -->
+                <p class="tpl-auth-modal__lead">
+                    {{ t('landing.templates_page.auth_modal_lead') }}
+                </p>
+            </div>
+
+            <div class="tpl-auth-modal__paths">
+                <section class="tpl-auth-modal__path tpl-auth-modal__path--primary">
+                    <!-- <p class="tpl-auth-modal__path-text">
+                        {{ t('landing.templates_page.auth_modal_bullet_account') }}
+                    </p> -->
+                    <div class="tpl-auth-modal__cta">
+                        <Button :to="createUrl" variant="primary" block @click="open = false">
+                            {{ t('landing.footer_create_account') }}
+                        </Button>
+                        <Button :to="loginUrl" variant="secondary" block @click="open = false">
+                            {{ t('landing.nav.login') }}
+                        </Button>
+                    </div>
+                </section>
+
+                <div class="tpl-auth-modal__divider" role="separator">
+                    <span>{{ t('auth.or') }}</span>
+                </div>
+
+                <section class="tpl-auth-modal__path tpl-auth-modal__path--alt">
+                    <p class="tpl-auth-modal__path-text">
+                        {{ t('landing.templates_page.auth_modal_bullet_prompt') }}
+                    </p>
+                    <Button
+                        variant="ghost"
+                        block
+                        :loading="copying"
+                        @click="copyPrompt"
+                    >
+                        <Icon :name="copied ? 'check' : 'copy'" :size="16" />
+                        {{
+                            copied
+                                ? t('landing.templates_page.prompt_copied')
+                                : t('landing.templates_page.copy_prompt')
+                        }}
+                    </Button>
+                </section>
+            </div>
+        </div>
     </Modal>
 </template>

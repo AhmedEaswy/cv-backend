@@ -4,7 +4,8 @@ Meta-prompt for generating one-page landing page prompts for our **CV + Cover Le
 
 **Assumptions:** multi-language audience (EN / AR RTL / TR); primary CTA “Create your CV”; features — CV templates, cover letters, PDF export, multi-language, ATS-friendly; target — Laravel Blade at `resources/views/landing/index.blade.php`; brand-biased style list.
 
-**Brand:** Primary `#5c17e7` · Secondary `#130e21` · Logos: `public/images/cv-logo.png`, `logo-horizontal.png`, `logo-icon.png`
+**Brand (legacy — do not use for new work):** Primary `#5c17e7` · Secondary `#130e21`  
+**Current identity:** see [ui-ux-guide.md](./ui-ux-guide.md) — grayscale paper + sky `#38bdf8`, logos: `public/images/cv-logo.png`, `logo-horizontal.png`, `logo-horizontal-white.png`, `logo-icon.png`
 
 **Imagery:** Use **placeholder mockups** (phone frames, CV/cover-letter paper previews built with HTML/CSS/SVG). Real app screenshots will replace them later — keep image slots easy to swap (`src`, `background-image`, or Blade `asset()` paths).
 

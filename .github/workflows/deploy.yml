@@ -78,6 +78,35 @@ jobs:
             fi
             pnpm -v
 
+            # Read KEY=value from .env without sourcing (values may break bash).
+            env_get() {
+              local file="$1" key="$2"
+              [ -f "$file" ] || return 0
+              local line
+              line="$(grep -E "^${key}=" "$file" | tail -n 1 || true)"
+              [ -n "$line" ] || return 0
+              printf '%s' "${line#*=}" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
+            }
+
+            NUXT_GOOGLE_CLIENT_ID="$(env_get "$APP_DIR/frontend/.env" NUXT_GOOGLE_CLIENT_ID)"
+            NUXT_GOOGLE_CLIENT_ID="${NUXT_GOOGLE_CLIENT_ID:-$(env_get "$APP_DIR/.env" GOOGLE_CLIENT_ID)}"
+            NUXT_GOOGLE_CLIENT_SECRET="$(env_get "$APP_DIR/frontend/.env" NUXT_GOOGLE_CLIENT_SECRET)"
+            NUXT_GOOGLE_CLIENT_SECRET="${NUXT_GOOGLE_CLIENT_SECRET:-$(env_get "$APP_DIR/.env" GOOGLE_CLIENT_SECRET)}"
+            NUXT_AUTH_SECRET="$(env_get "$APP_DIR/frontend/.env" NUXT_AUTH_SECRET)"
+            NUXT_AUTH_SECRET="${NUXT_AUTH_SECRET:-$(env_get "$APP_DIR/.env" NUXT_AUTH_SECRET)}"
+            NUXT_AUTH_SECRET="${NUXT_AUTH_SECRET:-$(env_get "$APP_DIR/.env" AUTH_SECRET)}"
+            NUXT_AUTH_ORIGIN_VALUE="$(env_get "$APP_DIR/frontend/.env" NUXT_AUTH_ORIGIN)"
+            NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$(env_get "$APP_DIR/.env" NUXT_AUTH_ORIGIN)}"
+            NUXT_AUTH_ORIGIN_VALUE="${NUXT_AUTH_ORIGIN_VALUE:-$APP_URL/api/auth}"
+            # Guard against site-root values that cause sidebase /session recursion.
+            if ! printf '%s' "$NUXT_AUTH_ORIGIN_VALUE" | grep -Eq '/api/auth/?$'; then
+              NUXT_AUTH_ORIGIN_VALUE="$APP_URL/api/auth"
+            fi
+
+            if [ -z "$NUXT_AUTH_SECRET" ]; then
+              echo "WARN: NUXT_AUTH_SECRET / AUTH_SECRET missing - Google Auth.js will fail until set in .env"
+            fi
+
             cd frontend
             if [ -f pnpm-lock.yaml ]; then
               pnpm install --frozen-lockfile
@@ -87,6 +116,11 @@ jobs:
             # Same-origin behind nginx — public API calls hit /api on this host.
             NUXT_PUBLIC_LARAVEL_URL="$APP_URL" \
             NUXT_PUBLIC_APP_NAME="${NUXT_PUBLIC_APP_NAME:-CV}" \
+            NUXT_SITE_URL="$APP_URL" \
+            NUXT_AUTH_ORIGIN="$NUXT_AUTH_ORIGIN_VALUE" \
+            NUXT_AUTH_SECRET="$NUXT_AUTH_SECRET" \
+            NUXT_GOOGLE_CLIENT_ID="$NUXT_GOOGLE_CLIENT_ID" \
+            NUXT_GOOGLE_CLIENT_SECRET="$NUXT_GOOGLE_CLIENT_SECRET" \
               pnpm build
             test -f .output/server/index.mjs
             test -d .output/public/_nuxt
@@ -134,13 +168,17 @@ jobs:
               chown -R "$APP_USER:$APP_USER" public/_nuxt
             fi
 
-            echo "==> Checking nginx Nuxt proxy + /_nuxt static"
+            echo "==> Checking nginx Nuxt proxy + /_nuxt static + /api/auth"
             if [ -f "$NGINX_CONF" ] && ! grep -q '127.0.0.1:3001' "$NGINX_CONF"; then
               echo "WARN: $NGINX_CONF has no Nuxt proxy on :3001 yet."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
             if [ -f "$NGINX_CONF" ] && ! grep -q 'location ^~ /_nuxt/' "$NGINX_CONF"; then
               echo "WARN: $NGINX_CONF missing location ^~ /_nuxt/ — hashed JS may 500 via FastPanel static→PHP."
+              echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
+            fi
+            if [ -f "$NGINX_CONF" ] && ! grep -q 'location ^~ /api/auth' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF missing location ^~ /api/auth — sidebase Auth.js will hit Laravel and break Google login."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
 
@@ -153,8 +191,23 @@ jobs:
             pm2 save
 
             echo "==> Smoke checks"
-            sleep 2
-            curl -fsS --max-time 10 "http://127.0.0.1:3001/" >/dev/null
+            # Cold start after reload can exceed a single short curl (exit 28).
+            SMOKE_OK=0
+            for attempt in 1 2 3 4 5 6 7 8; do
+              if curl -fsS --connect-timeout 3 --max-time 15 "http://127.0.0.1:3001/" >/dev/null; then
+                SMOKE_OK=1
+                echo "Nuxt :3001 OK (attempt $attempt)"
+                break
+              fi
+              echo "Waiting for Nuxt on :3001 (attempt $attempt/8)..."
+              sleep 3
+            done
+            if [ "$SMOKE_OK" -ne 1 ]; then
+              echo "ERROR: Nuxt did not respond on 127.0.0.1:3001"
+              pm2 describe cv-nuxt || true
+              pm2 logs cv-nuxt --lines 80 --nostream || true
+              exit 1
+            fi
             # Soft checks against public URL (do not fail deploy on upstream CDN quirks)
             curl -fsS --max-time 15 -o /dev/null -w "landing:%{http_code}\n" "$APP_URL/" || true
             curl -fsS --max-time 15 -o /dev/null -w "api:%{http_code}\n" "$APP_URL/api/v1/shares/templates" || true

@@ -6,6 +6,34 @@
 3. [Database Schema](#database-schema)
 4. [Key Concepts](#key-concepts)
 5. [Important Notes for Developers](#important-notes-for-developers)
+6. [Mobile integration](#mobile-integration)
+7. [UI / UX](#ui--ux)
+
+---
+
+## Mobile integration
+
+Mobile client docs and Postman collection:
+
+| Resource | Path |
+|----------|------|
+| Index | [mobile/README.md](./mobile/README.md) |
+| Getting started | [mobile/getting-started.md](./mobile/getting-started.md) |
+| Authentication | [mobile/authentication.md](./mobile/authentication.md) |
+| API reference | [mobile/api-reference.md](./mobile/api-reference.md) |
+| Data models | [mobile/data-models.md](./mobile/data-models.md) |
+| Workflows | [mobile/workflows.md](./mobile/workflows.md) |
+| Postman collection | [CV_Mobile_API.postman_collection.json](./CV_Mobile_API.postman_collection.json) |
+
+---
+
+## UI / UX
+
+Design identity, color tokens, typography, and component patterns for web + mobile:
+
+| Resource | Path |
+|----------|------|
+| UI / UX guide | [ui-ux-guide.md](./ui-ux-guide.md) |
 
 ---
 

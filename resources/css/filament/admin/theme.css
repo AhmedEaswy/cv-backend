@@ -4,11 +4,11 @@
 @source '../../../../resources/views/filament/**/*';
 
 :root {
-    --brand-primary: #5c17e7;
-    --brand-secondary: #130e21;
-    --sidebar-bg: #130e21;
-    --sidebar-hover: #1f1733;
-    --sidebar-active: #5c17e7;
+    --brand-primary: #38bdf8;
+    --brand-secondary: #0c1222;
+    --sidebar-bg: #0c1222;
+    --sidebar-hover: #152038;
+    --sidebar-active: #38bdf8;
     --card-radius: 16px;
 }
 

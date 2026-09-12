@@ -194,32 +194,56 @@
 }
 
 .hero-orbit__btn--register {
-    background: #f4f4f2 !important;
     color: #0a0a0a !important;
     border-color: transparent !important;
     box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
     padding-inline: 1.25rem 1.15rem !important;
     font-weight: 600;
     gap: 0.45rem;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #f4f4f2 !important;
 }
 
 .hero-orbit__btn--register:hover {
-    background: #ffffff !important;
     transform: translateY(-1px);
     box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.6);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        #ffffff !important;
 }
 
 .hero-orbit__btn--ai {
-    background: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
     padding-inline: 1.05rem 1.3rem !important;
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        rgba(255, 255, 255, 0.08) !important;
 }
 
 .hero-orbit__btn--ai:hover {
-    background: rgba(255, 255, 255, 0.14) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
     transform: translateY(-1px);
+    background:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            transparent
+        ),
+        rgba(255, 255, 255, 0.14) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1158,32 +1182,122 @@
     justify-content: center;
 }
 
+.tpl-auth-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+    padding-bottom: 0.25rem;
+}
+.modal:has(.tpl-auth-modal) .modal__header {
+    padding-bottom: 0;
+}
+.modal:has(.tpl-auth-modal) .modal__body {
+    padding-top: 0.15rem;
+}
+.tpl-auth-modal__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.tpl-auth-modal__icon-wrap {
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    margin-bottom: 1rem;
+    border-radius: 1.25rem;
+    background:
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-brand-primary) 18%, transparent), transparent 55%),
+        var(--color-paper-2);
+    border: 1px solid var(--color-line);
+}
+.tpl-auth-modal__icon {
+    display: block;
+    width: 3.75rem;
+    height: 3.75rem;
+    object-fit: contain;
+}
+.tpl-auth-modal__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+}
+.tpl-auth-modal__template {
+    margin: 0.55rem 0 0;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+    font-size: 0.78rem;
+    line-height: 1.3;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .tpl-auth-modal__lead {
-    margin: 0 0 1rem;
+    margin: 0.75rem 0 0;
     color: var(--color-ink-soft);
     line-height: 1.55;
+    font-size: 0.95rem;
+    max-width: 26rem;
 }
-.tpl-auth-modal__bullets {
-    margin: 0;
-    padding-inline-start: 1.2rem;
-    color: var(--color-ink);
+.tpl-auth-modal__paths {
     display: grid;
-    gap: 0.45rem;
-    line-height: 1.45;
+    gap: 0.85rem;
 }
-.tpl-auth-modal__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    width: 100%;
+.tpl-auth-modal__path {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg, 1rem);
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
 }
-.tpl-auth-modal__auth {
-    display: flex;
-    flex-wrap: wrap;
+.tpl-auth-modal__path--primary {
+    background: linear-gradient(180deg, var(--color-white), var(--color-paper-2));
+}
+.tpl-auth-modal__path--alt {
+    background: var(--color-white);
+}
+.tpl-auth-modal__path-text {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+}
+.tpl-auth-modal__cta {
+    display: grid;
     gap: 0.5rem;
 }
+.tpl-auth-modal__divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.tpl-auth-modal__divider::before,
+.tpl-auth-modal__divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+}
+.tpl-auth-modal__divider span {
+    flex-shrink: 0;
+}
+
 
 /* components/landing/AiConnectSection.vue */
 .ai-connect { background: var(--color-paper); }
