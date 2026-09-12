@@ -11,6 +11,7 @@ Guides and Postman collection for integrating a native mobile client (iOS / Andr
 | [API reference](./api-reference.md) | Every `/api/v1` endpoint with auth, body, and response notes |
 | [Data models](./data-models.md) | Response envelope, CV / cover letter / public profile `user_data` |
 | [Mobile workflows](./workflows.md) | Recommended screen → API flows |
+| [UI / UX guide](../ui-ux-guide.md) | Brand identity, colors, type, components for the app UI |
 
 ## Postman
 
