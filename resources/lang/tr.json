@@ -2603,5 +2603,15 @@
     "templates.public-profile.classic-centered.description": "Serif display’li klasik ortalanmış portföy.",
     "portal.cvs.template_default": "Varsayılan",
     "portal.cvs.template_prev": "Önceki şablon",
-    "portal.cvs.template_next": "Sonraki şablon"
+    "portal.cvs.template_next": "Sonraki şablon",
+    "portal.common.live_preview": "Canlı önizleme",
+    "portal.common.live_preview_hint": "Şablonu veya içeriği değiştirdiğinizde güncellenir.",
+    "portal.common.live_preview_open": "Tam önizlemeyi aç",
+    "portal.common.live_preview_pick_template": "Canlı önizleme için bir şablon seçin.",
+    "portal.common.live_preview_unavailable": "Belge hazır olduğunda önizleme görünecek.",
+    "portal.common.live_preview_loading": "Önizleme yenileniyor…",
+    "portal.common.live_preview_failed": "Önizleme yüklenemedi.",
+    "portal.common.live_preview_retry": "Yeniden dene",
+    "portal.cvs.actions": "İşlemler",
+    "portal.cvs.download": "PDF indir"
 }

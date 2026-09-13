@@ -2593,5 +2593,15 @@
     "templates.public-profile.classic-centered.description": "Klassisches zentriertes Portfolio mit Serifen-Display.",
     "portal.cvs.template_default": "Standard",
     "portal.cvs.template_prev": "Vorherige Vorlage",
-    "portal.cvs.template_next": "Nächste Vorlage"
+    "portal.cvs.template_next": "Nächste Vorlage",
+    "portal.common.live_preview": "Live-Vorschau",
+    "portal.common.live_preview_hint": "Aktualisiert sich bei Vorlagen- oder Inhaltsänderungen.",
+    "portal.common.live_preview_open": "Vollständige Vorschau öffnen",
+    "portal.common.live_preview_pick_template": "Wähle eine Vorlage für die Live-Vorschau.",
+    "portal.common.live_preview_unavailable": "Die Vorschau erscheint, sobald das Dokument bereit ist.",
+    "portal.common.live_preview_loading": "Vorschau wird aktualisiert…",
+    "portal.common.live_preview_failed": "Vorschau konnte nicht geladen werden.",
+    "portal.common.live_preview_retry": "Erneut versuchen",
+    "portal.cvs.actions": "Aktionen",
+    "portal.cvs.download": "PDF herunterladen"
 }

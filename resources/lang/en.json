@@ -2635,5 +2635,15 @@
     "templates.public-profile.classic-centered.description": "Traditional centered portfolio stack with serif display and calm spacing.",
     "portal.cvs.template_default": "Default",
     "portal.cvs.template_prev": "Previous template",
-    "portal.cvs.template_next": "Next template"
+    "portal.cvs.template_next": "Next template",
+    "portal.common.live_preview": "Live preview",
+    "portal.common.live_preview_hint": "Updates when you change the template or edit content.",
+    "portal.common.live_preview_open": "Open full preview",
+    "portal.common.live_preview_pick_template": "Choose a template to see a live preview.",
+    "portal.common.live_preview_unavailable": "Preview will appear once this document is ready.",
+    "portal.common.live_preview_loading": "Refreshing preview…",
+    "portal.common.live_preview_failed": "Could not load the preview.",
+    "portal.common.live_preview_retry": "Retry",
+    "portal.cvs.actions": "Actions",
+    "portal.cvs.download": "Download PDF"
 }

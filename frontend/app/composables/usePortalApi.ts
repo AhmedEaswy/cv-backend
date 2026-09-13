@@ -314,13 +314,22 @@ export const usePortalApi = () => {
         });
     }
 
-    async function update<T>(url: string, body: any, successMessage = 'Saved'): Promise<T | null> {
+    async function update<T>(
+        url: string,
+        body: any,
+        successMessage = 'Saved',
+        opts?: { silent?: boolean },
+    ): Promise<T | null> {
         try {
             const res = await api<ApiEnvelope<T>>(url, { method: 'PUT', body });
-            toast.success(successMessage);
+            if (!opts?.silent) {
+                toast.success(successMessage);
+            }
             return unwrap(res);
         } catch (e: any) {
-            toast.error(e?.data?.message || 'Could not save');
+            if (!opts?.silent) {
+                toast.error(e?.data?.message || 'Could not save');
+            }
             return null;
         }
     }

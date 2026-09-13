@@ -2,6 +2,7 @@
 /**
  * /portal/cvs/[id]/edit — section-based CV builder (mobile parity).
  */
+import { watchDebounced } from '@vueuse/core';
 import type { CVSummary } from '~/composables/usePortalApi';
 import {
     compactCvUserData,
@@ -28,6 +29,11 @@ const loading = ref(true);
 const saving = ref(false);
 const printing = ref(false);
 const atsOpen = ref(false);
+const previewRevision = ref(0);
+const previewReady = ref(false);
+const autosaving = ref(false);
+/** Suppress autosave while hydrating from the server. */
+const syncingForm = ref(false);
 
 const langs = [
     { code: 'en', name: 'English' },
@@ -64,6 +70,7 @@ onMounted(async () => {
     cv.value = c;
     templates.value = tpls;
     if (c) {
+        syncingForm.value = true;
         form.name = c.name || '';
         form.language = c.language || 'en';
         const defaultTpl = tpls.find((tpl) => tpl.is_default);
@@ -73,6 +80,10 @@ onMounted(async () => {
         sectionsOrder.value = (c.sections_order && c.sections_order.length)
             ? [...c.sections_order]
             : [...DEFAULT_CV_SECTIONS];
+        previewRevision.value = Date.now();
+        await nextTick();
+        syncingForm.value = false;
+        previewReady.value = true;
     }
     loading.value = false;
 });
@@ -88,17 +99,49 @@ function payload() {
     };
 }
 
+function bumpPreview() {
+    previewRevision.value = Date.now();
+}
+
+async function persist(opts?: { silent?: boolean }) {
+    if (!cv.value) return null;
+    const updated = await portal.update<CVSummary>(
+        `/cvs/${id.value}`,
+        payload(),
+        t('portal.cvs.saved'),
+        { silent: opts?.silent },
+    );
+    if (updated) {
+        cv.value = { ...cv.value, ...updated };
+        if (!opts?.silent) {
+            syncingForm.value = true;
+            if (updated.user_data) userData.value = normalizeCvUserData(updated.user_data);
+            if (updated.sections_order?.length) sectionsOrder.value = [...updated.sections_order];
+            await nextTick();
+            syncingForm.value = false;
+        }
+        bumpPreview();
+    }
+    return updated;
+}
+
 async function onSave() {
     if (!cv.value) return;
     saving.value = true;
-    const updated = await portal.update<CVSummary>(`/cvs/${id.value}`, payload(), t('portal.cvs.saved'));
-    if (updated) {
-        cv.value = { ...cv.value, ...updated };
-        if (updated.user_data) userData.value = normalizeCvUserData(updated.user_data);
-        if (updated.sections_order?.length) sectionsOrder.value = [...updated.sections_order];
-    }
+    await persist();
     saving.value = false;
 }
+
+watchDebounced(
+    [userData, sectionsOrder, () => form.name, () => form.language, () => form.template_id, () => form.is_public],
+    async () => {
+        if (!previewReady.value || !cv.value || saving.value || autosaving.value || syncingForm.value) return;
+        autosaving.value = true;
+        await persist({ silent: true });
+        autosaving.value = false;
+    },
+    { debounce: 900, deep: true },
+);
 
 async function onDelete() {
     if (!cv.value) return;
@@ -120,10 +163,10 @@ async function generatePdf(mode: 'preview' | 'download') {
         return;
     }
     printing.value = true;
-    const saved = await portal.update<CVSummary>(`/cvs/${id.value}`, payload(), t('portal.cvs.saved'));
-    if (saved) {
-        cv.value = { ...cv.value, ...saved };
-        if (saved.user_data) userData.value = normalizeCvUserData(saved.user_data);
+    const saved = await persist();
+    if (!cv.value) {
+        printing.value = false;
+        return;
     }
     const printed = await portal.printCv({
         profile_id: cv.value.id,
@@ -233,6 +276,14 @@ function onAction(key: string) {
                     <span class="field-hint">{{ t('portal.cvs.field.public_help') }}</span>
                 </Switch>
             </div>
+
+            <TemplateLivePreview
+                kind="cv"
+                :document-id="cv.id"
+                :template-id="form.template_id"
+                :revision="previewRevision"
+                :loading="autosaving"
+            />
         </aside>
 
         <div class="cv-builder__save">

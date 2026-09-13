@@ -32,10 +32,20 @@
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
                 box-sizing: border-box;
             }
+            body.preview-canvas.preview-embed {
+                padding: 8px !important;
+                background: #eef0f3 !important;
+            }
+            body.preview-canvas.preview-embed .page {
+                box-shadow: none;
+            }
         </style>
     @endif
 </head>
-<body {{ $attributes->merge(['class' => $preview ? 'preview-canvas' : '']) }}>
+<body {{ $attributes->class([
+    'preview-canvas' => $preview,
+    'preview-embed' => $preview && request()->boolean('embed'),
+]) }}>
     <div class="page">
         {{ $slot }}
     </div>
