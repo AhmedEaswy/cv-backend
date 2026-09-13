@@ -252,7 +252,8 @@ export function compactCvUserData(data: CvUserData): CvUserData {
 export const usePortalApi = () => {
     const api = useApi();
     const toast = useToast();
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
+    const { user } = useAuthSession();
 
     async function list<T>(url: string): Promise<T[]> {
         try {
@@ -289,8 +290,7 @@ export const usePortalApi = () => {
     }
 
     async function createBlankCv(opts?: { template_id?: number }): Promise<{ id: number } | null> {
-        const locale = useI18n().locale.value;
-        const language = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'].includes(locale) ? locale : 'en';
+        const language = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'].includes(locale.value) ? locale.value : 'en';
         return create<{ id: number }>('/cvs', {
             name: t('portal.cvs.untitled'),
             language,
@@ -299,8 +299,7 @@ export const usePortalApi = () => {
     }
 
     async function createBlankCoverLetter(opts?: { cover_letter_template_id?: number }): Promise<{ id: number } | null> {
-        const locale = useI18n().locale.value;
-        const language = ['en', 'ar', 'tr'].includes(locale) ? locale : 'en';
+        const language = ['en', 'ar', 'tr'].includes(locale.value) ? locale.value : 'en';
         return create<{ id: number }>('/cover-letters', {
             name: t('portal.cover_letters.untitled'),
             language,
@@ -311,9 +310,7 @@ export const usePortalApi = () => {
     }
 
     async function createBlankPublicProfile(): Promise<ProfileData | null> {
-        const { user } = useAuthSession();
-        const locale = useI18n().locale.value;
-        const language = ['en', 'ar', 'tr'].includes(locale) ? locale : 'en';
+        const language = ['en', 'ar', 'tr'].includes(locale.value) ? locale.value : 'en';
         const parts = String(user.value?.name || '').trim().split(/\s+/).filter(Boolean);
         return create<ProfileData>('/public-profiles', {
             language,
