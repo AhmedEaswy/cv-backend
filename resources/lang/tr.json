@@ -2040,6 +2040,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "Adsız CV",
+    "portal.cover_letters.untitled": "Adsız ön yazı",
     "portal.cvs.drag": "Sıralamak için sürükle",
     "portal.cvs.move_to_top": "En üste taşı",
     "portal.cvs.move_to_bottom": "En alta taşı",
@@ -2613,5 +2614,6 @@
     "portal.common.live_preview_failed": "Önizleme yüklenemedi.",
     "portal.common.live_preview_retry": "Yeniden dene",
     "portal.cvs.actions": "İşlemler",
-    "portal.cvs.download": "PDF indir"
+    "portal.cvs.download": "PDF indir",
+    "portal.nav.close_menu": "Menüyü kapat"
 }

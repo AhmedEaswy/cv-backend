@@ -298,6 +298,18 @@ export const usePortalApi = () => {
         });
     }
 
+    async function createBlankCoverLetter(opts?: { cover_letter_template_id?: number }): Promise<{ id: number } | null> {
+        const locale = useI18n().locale.value;
+        const language = ['en', 'ar', 'tr'].includes(locale) ? locale : 'en';
+        return create<{ id: number }>('/cover-letters', {
+            name: t('portal.cover_letters.untitled'),
+            language,
+            ...(opts?.cover_letter_template_id
+                ? { cover_letter_template_id: opts.cover_letter_template_id }
+                : {}),
+        });
+    }
+
     async function createBlankPublicProfile(): Promise<ProfileData | null> {
         const { user } = useAuthSession();
         const locale = useI18n().locale.value;
@@ -399,7 +411,7 @@ export const usePortalApi = () => {
         }
     }
 
-    return { list, show, create, createBlankCv, createBlankPublicProfile, update, destroy, duplicate, printCv, atsCheck, resolvePublicFileUrl };
+    return { list, show, create, createBlankCv, createBlankCoverLetter, createBlankPublicProfile, update, destroy, duplicate, printCv, atsCheck, resolvePublicFileUrl };
 };
 
 export function resolvePublicFileUrl(url: string): string {

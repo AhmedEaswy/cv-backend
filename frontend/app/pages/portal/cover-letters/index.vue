@@ -6,14 +6,43 @@ definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { CoverLetterSummary } from '~/composables/usePortalApi';
 
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 const portal = usePortalApi();
 const { refresh: refreshStats } = usePortalStats();
 const letters = ref<CoverLetterSummary[]>([]);
 const loading = ref(true);
+const creating = ref(false);
+
+async function openCreate() {
+    if (creating.value) return;
+    creating.value = true;
+    try {
+        const created = await portal.createBlankCoverLetter();
+        if (created?.id) {
+            refreshStats();
+            await router.push(`/portal/cover-letters/${created.id}/edit`);
+            return;
+        }
+    } finally {
+        creating.value = false;
+    }
+}
 
 onMounted(async () => {
     letters.value = await portal.list<CoverLetterSummary>('/cover-letters');
     loading.value = false;
+    if (route.query.create === '1') {
+        router.replace({ path: '/portal/cover-letters', query: {} });
+        await openCreate();
+    }
+});
+
+watch(() => route.query.create, async (v) => {
+    if (v === '1') {
+        router.replace({ path: '/portal/cover-letters', query: {} });
+        await openCreate();
+    }
 });
 
 async function onDelete(l: CoverLetterSummary) {
@@ -46,9 +75,10 @@ function timeAgo(iso?: string) {
             <p class="page-header__subtitle">{{ t('portal.cover_letters.subtitle') }}</p>
         </div>
         <div class="page-header__actions">
-            <NuxtLink to="/portal/cover-letters/create" class="btn btn--primary">
-                <Icon name="plus" :size="15" /> {{ t('portal.cover_letters.new') }}
-            </NuxtLink>
+            <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
+                <Icon name="plus" :size="15" />
+                {{ creating ? t('portal.cover_letters.creating') : t('portal.cover_letters.new') }}
+            </button>
         </div>
     </header>
 
@@ -58,7 +88,9 @@ function timeAgo(iso?: string) {
         <span class="empty__icon"><Icon name="mail" :size="22" /></span>
         <p class="empty__title">{{ t('portal.cover_letters.empty') }}</p>
         <p class="empty__text">{{ t('portal.cover_letters.empty_text') }}</p>
-        <NuxtLink to="/portal/cover-letters/create" class="btn btn--primary">{{ t('portal.cover_letters.create_first') }}</NuxtLink>
+        <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
+            {{ creating ? t('portal.cover_letters.creating') : t('portal.cover_letters.create_first') }}
+        </button>
     </div>
 
     <div v-else class="list">
@@ -86,4 +118,3 @@ function timeAgo(iso?: string) {
         </article>
     </div>
 </template>
-

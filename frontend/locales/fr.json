@@ -2030,6 +2030,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "CV sans titre",
+    "portal.cover_letters.untitled": "Lettre de motivation sans titre",
     "portal.cvs.drag": "Glisser pour réordonner",
     "portal.cvs.move_to_top": "Déplacer en haut",
     "portal.cvs.move_to_bottom": "Déplacer en bas",
@@ -2603,5 +2604,6 @@
     "portal.common.live_preview_failed": "Impossible de charger l’aperçu.",
     "portal.common.live_preview_retry": "Réessayer",
     "portal.cvs.actions": "Actions",
-    "portal.cvs.download": "Télécharger le PDF"
+    "portal.cvs.download": "Télécharger le PDF",
+    "portal.nav.close_menu": "Fermer la navigation"
 }

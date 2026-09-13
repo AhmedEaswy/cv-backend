@@ -58,23 +58,53 @@ function isActive(item: NavItem) {
     return item.match ? item.match(route.path) : route.path.startsWith(item.to);
 }
 
+/** Off-canvas drawer only below tablet; ≥768px keeps the sidebar visible. */
+const DRAWER_MQ = '(max-width: 767.98px)';
 const sidebarOpen = ref(false);
+const isDrawerViewport = ref(false);
+
+function syncViewportMode() {
+    if (!import.meta.client) return;
+    isDrawerViewport.value = window.matchMedia(DRAWER_MQ).matches;
+    if (!isDrawerViewport.value) {
+        sidebarOpen.value = false;
+        document.body.style.overflow = '';
+    }
+}
+
+function setSidebarOpen(open: boolean) {
+    sidebarOpen.value = open;
+    if (import.meta.client && isDrawerViewport.value) {
+        document.body.style.overflow = open ? 'hidden' : '';
+    }
+}
+
+function toggleSidebar() {
+    setSidebarOpen(!sidebarOpen.value);
+}
+
+function closeSidebar() {
+    setSidebarOpen(false);
+}
+
 watch(() => route.fullPath, () => {
-    sidebarOpen.value = false;
+    closeSidebar();
     refreshStats();
-});
-watch(sidebarOpen, (open) => {
-    if (import.meta.client) document.body.style.overflow = open ? 'hidden' : '';
 });
 
 function onKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') sidebarOpen.value = false;
+    if (e.key === 'Escape') closeSidebar();
 }
+
 onMounted(() => {
+    syncViewportMode();
+    window.addEventListener('resize', syncViewportMode);
     document.addEventListener('keydown', onKeydown);
     refreshStats();
 });
+
 onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncViewportMode);
     document.removeEventListener('keydown', onKeydown);
     document.body.style.overflow = '';
 });
@@ -89,8 +119,8 @@ onBeforeUnmount(() => {
                     class="portal-topbar__menu"
                     :aria-expanded="sidebarOpen"
                     aria-controls="portal-sidebar"
-                    :aria-label="t('portal.nav.menu')"
-                    @click="sidebarOpen = !sidebarOpen"
+                    :aria-label="sidebarOpen ? t('portal.nav.close_menu') : t('portal.nav.menu')"
+                    @click.stop="toggleSidebar"
                 >
                     <Icon :name="sidebarOpen ? 'close' : 'menu'" :size="18" />
                 </button>
@@ -117,10 +147,14 @@ onBeforeUnmount(() => {
             class="portal-backdrop no-print"
             :class="{ open: sidebarOpen }"
             aria-hidden="true"
-            @click="sidebarOpen = false"
+            @click="closeSidebar"
         />
 
-        <aside id="portal-sidebar" class="portal-sidebar no-print">
+        <aside
+            id="portal-sidebar"
+            class="portal-sidebar no-print"
+            :aria-hidden="isDrawerViewport && !sidebarOpen ? 'true' : undefined"
+        >
             <div class="portal-sidebar__profile">
                 <span class="portal-sidebar__avatar" aria-hidden="true">
                     <img
@@ -148,6 +182,7 @@ onBeforeUnmount(() => {
                         :to="item.to"
                         class="portal-sidebar__link"
                         :aria-current="isActive(item) ? 'page' : undefined"
+                        @click="closeSidebar"
                     >
                         <Icon :name="item.icon" :size="16" />
                         <span class="portal-sidebar__link-label">{{ item.label }}</span>
@@ -162,6 +197,7 @@ onBeforeUnmount(() => {
                         :to="item.to"
                         class="portal-sidebar__link"
                         :aria-current="isActive(item) ? 'page' : undefined"
+                        @click="closeSidebar"
                     >
                         <Icon :name="item.icon" :size="16" />
                         <span>{{ item.label }}</span>
@@ -170,6 +206,10 @@ onBeforeUnmount(() => {
             </nav>
 
             <div class="portal-sidebar__foot">
+                <NuxtLink to="/" class="portal-sidebar__link portal-sidebar__site" @click="closeSidebar">
+                    <Icon name="arrow-left" :size="16" />
+                    <span>{{ t('portal.nav.back_to_site') }}</span>
+                </NuxtLink>
                 <button type="button" class="portal-sidebar__link portal-sidebar__link--danger" @click="logout">
                     <Icon name="log-out" :size="16" />
                     <span>{{ t('portal.nav.signout') }}</span>

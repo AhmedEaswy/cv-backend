@@ -2030,6 +2030,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "Unbenannter Lebenslauf",
+    "portal.cover_letters.untitled": "Unbenanntes Anschreiben",
     "portal.cvs.drag": "Zum Sortieren ziehen",
     "portal.cvs.move_to_top": "Nach ganz oben",
     "portal.cvs.move_to_bottom": "Nach ganz unten",
@@ -2603,5 +2604,6 @@
     "portal.common.live_preview_failed": "Vorschau konnte nicht geladen werden.",
     "portal.common.live_preview_retry": "Erneut versuchen",
     "portal.cvs.actions": "Aktionen",
-    "portal.cvs.download": "PDF herunterladen"
+    "portal.cvs.download": "PDF herunterladen",
+    "portal.nav.close_menu": "Navigation schließen"
 }

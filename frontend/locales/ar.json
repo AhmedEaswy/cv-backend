@@ -2040,6 +2040,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "سيرة ذاتية بلا عنوان",
+    "portal.cover_letters.untitled": "خطاب تغطية بلا عنوان",
     "portal.cvs.drag": "اسحب لإعادة الترتيب",
     "portal.cvs.move_to_top": "نقل إلى الأعلى",
     "portal.cvs.move_to_bottom": "نقل إلى الأسفل",
@@ -2613,5 +2614,6 @@
     "portal.common.live_preview_failed": "تعذر تحميل المعاينة.",
     "portal.common.live_preview_retry": "إعادة المحاولة",
     "portal.cvs.actions": "إجراءات",
-    "portal.cvs.download": "تنزيل PDF"
+    "portal.cvs.download": "تنزيل PDF",
+    "portal.nav.close_menu": "إغلاق القائمة"
 }

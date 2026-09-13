@@ -2030,6 +2030,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "بلا عنوان CV",
+    "portal.cover_letters.untitled": "بلا عنوان کور لیٹر",
     "portal.cvs.drag": "ترتیب کے لیے گھسیٹیں",
     "portal.cvs.move_to_top": "اوپر منتقل کریں",
     "portal.cvs.move_to_bottom": "نیچے منتقل کریں",
@@ -2603,5 +2604,6 @@
     "portal.common.live_preview_failed": "پیش نظارہ لوڈ نہیں ہو سکا۔",
     "portal.common.live_preview_retry": "دوبارہ کوشش",
     "portal.cvs.actions": "اقدامات",
-    "portal.cvs.download": "PDF ڈاؤن لوڈ"
+    "portal.cvs.download": "PDF ڈاؤن لوڈ",
+    "portal.nav.close_menu": "مینو بند کریں"
 }
