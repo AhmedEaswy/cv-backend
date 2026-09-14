@@ -21,7 +21,7 @@
 }
 
 .site-header__nav {
-    @apply hidden items-center gap-[1.6rem] text-sm text-white/70 md:flex;
+    @apply hidden items-center gap-[1.6rem] text-sm text-white/70;
 }
 
 .site-header__nav a {
@@ -49,7 +49,74 @@
 }
 
 .site-header__ghost {
-    @apply hidden items-center rounded-full px-3 py-[0.45rem] text-[0.85rem] font-medium text-white/80 no-underline transition duration-150 hover:bg-white/5 hover:text-white sm:inline-flex;
+    @apply hidden items-center rounded-full px-3 py-[0.45rem] text-[0.85rem] font-medium text-white/80 no-underline transition duration-150 hover:bg-white/5 hover:text-white;
+}
+
+.site-header__menu-btn {
+    @apply inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition duration-150 hover:bg-white/10;
+}
+
+.site-header__menu-btn:focus-visible {
+    @apply outline-2 outline-offset-2 outline-white;
+}
+
+.site-header__backdrop {
+    @apply pointer-events-none fixed inset-0 z-30 bg-black/45 opacity-0 transition-opacity duration-200;
+}
+
+.site-header__backdrop.is-open {
+    @apply pointer-events-auto opacity-100;
+}
+
+.site-header__panel {
+    @apply pointer-events-none invisible absolute inset-x-3 top-[calc(100%+0.35rem)] z-40 flex max-h-[min(70vh,32rem)] translate-y-1 flex-col gap-0.5 overflow-y-auto rounded-[1.35rem] border border-white/10 bg-[rgba(12,12,12,0.94)] p-3 opacity-0 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.75)] backdrop-blur-[16px] transition duration-200;
+}
+
+.site-header__panel.is-open {
+    @apply pointer-events-auto visible translate-y-0 opacity-100;
+}
+
+.site-header__panel > a {
+    @apply rounded-xl px-3.5 py-2.5 text-[0.95rem] font-medium text-white/75 no-underline transition duration-150 hover:bg-white/5 hover:text-white;
+}
+
+.site-header__panel > a.is-active,
+.site-header__panel > a.router-link-active {
+    @apply bg-white/5 text-white;
+}
+
+.site-header__panel-actions {
+    @apply mt-2 flex flex-col gap-2 border-t border-white/10 pt-3;
+}
+
+.site-header__panel-link {
+    @apply rounded-xl px-3.5 py-2.5 text-[0.95rem] font-medium text-white/80 no-underline transition duration-150 hover:bg-white/5 hover:text-white;
+}
+
+.site-header__cta--block {
+    @apply w-full;
+}
+
+@media (max-width: 989px) {
+    .site-header__cta:not(.site-header__cta--block) {
+        display: none;
+    }
+}
+
+@media (min-width: 990px) {
+    .site-header__nav {
+        display: flex;
+    }
+
+    .site-header__ghost {
+        display: inline-flex;
+    }
+
+    .site-header__menu-btn,
+    .site-header__backdrop,
+    .site-header__panel {
+        display: none;
+    }
 }
 
 .site-header__cta {

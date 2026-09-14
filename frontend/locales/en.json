@@ -2345,6 +2345,8 @@
     "ai_analytics.charts.platform_description": "Where agents identified themselves.",
     "ai_analytics.charts.platform_dataset": "Calls",
     "landing.nav.ai_connect": "Connect your AI",
+    "landing.nav.menu": "Open menu",
+    "landing.nav.close_menu": "Close menu",
     "landing.hero_cta_ai": "Connect your AI",
     "landing.ai_connect_eyebrow": "Works with the AI you already use",
     "landing.ai_connect_title": "Build your CV without leaving your AI chat",
