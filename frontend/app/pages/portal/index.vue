@@ -21,6 +21,7 @@ const loading = ref(true);
 const createOpen = ref(false);
 const createRoot = ref<HTMLElement | null>(null);
 const creatingCv = ref(false);
+const creatingCoverLetter = ref(false);
 const creatingProfile = ref(false);
 const filter = ref<'all' | 'cvs' | 'letters' | 'inbox'>('all');
 
@@ -172,7 +173,8 @@ const profileUrl = computed(() => {
 });
 
 function onDocClick(e: MouseEvent) {
-    if (createRoot.value && !createRoot.value.contains(e.target as Node)) createOpen.value = false;
+    if (!createOpen.value || !createRoot.value) return;
+    if (!createRoot.value.contains(e.target as Node)) createOpen.value = false;
 }
 onMounted(() => document.addEventListener('click', onDocClick));
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
@@ -186,6 +188,18 @@ async function startNewCv() {
         if (created?.id) await navigateTo(`/portal/cvs/${created.id}/edit`);
     } finally {
         creatingCv.value = false;
+    }
+}
+
+async function startNewCoverLetter() {
+    if (creatingCoverLetter.value) return;
+    creatingCoverLetter.value = true;
+    createOpen.value = false;
+    try {
+        const created = await portal.createBlankCoverLetter();
+        if (created?.id) await navigateTo(`/portal/cover-letters/${created.id}/edit`);
+    } finally {
+        creatingCoverLetter.value = false;
     }
 }
 
@@ -227,20 +241,20 @@ async function startPublicProfile() {
                     class="btn btn--primary"
                     :aria-expanded="createOpen"
                     aria-haspopup="menu"
-                    @click="createOpen = !createOpen"
+                    @click.stop="createOpen = !createOpen"
                 >
                     <Icon name="plus" :size="15" />
                     {{ t('portal.dashboard.create_new') }}
                 </button>
-                <div class="create-menu__panel" :class="{ open: createOpen }" role="menu">
+                <div class="create-menu__panel" :class="{ open: createOpen }" role="menu" @click.stop>
                     <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingCv" @click="startNewCv">
                         <Icon name="file-plus" :size="15" />
                         <span>{{ creatingCv ? t('portal.cvs.creating') : t('portal.dashboard.new_cv') }}</span>
                     </button>
-                    <NuxtLink to="/portal/cover-letters/create" class="create-menu__item" role="menuitem" @click="createOpen = false">
+                    <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingCoverLetter" @click="startNewCoverLetter">
                         <Icon name="mail" :size="15" />
-                        <span>{{ t('portal.dashboard.new_cover_letter') }}</span>
-                    </NuxtLink>
+                        <span>{{ creatingCoverLetter ? t('portal.cover_letters.creating') : t('portal.dashboard.new_cover_letter') }}</span>
+                    </button>
                     <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingProfile" @click="startPublicProfile">
                         <Icon name="user" :size="15" />
                         <span>{{ creatingProfile ? t('portal.common.loading') : t('portal.dashboard.create_public_profile') }}</span>
@@ -389,11 +403,11 @@ async function startPublicProfile() {
                         <span>{{ creatingCv ? t('portal.cvs.creating') : t('portal.dashboard.new_cv') }}</span>
                         <Icon name="chevron-right" :size="15" />
                     </button>
-                    <NuxtLink to="/portal/cover-letters/create" class="quick-action">
+                    <button type="button" class="quick-action" :disabled="creatingCoverLetter" @click="startNewCoverLetter">
                         <span class="quick-action__icon"><Icon name="mail" :size="15" /></span>
-                        <span>{{ t('portal.dashboard.new_cover_letter') }}</span>
+                        <span>{{ creatingCoverLetter ? t('portal.cover_letters.creating') : t('portal.dashboard.new_cover_letter') }}</span>
                         <Icon name="chevron-right" :size="15" />
-                    </NuxtLink>
+                    </button>
                     <NuxtLink to="/portal/cvs" class="quick-action">
                         <span class="quick-action__icon"><Icon name="target" :size="15" /></span>
                         <span>{{ t('portal.dashboard.action_ats') }}</span>

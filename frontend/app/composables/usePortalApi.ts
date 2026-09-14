@@ -252,7 +252,8 @@ export function compactCvUserData(data: CvUserData): CvUserData {
 export const usePortalApi = () => {
     const api = useApi();
     const toast = useToast();
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
+    const { user } = useAuthSession();
 
     async function list<T>(url: string): Promise<T[]> {
         try {
@@ -289,8 +290,7 @@ export const usePortalApi = () => {
     }
 
     async function createBlankCv(opts?: { template_id?: number }): Promise<{ id: number } | null> {
-        const locale = useI18n().locale.value;
-        const language = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'].includes(locale) ? locale : 'en';
+        const language = ['en', 'ar', 'tr', 'es', 'fr', 'de', 'ur'].includes(locale.value) ? locale.value : 'en';
         return create<{ id: number }>('/cvs', {
             name: t('portal.cvs.untitled'),
             language,
@@ -298,10 +298,19 @@ export const usePortalApi = () => {
         });
     }
 
+    async function createBlankCoverLetter(opts?: { cover_letter_template_id?: number }): Promise<{ id: number } | null> {
+        const language = ['en', 'ar', 'tr'].includes(locale.value) ? locale.value : 'en';
+        return create<{ id: number }>('/cover-letters', {
+            name: t('portal.cover_letters.untitled'),
+            language,
+            ...(opts?.cover_letter_template_id
+                ? { cover_letter_template_id: opts.cover_letter_template_id }
+                : {}),
+        });
+    }
+
     async function createBlankPublicProfile(): Promise<ProfileData | null> {
-        const { user } = useAuthSession();
-        const locale = useI18n().locale.value;
-        const language = ['en', 'ar', 'tr'].includes(locale) ? locale : 'en';
+        const language = ['en', 'ar', 'tr'].includes(locale.value) ? locale.value : 'en';
         const parts = String(user.value?.name || '').trim().split(/\s+/).filter(Boolean);
         return create<ProfileData>('/public-profiles', {
             language,
@@ -314,13 +323,22 @@ export const usePortalApi = () => {
         });
     }
 
-    async function update<T>(url: string, body: any, successMessage = 'Saved'): Promise<T | null> {
+    async function update<T>(
+        url: string,
+        body: any,
+        successMessage = 'Saved',
+        opts?: { silent?: boolean },
+    ): Promise<T | null> {
         try {
             const res = await api<ApiEnvelope<T>>(url, { method: 'PUT', body });
-            toast.success(successMessage);
+            if (!opts?.silent) {
+                toast.success(successMessage);
+            }
             return unwrap(res);
         } catch (e: any) {
-            toast.error(e?.data?.message || 'Could not save');
+            if (!opts?.silent) {
+                toast.error(e?.data?.message || 'Could not save');
+            }
             return null;
         }
     }
@@ -390,7 +408,7 @@ export const usePortalApi = () => {
         }
     }
 
-    return { list, show, create, createBlankCv, createBlankPublicProfile, update, destroy, duplicate, printCv, atsCheck, resolvePublicFileUrl };
+    return { list, show, create, createBlankCv, createBlankCoverLetter, createBlankPublicProfile, update, destroy, duplicate, printCv, atsCheck, resolvePublicFileUrl };
 };
 
 export function resolvePublicFileUrl(url: string): string {

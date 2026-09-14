@@ -2030,6 +2030,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "CV sans titre",
+    "portal.cover_letters.untitled": "Lettre de motivation sans titre",
     "portal.cvs.drag": "Glisser pour réordonner",
     "portal.cvs.move_to_top": "Déplacer en haut",
     "portal.cvs.move_to_bottom": "Déplacer en bas",
@@ -2593,5 +2594,16 @@
     "templates.public-profile.classic-centered.description": "Portfolio classique centré, display serif.",
     "portal.cvs.template_default": "Par défaut",
     "portal.cvs.template_prev": "Modèle précédent",
-    "portal.cvs.template_next": "Modèle suivant"
+    "portal.cvs.template_next": "Modèle suivant",
+    "portal.common.live_preview": "Aperçu en direct",
+    "portal.common.live_preview_hint": "Se met à jour quand vous changez le modèle ou le contenu.",
+    "portal.common.live_preview_open": "Ouvrir l’aperçu complet",
+    "portal.common.live_preview_pick_template": "Choisissez un modèle pour voir l’aperçu.",
+    "portal.common.live_preview_unavailable": "L’aperçu apparaîtra lorsque le document sera prêt.",
+    "portal.common.live_preview_loading": "Actualisation de l’aperçu…",
+    "portal.common.live_preview_failed": "Impossible de charger l’aperçu.",
+    "portal.common.live_preview_retry": "Réessayer",
+    "portal.cvs.actions": "Actions",
+    "portal.cvs.download": "Télécharger le PDF",
+    "portal.nav.close_menu": "Fermer la navigation"
 }

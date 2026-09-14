@@ -53,6 +53,13 @@
                         <Skeleton width="100%" height="2.6rem" radius="10px" />
                     </div>
                 </div>
+                <div class="live-preview" aria-hidden="true">
+                    <div class="live-preview__header">
+                        <Skeleton width="6.5rem" height="0.85rem" />
+                        <Skeleton width="1.85rem" height="1.85rem" radius="8px" />
+                    </div>
+                    <Skeleton width="100%" height="18rem" radius="8px" />
+                </div>
             </aside>
 
             <div class="cv-builder__save">

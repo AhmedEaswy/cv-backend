@@ -2040,6 +2040,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "سيرة ذاتية بلا عنوان",
+    "portal.cover_letters.untitled": "خطاب تغطية بلا عنوان",
     "portal.cvs.drag": "اسحب لإعادة الترتيب",
     "portal.cvs.move_to_top": "نقل إلى الأعلى",
     "portal.cvs.move_to_bottom": "نقل إلى الأسفل",
@@ -2603,5 +2604,16 @@
     "templates.public-profile.classic-centered.description": "ملف تقليدي متوسط بخط عرض serif وتباعد هادئ.",
     "portal.cvs.template_default": "افتراضي",
     "portal.cvs.template_prev": "القالب السابق",
-    "portal.cvs.template_next": "القالب التالي"
+    "portal.cvs.template_next": "القالب التالي",
+    "portal.common.live_preview": "معاينة مباشرة",
+    "portal.common.live_preview_hint": "تتحدث عند تغيير القالب أو تعديل المحتوى.",
+    "portal.common.live_preview_open": "فتح المعاينة الكاملة",
+    "portal.common.live_preview_pick_template": "اختر قالباً لعرض معاينة مباشرة.",
+    "portal.common.live_preview_unavailable": "ستظهر المعاينة عندما يصبح المستند جاهزاً.",
+    "portal.common.live_preview_loading": "جاري تحديث المعاينة…",
+    "portal.common.live_preview_failed": "تعذر تحميل المعاينة.",
+    "portal.common.live_preview_retry": "إعادة المحاولة",
+    "portal.cvs.actions": "إجراءات",
+    "portal.cvs.download": "تنزيل PDF",
+    "portal.nav.close_menu": "إغلاق القائمة"
 }

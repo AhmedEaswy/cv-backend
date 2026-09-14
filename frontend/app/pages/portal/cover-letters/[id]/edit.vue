@@ -1,7 +1,12 @@
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth', layout: 'portal' });
+/**
+ * /portal/cover-letters/[id]/edit — cover letter editor with live template preview.
+ */
+import { watchDebounced } from '@vueuse/core';
 import type { CoverLetterSummary } from '~/composables/usePortalApi';
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
+
+definePageMeta({ middleware: 'auth', layout: 'portal' });
 
 const { t } = useI18n();
 const route = useRoute();
@@ -13,6 +18,11 @@ const letter = ref<CoverLetterSummary | null>(null);
 const templates = ref<TemplateOption[]>([]);
 const loading = ref(true);
 const saving = ref(false);
+const autosaving = ref(false);
+const previewRevision = ref(0);
+const previewReady = ref(false);
+/** Suppress autosave while hydrating from the server. */
+const syncingForm = ref(false);
 
 const form = reactive({
     name: '',
@@ -21,6 +31,41 @@ const form = reactive({
     template_id: '' as string | number,
     body: '',
 });
+
+function applyLetter(l: CoverLetterSummary) {
+    syncingForm.value = true;
+    const userData = (l.user_data || {}) as Record<string, unknown>;
+    form.name = l.name || '';
+    form.company = String(
+        userData.companyName
+        || userData.recipientCompany
+        || l.company
+        || '',
+    );
+    form.role = String(userData.jobTitle || l.role || '');
+    form.body = String(userData.body || l.body || '');
+    const defaultTpl = templates.value.find((tpl) => tpl.is_default);
+    form.template_id = l.cover_letter_template_id
+        ?? l.template_id
+        ?? defaultTpl?.id
+        ?? '';
+    nextTick(() => {
+        syncingForm.value = false;
+    });
+}
+
+function payload() {
+    return {
+        name: form.name,
+        cover_letter_template_id: form.template_id || null,
+        user_data: {
+            companyName: form.company || null,
+            recipientCompany: form.company || null,
+            jobTitle: form.role || null,
+            body: form.body || null,
+        },
+    };
+}
 
 onMounted(async () => {
     const [l, t1, t2] = await Promise.all([
@@ -31,29 +76,48 @@ onMounted(async () => {
     letter.value = l;
     templates.value = (t1 && t1.length ? t1 : t2);
     if (l) {
-        form.name = l.name || '';
-        form.company = l.company || '';
-        form.role = l.role || '';
-        const defaultTpl = templates.value.find((tpl) => tpl.is_default);
-        form.template_id = l.template_id ?? defaultTpl?.id ?? '';
-        form.body = l.body || '';
+        applyLetter(l);
+        previewRevision.value = Date.now();
+        previewReady.value = true;
     }
     loading.value = false;
 });
 
+async function persist(opts?: { silent?: boolean }) {
+    if (!letter.value) return null;
+    const updated = await portal.update<CoverLetterSummary>(
+        `/cover-letters/${id.value}`,
+        payload(),
+        t('portal.cover_letters.saved'),
+        { silent: opts?.silent },
+    );
+    if (updated) {
+        letter.value = { ...letter.value, ...updated };
+        if (!opts?.silent) {
+            applyLetter(letter.value);
+        }
+        previewRevision.value = Date.now();
+    }
+    return updated;
+}
+
 async function onSave() {
     if (!letter.value) return;
     saving.value = true;
-    const updated = await portal.update(`/cover-letters/${id.value}`, {
-        name: form.name,
-        company: form.company,
-        role: form.role,
-        template_id: form.template_id || null,
-        body: form.body,
-    }, t('portal.cover_letters.saved'));
-    if (updated) letter.value = { ...letter.value, ...(updated as any) };
+    await persist();
     saving.value = false;
 }
+
+watchDebounced(
+    [() => form.name, () => form.company, () => form.role, () => form.body, () => form.template_id],
+    async () => {
+        if (!previewReady.value || !letter.value || saving.value || autosaving.value || syncingForm.value) return;
+        autosaving.value = true;
+        await persist({ silent: true });
+        autosaving.value = false;
+    },
+    { debounce: 900 },
+);
 
 async function onDelete() {
     if (!letter.value) return;
@@ -123,6 +187,14 @@ async function onDelete() {
                     <CvTemplateSlider v-model="form.template_id" :templates="templates" kind="cover-letter" />
                 </div>
             </div>
+
+            <TemplateLivePreview
+                kind="cover-letter"
+                :document-id="letter.id"
+                :template-id="form.template_id"
+                :revision="previewRevision"
+                :loading="autosaving"
+            />
         </aside>
 
         <div class="cv-builder__save">
@@ -133,4 +205,3 @@ async function onDelete() {
     </form>
     </template>
 </template>
-

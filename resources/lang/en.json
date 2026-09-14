@@ -1978,6 +1978,7 @@
     "auth.reset_token_invalid": "This reset link is invalid.",
     "portal.nav.signout": "Sign out",
     "portal.nav.menu": "Open navigation",
+    "portal.nav.close_menu": "Close navigation",
     "portal.nav.ai_access": "AI access",
     "portal.brand": "Scribblit",
     "portal.search.placeholder": "Search…",
@@ -2054,6 +2055,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "Untitled CV",
+    "portal.cover_letters.untitled": "Untitled cover letter",
     "portal.cvs.drag": "Drag to reorder",
     "portal.cvs.move_to_top": "Move to top",
     "portal.cvs.move_to_bottom": "Move to bottom",
@@ -2637,5 +2639,15 @@
     "templates.public-profile.classic-centered.description": "Traditional centered portfolio stack with serif display and calm spacing.",
     "portal.cvs.template_default": "Default",
     "portal.cvs.template_prev": "Previous template",
-    "portal.cvs.template_next": "Next template"
+    "portal.cvs.template_next": "Next template",
+    "portal.common.live_preview": "Live preview",
+    "portal.common.live_preview_hint": "Updates when you change the template or edit content.",
+    "portal.common.live_preview_open": "Open full preview",
+    "portal.common.live_preview_pick_template": "Choose a template to see a live preview.",
+    "portal.common.live_preview_unavailable": "Preview will appear once this document is ready.",
+    "portal.common.live_preview_loading": "Refreshing preview…",
+    "portal.common.live_preview_failed": "Could not load the preview.",
+    "portal.common.live_preview_retry": "Retry",
+    "portal.cvs.actions": "Actions",
+    "portal.cvs.download": "Download PDF"
 }

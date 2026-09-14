@@ -2030,6 +2030,7 @@
     "portal.cvs.move_up": "Move up",
     "portal.cvs.move_down": "Move down",
     "portal.cvs.untitled": "CV sin título",
+    "portal.cover_letters.untitled": "Carta de presentación sin título",
     "portal.cvs.drag": "Arrastra para reordenar",
     "portal.cvs.move_to_top": "Mover al inicio",
     "portal.cvs.move_to_bottom": "Mover al final",
@@ -2593,5 +2594,16 @@
     "templates.public-profile.classic-centered.description": "Portafolio clásico centrado con display serif.",
     "portal.cvs.template_default": "Predeterminada",
     "portal.cvs.template_prev": "Plantilla anterior",
-    "portal.cvs.template_next": "Plantilla siguiente"
+    "portal.cvs.template_next": "Plantilla siguiente",
+    "portal.common.live_preview": "Vista previa en vivo",
+    "portal.common.live_preview_hint": "Se actualiza al cambiar la plantilla o el contenido.",
+    "portal.common.live_preview_open": "Abrir vista previa completa",
+    "portal.common.live_preview_pick_template": "Elige una plantilla para ver la vista previa.",
+    "portal.common.live_preview_unavailable": "La vista previa aparecerá cuando el documento esté listo.",
+    "portal.common.live_preview_loading": "Actualizando vista previa…",
+    "portal.common.live_preview_failed": "No se pudo cargar la vista previa.",
+    "portal.common.live_preview_retry": "Reintentar",
+    "portal.cvs.actions": "Acciones",
+    "portal.cvs.download": "Descargar PDF",
+    "portal.nav.close_menu": "Cerrar navegación"
 }
