@@ -12,6 +12,8 @@ const router = useRouter();
 const portal = usePortalApi();
 const { refresh: refreshStats } = usePortalStats();
 const { start: startLinkedIn } = useLinkedInAuth();
+const config = useRuntimeConfig();
+const linkedinAuthEnabled = computed(() => config.public.linkedinAuthEnabled !== false);
 const cvs = ref<CVSummary[]>([]);
 const loading = ref(true);
 const creating = ref(false);
@@ -108,7 +110,12 @@ function timeAgo(iso?: string) {
             <p class="page-header__subtitle">{{ t('portal.cvs.subtitle') }}</p>
         </div>
         <div class="page-header__actions">
-            <button type="button" class="btn btn--secondary" @click="importFromLinkedIn">
+            <button
+                v-if="linkedinAuthEnabled"
+                type="button"
+                class="btn btn--secondary"
+                @click="importFromLinkedIn"
+            >
                 <Icon name="linkedin" :size="15" />
                 {{ t('portal.cvs.import_linkedin') }}
             </button>
@@ -126,7 +133,13 @@ function timeAgo(iso?: string) {
         <p class="empty__title">{{ t('portal.cvs.empty') }}</p>
         <p class="empty__text">{{ t('portal.cvs.empty_text') }}</p>
         <div class="empty__actions">
-            <button type="button" class="btn btn--secondary" :disabled="creating" @click="importFromLinkedIn">
+            <button
+                v-if="linkedinAuthEnabled"
+                type="button"
+                class="btn btn--secondary"
+                :disabled="creating"
+                @click="importFromLinkedIn"
+            >
                 <Icon name="linkedin" :size="15" />
                 {{ t('portal.cvs.import_linkedin') }}
             </button>

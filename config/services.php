@@ -45,7 +45,8 @@ return [
         'client_id' => env('LINKEDIN_CLIENT_ID'),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
         'redirect' => env('LINKEDIN_REDIRECT_URI'),
-        'dma_enabled' => env('LINKEDIN_DMA_ENABLED', false),
+        'enabled' => filter_var(env('LINKEDIN_AUTH_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'dma_enabled' => filter_var(env('LINKEDIN_DMA_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
         'api_version' => env('LINKEDIN_API_VERSION', '202401'),
     ],
 
@@ -67,6 +68,7 @@ return [
         'private_key' => env('APPLE_PRIVATE_KEY'),
         'passphrase' => env('APPLE_PASSPHRASE'),
         'redirect' => env('APPLE_REDIRECT_URI'),
+        'enabled' => filter_var(env('APPLE_AUTH_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'app_store' => [

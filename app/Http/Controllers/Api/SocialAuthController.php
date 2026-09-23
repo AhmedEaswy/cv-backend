@@ -66,6 +66,10 @@ class SocialAuthController extends BaseApiController
      */
     public function linkedin(Request $request): JsonResponse
     {
+        if (! SocialProvider::isEnabled(SocialProvider::LINKEDIN)) {
+            return $this->errorResponse(__('messages.invalid_provider'), 403);
+        }
+
         $request->validate([
             'code' => 'required|string',
             'import_cv' => 'sometimes|boolean',
@@ -135,6 +139,10 @@ class SocialAuthController extends BaseApiController
      */
     public function apple(Request $request): JsonResponse
     {
+        if (! SocialProvider::isEnabled(SocialProvider::APPLE)) {
+            return $this->errorResponse(__('messages.invalid_provider'), 403);
+        }
+
         $request->validate([
             'code' => 'required|string',
             'nonce' => 'sometimes|nullable|string',
@@ -177,7 +185,7 @@ class SocialAuthController extends BaseApiController
 
     public function redirect(string $provider): JsonResponse
     {
-        if (! SocialProvider::isSupported($provider)) {
+        if (! SocialProvider::isSupported($provider) || ! SocialProvider::isEnabled($provider)) {
             return $this->errorResponse(__('messages.invalid_provider'), 400);
         }
 
@@ -204,7 +212,7 @@ class SocialAuthController extends BaseApiController
 
     public function callback(Request $request, string $provider): JsonResponse
     {
-        if (! SocialProvider::isSupported($provider)) {
+        if (! SocialProvider::isSupported($provider) || ! SocialProvider::isEnabled($provider)) {
             return $this->errorResponse(__('messages.invalid_provider'), 400);
         }
 

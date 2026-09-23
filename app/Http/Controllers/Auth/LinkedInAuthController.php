@@ -24,7 +24,7 @@ class LinkedInAuthController extends Controller
 
     public function redirect(Request $request): RedirectResponse
     {
-        if (! config('services.linkedin-openid.client_id')) {
+        if (! SocialProvider::isEnabled(SocialProvider::LINKEDIN) || ! config('services.linkedin-openid.client_id')) {
             return redirect()->to($this->frontendUrl('/auth/login?error=social'));
         }
 

@@ -21,7 +21,7 @@ class AppleAuthController extends Controller
 
     public function redirect(Request $request): RedirectResponse
     {
-        if (! config('services.apple.client_id')) {
+        if (! SocialProvider::isEnabled(SocialProvider::APPLE) || ! config('services.apple.client_id')) {
             return redirect()->to($this->frontendUrl('/auth/login?error=social'));
         }
 

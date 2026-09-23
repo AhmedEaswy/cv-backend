@@ -116,6 +116,13 @@ export default defineNuxtConfig({
             playStoreUrl: process.env.NUXT_PUBLIC_PLAY_STORE_URL || '',
             apiPrefix: '/api/v1',
             googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '',
+            // "false" / "0" / "off" / "no" disable; unset defaults to enabled.
+            linkedinAuthEnabled: !['0', 'false', 'off', 'no'].includes(
+                String(process.env.NUXT_PUBLIC_LINKEDIN_AUTH_ENABLED ?? 'true').toLowerCase(),
+            ),
+            appleAuthEnabled: !['0', 'false', 'off', 'no'].includes(
+                String(process.env.NUXT_PUBLIC_APPLE_AUTH_ENABLED ?? 'true').toLowerCase(),
+            ),
         },
     },
 

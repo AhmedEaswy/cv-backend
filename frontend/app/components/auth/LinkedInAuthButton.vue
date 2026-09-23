@@ -4,7 +4,7 @@
  * After callback, google-handoff stores the Sanctum token and redirects.
  */
 const { t } = useI18n()
-const { start } = useLinkedInAuth()
+const { start, enabled } = useLinkedInAuth()
 
 function handleLinkedInLogin() {
     start({ intent: 'login' })
@@ -13,6 +13,7 @@ function handleLinkedInLogin() {
 
 <template>
     <button
+        v-if="enabled"
         type="button"
         class="btn btn--secondary btn--block"
         @click="handleLinkedInLogin"

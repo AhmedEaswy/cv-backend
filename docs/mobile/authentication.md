@@ -166,6 +166,8 @@ GET /api/v1/auth/google/callback?code=…&state=…  → { "result": { "token", 
 
 Same for `linkedin` (`POST /auth/linkedin` with the LinkedIn access token). Optional `import_cv` (boolean) creates a CV from LinkedIn profile data. Sign In with LinkedIn (OpenID) always includes name, email, and photo; experience/education/skills require LinkedIn Member Data Portability approval (`LINKEDIN_DMA_ENABLED`).
 
+Feature flags: set `LINKEDIN_AUTH_ENABLED=false` (Laravel) and `NUXT_PUBLIC_LINKEDIN_AUTH_ENABLED=false` (Nuxt) to disable LinkedIn auth/import. Same pattern for Apple with `APPLE_AUTH_ENABLED` / `NUXT_PUBLIC_APPLE_AUTH_ENABLED`.
+
 After login, `POST /cvs/import/linkedin` creates another CV from the stored token (or a fresh `code` access token).
 
 ### Apple Sign-In (native — recommended)

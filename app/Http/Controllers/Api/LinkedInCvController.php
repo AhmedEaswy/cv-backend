@@ -23,6 +23,10 @@ class LinkedInCvController extends BaseApiController
      */
     public function store(Request $request): JsonResponse
     {
+        if (! SocialProvider::isEnabled(SocialProvider::LINKEDIN)) {
+            return $this->errorResponse(__('messages.invalid_provider'), 403);
+        }
+
         $request->validate([
             'code' => 'sometimes|string',
         ]);

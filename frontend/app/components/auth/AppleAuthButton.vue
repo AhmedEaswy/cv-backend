@@ -4,7 +4,7 @@
  * After callback, google-handoff stores the Sanctum token and redirects.
  */
 const { t } = useI18n()
-const { start } = useAppleAuth()
+const { start, enabled } = useAppleAuth()
 
 function handleAppleLogin() {
     start()
@@ -13,6 +13,7 @@ function handleAppleLogin() {
 
 <template>
     <button
+        v-if="enabled"
         type="button"
         class="btn btn--secondary btn--block"
         @click="handleAppleLogin"
