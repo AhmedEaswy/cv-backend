@@ -56,15 +56,7 @@ jobs:
             composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
             echo "==> Building Laravel Vite assets (Filament / public)"
-            if [ -f package-lock.json ]; then
-              npm ci
-            else
-              npm install
-            fi
-            npm run build
-
-            echo "==> Building Nuxt frontend"
-            # Prefer system Node 20+; fall back to nvm when available.
+            # Vite 7 needs Node 20+. Do this before the asset build, not only before Nuxt.
             if ! node -v | grep -Eq 'v(2[0-9]|[3-9][0-9])'; then
               export NVM_DIR="$HOME/.nvm"
               if [ -s "$NVM_DIR/nvm.sh" ]; then
@@ -74,6 +66,46 @@ jobs:
                 nvm use 20 >/dev/null
               fi
             fi
+            node -v
+
+            # Compiled views are regenerated later. Clear them so nothing stale is around.
+            php artisan view:clear || true
+
+            if [ -f package-lock.json ]; then
+              npm ci --no-audit --no-fund
+            else
+              npm install --no-audit --no-fund
+            fi
+
+            # Vite prints "transforming..." once, then stays silent until the build
+            # finishes. A heartbeat shows the step is alive. timeout fails the deploy
+            # instead of holding the SSH session until the 35 minute job limit.
+            (
+              seconds=0
+              while true; do
+                sleep 15
+                seconds=$((seconds + 15))
+                echo "vite build still running (${seconds}s)..."
+              done
+            ) &
+            HEARTBEAT_PID=$!
+            set +e
+            if command -v timeout >/dev/null 2>&1; then
+              timeout 180 npm run build
+              BUILD_STATUS=$?
+            else
+              npm run build
+              BUILD_STATUS=$?
+            fi
+            set -e
+            kill "$HEARTBEAT_PID" 2>/dev/null || true
+            wait "$HEARTBEAT_PID" 2>/dev/null || true
+            if [ "$BUILD_STATUS" -ne 0 ]; then
+              echo "ERROR: vite build failed (exit ${BUILD_STATUS}). Exit 124 means it exceeded 3 minutes."
+              exit 1
+            fi
+
+            echo "==> Building Nuxt frontend"
             node -v
             # corepack pnpm is unreliable on this VPS; install a pinned global pnpm.
             if ! command -v pnpm >/dev/null 2>&1 || ! pnpm -v | grep -Eq '^10\.'; then

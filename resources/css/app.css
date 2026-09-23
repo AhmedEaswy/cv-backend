@@ -1,7 +1,8 @@
-@import 'tailwindcss';
+/* source(none) stops Tailwind from walking the whole repo. On the server that
+   walk follows public/storage and other large trees and sits on "transforming...". */
+@import 'tailwindcss' source(none);
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
