@@ -24,7 +24,7 @@ class TemplateInfolist
                             ->columnSpanFull(),
                         ImageEntry::make('preview')
                             ->label('Preview Image')
-                            ->disk('public')
+                            ->getStateUsing(fn ($record) => $record->preview_url)
                             ->height(200)
                             ->defaultImageUrl(ImagePlaceholder::url())
                             ->extraImgAttributes(ImagePlaceholder::imgAttributes())

@@ -16,7 +16,7 @@ class TemplateSeeder extends Seeder
         $templates = [
             [
                 'name' => 'modern-professional',
-                'preview' => 'images/cv-templates/modern-professional.svg',
+                'preview' => 'images/cv-templates/modern-professional.png',
                 'description' => 'A clean and modern template perfect for tech professionals and developers.',
                 'is_active' => true,
                 'is_default' => true,
@@ -24,7 +24,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'office-manager',
-                'preview' => 'images/cv-templates/office-manager.svg',
+                'preview' => 'images/cv-templates/office-manager.png',
                 'description' => 'A template for office managers and administrators.',
                 'is_active' => true,
                 'is_default' => false,
@@ -32,7 +32,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'ats-classic',
-                'preview' => 'images/cv-templates/ats-classic.svg',
+                'preview' => 'images/cv-templates/ats-classic.png',
                 'description' => 'ATS-friendly single-column layout with clear sections, optimized for English and Arabic.',
                 'is_active' => true,
                 'is_default' => false,
@@ -40,7 +40,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'portrait-modern',
-                'preview' => 'images/cv-templates/portrait-modern.svg',
+                'preview' => 'images/cv-templates/portrait-modern.png',
                 'description' => 'Airy teal-accent CV with a circular portrait photo top-right.',
                 'is_active' => true,
                 'is_default' => false,
@@ -48,7 +48,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'sidebar-slate',
-                'preview' => 'images/cv-templates/sidebar-slate.svg',
+                'preview' => 'images/cv-templates/sidebar-slate.png',
                 'description' => 'Dark slate sidebar with photo, contact, and skills; white main column.',
                 'is_active' => true,
                 'is_default' => false,
@@ -56,7 +56,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'metro-grid',
-                'preview' => 'images/cv-templates/metro-grid.svg',
+                'preview' => 'images/cv-templates/metro-grid.png',
                 'description' => 'Magazine-style grid layout with large photo beside the name block.',
                 'is_active' => true,
                 'is_default' => false,
@@ -64,7 +64,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'midnight-banner',
-                'preview' => 'images/cv-templates/midnight-banner.svg',
+                'preview' => 'images/cv-templates/midnight-banner.png',
                 'description' => 'Near-black header banner with inset photo and gold accents.',
                 'is_active' => true,
                 'is_default' => false,
@@ -72,7 +72,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'coral-split',
-                'preview' => 'images/cv-templates/coral-split.svg',
+                'preview' => 'images/cv-templates/coral-split.png',
                 'description' => 'Warm coral and cream split header with rounded portrait photo.',
                 'is_active' => true,
                 'is_default' => false,
@@ -80,7 +80,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'forest-folio',
-                'preview' => 'images/cv-templates/forest-folio.svg',
+                'preview' => 'images/cv-templates/forest-folio.png',
                 'description' => 'Earth-toned green sidebar folio with serif headings and soft cream paper.',
                 'is_active' => true,
                 'is_default' => false,
@@ -88,7 +88,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'name' => 'ink-editorial',
-                'preview' => 'images/cv-templates/ink-editorial.svg',
+                'preview' => 'images/cv-templates/ink-editorial.png',
                 'description' => 'Black-and-white editorial masthead with a small formal portrait.',
                 'is_active' => true,
                 'is_default' => false,

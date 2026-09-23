@@ -27,7 +27,7 @@ class TemplatesTable
                     ->searchable(),
                 ImageColumn::make('preview')
                     ->label('Preview')
-                    ->disk('public')
+                    ->getStateUsing(fn ($record) => $record->preview_url)
                     ->circular()
                     ->defaultImageUrl(ImagePlaceholder::url())
                     ->extraImgAttributes(ImagePlaceholder::imgAttributes()),
