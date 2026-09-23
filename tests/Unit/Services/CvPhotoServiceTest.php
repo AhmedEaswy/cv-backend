@@ -23,7 +23,7 @@ class CvPhotoServiceTest extends TestCase
         $png = base64_encode(base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
         ));
-        $dataUri = 'data:image/png;base64,' . $png;
+        $dataUri = 'data:image/png;base64,'.$png;
 
         $userData = $this->service->processUserDataPhoto(['photo' => $dataUri]);
 
@@ -53,5 +53,22 @@ class CvPhotoServiceTest extends TestCase
         $url = $this->service->urlFor('cv-photos/demo.png');
 
         $this->assertStringContainsString('cv-photos/demo.png', $url);
+    }
+
+    public function test_store_from_url_saves_png(): void
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'https://cdn.example.com/me.png' => \Illuminate\Support\Facades\Http::response(
+                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='),
+                200,
+                ['Content-Type' => 'image/png']
+            ),
+        ]);
+
+        $path = $this->service->storeFromUrl('https://cdn.example.com/me.png');
+
+        $this->assertNotNull($path);
+        $this->assertStringStartsWith('cv-photos/', $path);
+        Storage::disk('public')->assertExists($path);
     }
 }

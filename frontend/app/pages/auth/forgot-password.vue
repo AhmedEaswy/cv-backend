@@ -1,16 +1,14 @@
 <script setup lang="ts">
 /**
- * /auth/forgot-password
+ * /auth/forgot-password — request a password-reset OTP by email.
  */
 const { t } = useI18n();
 const { forgot, loading, fieldError, generalError } = useAuthSession();
 
 const form = reactive({ email: '' });
-const sent = ref(false);
 
 async function onSubmit() {
-    const r = await forgot({ email: form.email });
-    if (r.ok) sent.value = true;
+    await forgot({ email: form.email });
 }
 </script>
 
@@ -24,10 +22,9 @@ async function onSubmit() {
         <h1 class="auth-form__title">{{ t('auth.forgot.title') }}</h1>
         <p class="auth-form__subtitle">{{ t('auth.forgot.subtitle') }}</p>
 
-        <Alert v-if="sent" variant="success">{{ t('auth.forgot.sent') }}</Alert>
-        <Alert v-else-if="generalError" variant="error">{{ generalError }}</Alert>
+        <Alert v-if="generalError" variant="error">{{ generalError }}</Alert>
 
-        <form v-if="!sent" @submit.prevent="onSubmit" novalidate>
+        <form @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.email') }}</label>
                 <input
@@ -54,4 +51,3 @@ async function onSubmit() {
         </div>
     </NuxtLayout>
 </template>
-

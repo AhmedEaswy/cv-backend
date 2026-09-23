@@ -45,6 +45,28 @@ return [
         'client_id' => env('LINKEDIN_CLIENT_ID'),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
         'redirect' => env('LINKEDIN_REDIRECT_URI'),
+        'dma_enabled' => env('LINKEDIN_DMA_ENABLED', false),
+        'api_version' => env('LINKEDIN_API_VERSION', '202401'),
+    ],
+
+    'linkedin-openid' => [
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    ],
+
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        // Bundle ID for native identity tokens when it differs from the web Services ID.
+        'native_client_id' => env('APPLE_NATIVE_CLIENT_ID'),
+        // Leave empty when using team_id + key_id + private_key (generated per request).
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        // Absolute path to AuthKey_*.p8, or the PEM contents.
+        'private_key' => env('APPLE_PRIVATE_KEY'),
+        'passphrase' => env('APPLE_PASSPHRASE'),
+        'redirect' => env('APPLE_REDIRECT_URI'),
     ],
 
     'app_store' => [

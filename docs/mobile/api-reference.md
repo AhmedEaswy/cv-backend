@@ -10,15 +10,18 @@ Auth column: **—** public · **Optional** Bearer attaches ownership when prese
 
 | Method | Path | Auth | Notes |
 |--------|------|------|-------|
-| POST | `/auth/register` | — | `name`, `email`, `password`, `password_confirmation` → `user` + `token` (201) |
-| POST | `/auth/login` | — | `email`, `password` → `user` + `token` |
+| POST | `/auth/register` | — | Creates unverified user; emails OTP → `verification_required` + `email` (201, no token) |
+| POST | `/auth/verify-email` | — | `email`, `code` → `user` + `token` |
+| POST | `/auth/resend-verification` | — | `email` → generic success / 429 when throttled |
+| POST | `/auth/login` | — | `email`, `password` → `user` + `token`; unverified → 403 + `verification_required` |
 | POST | `/auth/logout` | Bearer | Revokes current token |
 | GET | `/auth/me` | Bearer | Current user profile |
-| POST | `/auth/forgot-password` | — | `email` (must exist) |
-| POST | `/auth/reset-token` | — | `email`, `token` |
-| POST | `/auth/reset-password` | — | `email`, `token`, `password`, `password_confirmation` |
+| POST | `/auth/forgot-password` | — | `email` → generic success; emails reset OTP when account exists |
+| POST | `/auth/reset-password` | — | `email`, `code`, `password`, `password_confirmation` |
 | POST | `/auth/google` | — | `{ "code": "<google_access_token>" }` · throttle 10/min |
-| GET | `/auth/{provider}/redirect` | — | `provider`: `google` \| `linkedin` → `{ url }` |
+| POST | `/auth/linkedin` | — | `{ "code": "<linkedin_access_token>", "import_cv": true }` · optional `result.cv` |
+| POST | `/auth/apple` | — | `{ "code": "<apple_identity_token>" }` · optional `nonce`, `first_name`, `last_name`, `name` · throttle 10/min |
+| GET | `/auth/{provider}/redirect` | — | `provider`: `google` \| `linkedin` \| `apple` → `{ url }` |
 | GET | `/auth/{provider}/callback` | — | Query from provider → `token` + `user` |
 
 Details: [authentication.md](./authentication.md)
@@ -34,6 +37,7 @@ DB model is `Profile`. Soft-deleted. Ownership failures usually return **404**.
 | GET | `/cvs` | Bearer | Optional `?language=` · items include `latest_ats_score`, `latest_ats_grade` |
 | GET | `/cvs/{id}` | Bearer | Owned CV only |
 | POST | `/cvs` | Optional | Create. Guest + `template_id` → `{ url }` PDF instead of profile payload |
+| POST | `/cvs/import/linkedin` | Bearer | Create a CV from the stored LinkedIn token (or body `code`) |
 | PUT | `/cvs/{id}` | Bearer | Partial update; may include `is_public` |
 | DELETE | `/cvs/{id}` | Bearer | Soft delete |
 | POST | `/cvs/{id}/duplicate` | Bearer | Copy → new profile (201) |
@@ -267,4 +271,4 @@ Abilities: `cv:read`, `cv:write`, `ats:check`, `cover-letter:read`, `cover-lette
 
 Most `/api/v1` routes have **no** dedicated throttle in `routes/api.php`.
 
-Notable: `POST /auth/google` → `throttle:10,1`.
+Notable: `POST /auth/google`, `POST /auth/linkedin`, `POST /auth/apple` → `throttle:10,1`.

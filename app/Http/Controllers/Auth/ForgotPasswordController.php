@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
-use App\Services\Auth\AuthEventService;
+use App\Services\Auth\EmailOtpService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 
 class ForgotPasswordController extends Controller
 {
-    public function __construct(private readonly AuthEventService $authEvents)
+    public function __construct(private readonly EmailOtpService $otp)
     {
     }
 
@@ -24,19 +23,8 @@ class ForgotPasswordController extends Controller
     {
         $email = strtolower((string) $request->input('email'));
 
-        // Generic response — never reveal whether the address is on file.
-        $genericResponse = back()->with('status', __('messages.reset_link_sent_generic'));
+        $this->otp->issuePasswordReset($email);
 
-        if (! $this->authEvents->canSendResetLink($email)) {
-            return $genericResponse;
-        }
-
-        $status = Password::sendResetLink([
-            'email' => $email,
-        ]);
-
-        $this->authEvents->markResetLinkSent($email);
-
-        return $genericResponse;
+        return back()->with('status', __('messages.reset_code_sent_generic'));
     }
 }

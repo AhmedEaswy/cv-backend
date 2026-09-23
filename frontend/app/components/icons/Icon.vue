@@ -209,6 +209,19 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
         </template>
+        <template v-else-if="name === 'linkedin'">
+            <rect x="2" y="2" width="20" height="20" rx="4" fill="#0A66C2" stroke="none" />
+            <path d="M7.2 9.2V16.5" stroke="#fff" stroke-width="1.8" />
+            <circle cx="7.2" cy="7.05" r="1.15" fill="#fff" stroke="none" />
+            <path d="M10.6 16.5V12.1c0-1.55.85-2.55 2.2-2.55 1.25 0 1.85.75 1.85 2.55V16.5" stroke="#fff" stroke-width="1.8" />
+            <path d="M10.6 9.2V16.5" stroke="#fff" stroke-width="1.8" />
+        </template>
+        <template v-else-if="name === 'apple'">
+            <path
+                fill="currentColor"
+                d="M16.37 12.64c-.03-2.1 1.72-3.12 1.8-3.17-0.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.45 2.08-1.48 2.56-.38 6.35 1.06 8.43.71 1.02 1.55 2.16 2.66 2.12 1.07-.04 1.47-.69 2.76-.69 1.28 0 1.65.69 2.76.67 1.14-.02 1.86-1.03 2.55-2.06.81-1.18 1.14-2.33 1.16-2.39-.03-.01-2.22-.85-2.25-3.38zM14.2 6.44c.59-.71.98-1.7.88-2.69-.85.03-1.88.57-2.49 1.28-.54.62-1.02 1.63-.89 2.58.94.07 1.91-.48 2.5-1.17z"
+            />
+        </template>
         <!-- Fallback dot so missing icons still render something safe -->
         <template v-else>
             <circle cx="12" cy="12" r="2" fill="currentColor" />

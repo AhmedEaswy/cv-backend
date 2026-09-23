@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Throwable;
 
 class CvPhotoService
 {
@@ -67,11 +69,54 @@ class CvPhotoService
     {
         [$binary, $mime] = $this->decodeBase64($input);
         $extension = self::ALLOWED_MIMES[$mime];
-        $relativePath = 'cv-photos/' . Str::uuid()->toString() . '.' . $extension;
+        $relativePath = 'cv-photos/'.Str::uuid()->toString().'.'.$extension;
 
         Storage::disk('public')->put($relativePath, $binary);
 
         return $relativePath;
+    }
+
+    /**
+     * Download a remote image and store it. Returns null if the fetch is not a usable photo.
+     */
+    public function storeFromUrl(string $url, ?string $bearerToken = null): ?string
+    {
+        if (! $this->isHttpUrl($url)) {
+            return null;
+        }
+
+        try {
+            $request = Http::timeout(10)->withHeaders(['Accept' => 'image/*']);
+            if (is_string($bearerToken) && $bearerToken !== '') {
+                $request = $request->withToken($bearerToken);
+            }
+
+            $response = $request->get($url);
+            if (! $response->successful()) {
+                return null;
+            }
+
+            $binary = $response->body();
+            if ($binary === '' || strlen($binary) > self::MAX_BYTES) {
+                return null;
+            }
+
+            $headerMime = strtolower(trim(explode(';', (string) $response->header('Content-Type'))[0]));
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $detected = strtolower((string) ($finfo->buffer($binary) ?: ''));
+            $mime = isset(self::ALLOWED_MIMES[$detected]) ? $detected : $headerMime;
+
+            if (! isset(self::ALLOWED_MIMES[$mime])) {
+                return null;
+            }
+
+            $relativePath = 'cv-photos/'.Str::uuid()->toString().'.'.self::ALLOWED_MIMES[$mime];
+            Storage::disk('public')->put($relativePath, $binary);
+
+            return $relativePath;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**

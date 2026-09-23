@@ -13,6 +13,7 @@ const portal = usePortalApi();
 const api = useApi();
 const { profile, refresh: refreshProfile, setProfile } = usePortalPublicProfile();
 const { stats, refresh: refreshStats } = usePortalStats();
+const { start: startLinkedIn } = useLinkedInAuth();
 
 const cvs = ref<CVSummary[]>([]);
 const letters = ref<CoverLetterSummary[]>([]);
@@ -191,6 +192,11 @@ async function startNewCv() {
     }
 }
 
+function importFromLinkedIn() {
+    createOpen.value = false;
+    startLinkedIn({ intent: 'import', returnTo: '/portal/cvs' });
+}
+
 async function startNewCoverLetter() {
     if (creatingCoverLetter.value) return;
     creatingCoverLetter.value = true;
@@ -250,6 +256,10 @@ async function startPublicProfile() {
                     <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingCv" @click="startNewCv">
                         <Icon name="file-plus" :size="15" />
                         <span>{{ creatingCv ? t('portal.cvs.creating') : t('portal.dashboard.new_cv') }}</span>
+                    </button>
+                    <button type="button" class="create-menu__item" role="menuitem" @click="importFromLinkedIn">
+                        <Icon name="linkedin" :size="15" />
+                        <span>{{ t('portal.dashboard.import_linkedin') }}</span>
                     </button>
                     <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingCoverLetter" @click="startNewCoverLetter">
                         <Icon name="mail" :size="15" />

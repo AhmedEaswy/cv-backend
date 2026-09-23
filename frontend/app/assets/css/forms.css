@@ -332,3 +332,74 @@ html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
     background: var(--color-paper-2);
     color: var(--color-ink);
 }
+
+/* Shadcn-style OTP slots (see UiInputOtp) */
+.otp-input {
+    @apply relative w-full;
+}
+
+.otp-input__control {
+    @apply absolute inset-0 z-[1] h-full w-full cursor-text opacity-0;
+    /* Keep focusable for a11y / password managers, but visually hidden. */
+    caret-color: transparent;
+    color: transparent;
+}
+
+.otp-input__slots {
+    @apply relative z-0 flex w-full items-center justify-between gap-2;
+}
+
+.otp-input__slot {
+    @apply relative flex aspect-square min-h-[3rem] flex-1 items-center justify-center border border-line bg-white text-[1.25rem] font-semibold tabular-nums text-ink transition duration-150;
+    border-radius: var(--radius-md);
+    max-width: 3.25rem;
+}
+
+.otp-input__slot--active {
+    @apply border-ink;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.otp-input--invalid .otp-input__slot {
+    @apply border-danger;
+}
+
+.otp-input--invalid .otp-input__slot--active {
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08);
+}
+
+.otp-input--disabled {
+    @apply pointer-events-none opacity-50;
+}
+
+.otp-input__char {
+    @apply leading-none;
+}
+
+.otp-input__caret {
+    @apply block h-[1.15rem] w-px bg-ink;
+    animation: otp-caret-blink 1.2s ease-out infinite;
+}
+
+@keyframes otp-caret-blink {
+    0%,
+    70%,
+    100% {
+        opacity: 1;
+    }
+    20%,
+    50% {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .otp-input__slots {
+        @apply gap-1.5;
+    }
+
+    .otp-input__slot {
+        @apply min-h-[2.6rem] text-[1.05rem];
+        max-width: 2.75rem;
+    }
+}

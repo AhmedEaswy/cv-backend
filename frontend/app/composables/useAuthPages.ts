@@ -1,6 +1,6 @@
 /**
  * useAuthPages — central form-submit + error-state helpers used by the
- * auth pages (login, register, forgot, reset). Wraps useApi() with
+ * auth pages (login, register, forgot, reset, verify). Wraps useApi() with
  * field-level error extraction and global toast feedback.
  */
 export interface AuthFieldErrors { [key: string]: string[] }
@@ -17,14 +17,15 @@ export const useAuthPages = () => {
         generalError.value = null;
     }
 
-    function extractError(err: any): { general: string | null; fields: AuthFieldErrors } {
+    function extractError(err: any): { general: string | null; fields: AuthFieldErrors; result: any } {
         const data = err?.data ?? err?.response?._data;
         if (!data) {
-            return { general: err?.statusMessage || err?.message || null, fields: {} };
+            return { general: err?.statusMessage || err?.message || null, fields: {}, result: null };
         }
         return {
             general: data.message ?? null,
             fields: (data.errors as AuthFieldErrors) ?? {},
+            result: data.result ?? null,
         };
     }
 
@@ -32,7 +33,7 @@ export const useAuthPages = () => {
         url: string,
         body: Record<string, any>,
         successMessage?: string,
-    ): Promise<{ ok: true; data: T } | { ok: false }> {
+    ): Promise<{ ok: true; data: T } | { ok: false; result?: any; status?: number }> {
         clearErrors();
         loading.value = true;
         try {
@@ -40,11 +41,11 @@ export const useAuthPages = () => {
             if (successMessage) toast.success(successMessage);
             return { ok: true, data: res.result };
         } catch (err: any) {
-            const { general, fields } = extractError(err);
+            const { general, fields, result } = extractError(err);
             errors.value = fields;
             generalError.value = general;
             if (general) toast.error(general);
-            return { ok: false };
+            return { ok: false, result, status: err?.statusCode ?? err?.status ?? err?.response?.status };
         } finally {
             loading.value = false;
         }
@@ -98,6 +99,16 @@ export const useAuthSession = () => {
         window.location.href = safe;
     }
 
+    function verificationPath(email: string) {
+        const route = useRoute();
+        const q = new URLSearchParams({ email });
+        const raw = typeof route.query.redirect === 'string' ? route.query.redirect : '';
+        if (raw.startsWith('/') && !raw.startsWith('//')) {
+            q.set('redirect', raw);
+        }
+        return `/auth/verify-email?${q.toString()}`;
+    }
+
     async function login(payload: { email: string; password: string; remember?: boolean }) {
         const auth = useAuthPages();
         const result = await auth.submit<{ user: any; token: string }>('/auth/login', payload);
@@ -106,13 +117,51 @@ export const useAuthSession = () => {
             checked.value = false;
             await refresh();
             postAuthRedirect();
+            return result;
         }
+
+        if (!result.ok && result.status === 403 && result.result?.verification_required) {
+            const email = result.result.email || payload.email;
+            if (import.meta.client) {
+                await navigateTo(verificationPath(email));
+            }
+        }
+
         return result;
     }
 
     async function register(payload: { name: string; email: string; password: string; password_confirmation: string }) {
         const auth = useAuthPages();
-        const result = await auth.submit<{ user: any; token: string }>('/auth/register', payload);
+        const result = await auth.submit<{ verification_required?: boolean; email?: string; token?: string }>(
+            '/auth/register',
+            payload,
+        );
+
+        if (result.ok && result.data?.token) {
+            api.setToken(result.data.token);
+            checked.value = false;
+            await refresh();
+            postAuthRedirect();
+            return result;
+        }
+
+        if (result.ok && result.data?.verification_required) {
+            const email = result.data.email || payload.email;
+            if (import.meta.client) {
+                await navigateTo(verificationPath(email));
+            }
+        }
+
+        return result;
+    }
+
+    async function verifyEmail(payload: { email: string; code: string }) {
+        const auth = useAuthPages();
+        const result = await auth.submit<{ user: any; token: string }>(
+            '/auth/verify-email',
+            payload,
+            'auth.verify.success',
+        );
         if (result.ok && result.data?.token) {
             api.setToken(result.data.token);
             checked.value = false;
@@ -122,12 +171,21 @@ export const useAuthSession = () => {
         return result;
     }
 
-    async function forgot(payload: { email: string }) {
+    async function resendVerification(payload: { email: string }) {
         const auth = useAuthPages();
-        return auth.submit('/auth/forgot-password', payload);
+        return auth.submit('/auth/resend-verification', payload, 'auth.verify.sent');
     }
 
-    async function reset(payload: { token: string; email: string; password: string; password_confirmation: string }) {
+    async function forgot(payload: { email: string }) {
+        const auth = useAuthPages();
+        const result = await auth.submit('/auth/forgot-password', payload);
+        if (result.ok && import.meta.client) {
+            await navigateTo(`/auth/reset-password?email=${encodeURIComponent(payload.email)}`);
+        }
+        return result;
+    }
+
+    async function reset(payload: { code: string; email: string; password: string; password_confirmation: string }) {
         const auth = useAuthPages();
         return auth.submit('/auth/reset-password', payload, 'auth.password_reset_success');
     }
@@ -156,6 +214,8 @@ export const useAuthSession = () => {
         refresh,
         login,
         register,
+        verifyEmail,
+        resendVerification,
         forgot,
         reset,
         logout,

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 
 /**
- * Handles linking a verified Google account to a local user.
+ * Handles linking a verified social account (Google / LinkedIn / Apple) to a local user.
  *
  * Behavior:
  *  - If a SocialAccount row already exists for (provider, providerId),
@@ -43,13 +43,17 @@ class SocialAccountService
         $user = $email !== '' ? User::where('email', $email)->first() : null;
 
         if (! $user) {
+            $raw = method_exists($socialUser, 'getRaw') ? ($socialUser->getRaw() ?? []) : [];
             $name = trim((string) ($socialUser->getName() ?? $email)) ?: 'User';
             $parts = preg_split('/\s+/u', $name, 2) ?: [$name];
+            $appleName = is_array($raw['name'] ?? null) ? $raw['name'] : [];
+            $firstName = trim((string) ($raw['given_name'] ?? $appleName['firstName'] ?? $parts[0] ?? $name));
+            $lastName = trim((string) ($raw['family_name'] ?? $appleName['lastName'] ?? $parts[1] ?? ''));
 
             $user = User::create([
                 'name' => $name,
-                'first_name' => $parts[0] ?? $name,
-                'last_name' => $parts[1] ?? '',
+                'first_name' => $firstName !== '' ? $firstName : $name,
+                'last_name' => $lastName,
                 'email' => $email !== '' ? $email : $this->placeholderEmail($provider, $providerId),
                 'password' => Hash::make(Str::random(48)),
                 'type' => UserType::USER->value,

@@ -11,9 +11,14 @@ const route = useRoute();
 const router = useRouter();
 const portal = usePortalApi();
 const { refresh: refreshStats } = usePortalStats();
+const { start: startLinkedIn } = useLinkedInAuth();
 const cvs = ref<CVSummary[]>([]);
 const loading = ref(true);
 const creating = ref(false);
+
+async function importFromLinkedIn() {
+    startLinkedIn({ intent: 'import', returnTo: '/portal/cvs' });
+}
 
 async function openCreate() {
     if (creating.value) return;
@@ -103,6 +108,10 @@ function timeAgo(iso?: string) {
             <p class="page-header__subtitle">{{ t('portal.cvs.subtitle') }}</p>
         </div>
         <div class="page-header__actions">
+            <button type="button" class="btn btn--secondary" @click="importFromLinkedIn">
+                <Icon name="linkedin" :size="15" />
+                {{ t('portal.cvs.import_linkedin') }}
+            </button>
             <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
                 <Icon name="plus" :size="15" />
                 {{ creating ? t('portal.cvs.creating') : t('portal.cvs.new_cv') }}
@@ -116,9 +125,15 @@ function timeAgo(iso?: string) {
         <span class="empty__icon"><Icon name="file-plus" :size="22" /></span>
         <p class="empty__title">{{ t('portal.cvs.empty') }}</p>
         <p class="empty__text">{{ t('portal.cvs.empty_text') }}</p>
-        <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
-            {{ creating ? t('portal.cvs.creating') : t('portal.cvs.create_first') }}
-        </button>
+        <div class="empty__actions">
+            <button type="button" class="btn btn--secondary" :disabled="creating" @click="importFromLinkedIn">
+                <Icon name="linkedin" :size="15" />
+                {{ t('portal.cvs.import_linkedin') }}
+            </button>
+            <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
+                {{ creating ? t('portal.cvs.creating') : t('portal.cvs.create_first') }}
+            </button>
+        </div>
     </div>
 
     <div v-else class="list">

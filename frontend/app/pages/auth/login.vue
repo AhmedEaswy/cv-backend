@@ -52,7 +52,11 @@ const socialError = computed(() =>
 
         <Alert v-if="generalError || socialError" variant="error">{{ generalError || socialError }}</Alert>
 
-        <AuthGoogleAuthButton />
+        <div class="auth-social">
+            <AuthGoogleAuthButton />
+            <AuthLinkedInAuthButton />
+            <AuthAppleAuthButton />
+        </div>
 
         <div class="auth-divider">{{ t('auth.or') }}</div>
 

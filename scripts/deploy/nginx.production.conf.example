@@ -40,8 +40,9 @@ server {
         proxy_read_timeout 60s;
     }
 
-    # Laravel-owned routes (API, admin, public previews, MCP)
-    location ~ ^/(api|admin|mcp|u/|profile/|cover-letter/|test/|lang/|up|sanctum) {
+    # Laravel-owned routes (API, admin, Livewire, public previews, MCP)
+    # livewire is required for Filament admin login — without it POSTs hit Nuxt (502).
+    location ~ ^/(api|admin|mcp|livewire|u/|profile/|cover-letter/|test/|lang/|up|sanctum) {
         try_files $uri $uri/ /index.php$is_args$args;
     }
 

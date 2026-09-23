@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             TemplateSeeder::class,
             CoverLetterTemplateSeeder::class,
             PublicProfileTemplateSeeder::class,
+            SuperAdminSeeder::class,
         ]);
 
         if (app()->environment('local')) {

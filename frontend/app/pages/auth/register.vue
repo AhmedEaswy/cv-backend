@@ -46,7 +46,11 @@ const onSubmit = () => register({ ...form });
 
         <Alert v-if="generalError" variant="error">{{ generalError }}</Alert>
 
-        <AuthGoogleAuthButton />
+        <div class="auth-social">
+            <AuthGoogleAuthButton />
+            <AuthLinkedInAuthButton />
+            <AuthAppleAuthButton />
+        </div>
 
         <div class="auth-divider">{{ t('auth.or') }}</div>
 

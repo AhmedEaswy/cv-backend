@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\UserType;
+use App\Models\EmailOtp;
+use App\Services\Auth\EmailOtpService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -56,6 +58,18 @@ class User extends Authenticatable implements MustVerifyEmail
             'type' => UserType::class,
             'active' => 'boolean',
         ];
+    }
+
+    /**
+     * Send the email verification OTP instead of Laravel's signed link.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        app(EmailOtpService::class)->issue(
+            strtolower((string) $this->email),
+            EmailOtp::PURPOSE_REGISTER,
+            $this->full_name
+        );
     }
 
     /**

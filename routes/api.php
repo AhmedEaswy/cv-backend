@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AtsCheckController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
+use App\Http\Controllers\Api\LinkedInCvController;
 use App\Http\Controllers\Api\PortalStatsController;
 use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\ShareController;
@@ -24,11 +25,12 @@ Route::prefix('v1')->group(function () {
 
 Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function () {
     // Public auth routes
-    Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login']);
-    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
-    Route::post('/auth/reset-token', [AuthController::class, 'verifyResetToken']);
+    Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:10,1');
+    Route::post('/auth/resend-verification', [AuthController::class, 'resendVerification'])->middleware('throttle:6,1');
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
 
     // Protected auth routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -38,6 +40,8 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
 
     // Social auth routes
     Route::post('/auth/google', [SocialAuthController::class, 'google'])->middleware('throttle:10,1');
+    Route::post('/auth/linkedin', [SocialAuthController::class, 'linkedin'])->middleware('throttle:10,1');
+    Route::post('/auth/apple', [SocialAuthController::class, 'apple'])->middleware('throttle:10,1');
     Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect']);
     Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback']);
 
@@ -61,6 +65,7 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     // Protected CV routes (authenticated users only)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/cvs', [CVController::class, 'index']);
+        Route::post('/cvs/import/linkedin', [LinkedInCvController::class, 'store'])->middleware('throttle:10,1');
         Route::post('/cvs/{id}/duplicate', [CVController::class, 'duplicate']);
         Route::get('/cvs/{id}', [CVController::class, 'show']);
         Route::put('/cvs/{id}', [CVController::class, 'update']);

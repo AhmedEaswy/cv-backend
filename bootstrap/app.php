@@ -31,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'mcp/*',
+            // Apple Sign In posts the callback cross-site (response_mode=form_post).
+            'auth/apple/callback',
         ]);
 
         $middleware->alias([

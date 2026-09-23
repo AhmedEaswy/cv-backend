@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\AppleAuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\LinkedInAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -29,7 +31,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.email')
         ->middleware('throttle:5,1');
 
-    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])
+    Route::get('/reset-password/{token?}', [ResetPasswordController::class, 'show'])
         ->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'store'])
         ->name('password.store')
@@ -44,6 +46,20 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
     ->name('auth.google.callback')
     ->middleware('throttle:10,1');
 
+Route::get('/auth/linkedin/redirect', [LinkedInAuthController::class, 'redirect'])
+    ->name('auth.linkedin.redirect')
+    ->middleware('throttle:10,1');
+Route::get('/auth/linkedin/callback', [LinkedInAuthController::class, 'callback'])
+    ->name('auth.linkedin.callback')
+    ->middleware('throttle:10,1');
+
+Route::get('/auth/apple/redirect', [AppleAuthController::class, 'redirect'])
+    ->name('auth.apple.redirect')
+    ->middleware('throttle:10,1');
+Route::match(['get', 'post'], '/auth/apple/callback', [AppleAuthController::class, 'callback'])
+    ->name('auth.apple.callback')
+    ->middleware('throttle:10,1');
+
 // Logout
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
@@ -54,6 +70,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
         ->name('verification.verify')
         ->middleware('signed');
+    Route::post('/email/verify', [VerifyEmailController::class, 'store'])
+        ->name('verification.store')
+        ->middleware('throttle:10,1');
     Route::post('/email/verification-notification', [VerifyEmailController::class, 'resend'])
         ->name('verification.send')
         ->middleware('throttle:6,1');

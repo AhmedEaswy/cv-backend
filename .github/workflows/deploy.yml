@@ -136,10 +136,11 @@ jobs:
             echo "==> Running migrations"
             php artisan migrate --force
 
-            echo "==> Seeding missing templates only (firstOrCreate — no deletes)"
+            echo "==> Seeding missing templates + super admin (firstOrCreate — no deletes)"
             php artisan db:seed --class=TemplateSeeder --force
             php artisan db:seed --class=CoverLetterTemplateSeeder --force
             php artisan db:seed --class=PublicProfileTemplateSeeder --force
+            php artisan db:seed --class=SuperAdminSeeder --force
 
             echo "==> Filament & caches"
             php artisan filament:upgrade
@@ -179,6 +180,10 @@ jobs:
             fi
             if [ -f "$NGINX_CONF" ] && ! grep -q 'location ^~ /api/auth' "$NGINX_CONF"; then
               echo "WARN: $NGINX_CONF missing location ^~ /api/auth — sidebase Auth.js will hit Laravel and break Google login."
+              echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
+            fi
+            if [ -f "$NGINX_CONF" ] && ! grep -Eq 'livewire' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF missing livewire in Laravel location — Filament admin login will 502."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
 

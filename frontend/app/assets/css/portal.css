@@ -575,6 +575,7 @@ html[dir="rtl"] .portal-sidebar { transform: translateX(105%); }
     font-weight: 400;
 }
 .empty__text { font-size: 0.9rem; max-width: 28rem; margin: 0 auto 1.25rem; }
+.empty__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
 
 /* Modal */
 .modal-backdrop {

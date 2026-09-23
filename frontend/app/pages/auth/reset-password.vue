@@ -1,21 +1,22 @@
 <script setup lang="ts">
 /**
- * /auth/reset-password?token=…&email=…
+ * /auth/reset-password?email=…
+ * Enter the emailed OTP and a new password.
  */
 const { t } = useI18n();
 const route = useRoute();
 const { reset, loading, fieldError, generalError } = useAuthSession();
 
 const form = reactive({
-    token: (route.query.token as string) || '',
     email: (route.query.email as string) || '',
+    code: '',
     password: '',
     password_confirmation: '',
 });
 
 const success = ref(false);
 async function onSubmit() {
-    const r = await reset({ ...form });
+    const r = await reset({ ...form, code: form.code.trim() });
     if (r.ok) success.value = true;
 }
 </script>
@@ -31,13 +32,25 @@ async function onSubmit() {
         <p class="auth-form__subtitle">{{ t('auth.reset.subtitle') }}</p>
 
         <Alert v-if="success" variant="success">{{ t('auth.reset.success') }}</Alert>
-        <Alert v-else-if="!form.token || !form.email" variant="error">{{ t('auth.reset.invalid_token') }}</Alert>
+        <Alert v-else-if="!form.email" variant="error">{{ t('auth.reset.missing_email') }}</Alert>
         <Alert v-else-if="generalError" variant="error">{{ generalError }}</Alert>
 
-        <form v-if="!success && form.token && form.email" @submit.prevent="onSubmit" novalidate>
+        <form v-if="!success && form.email" @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.email') }}</label>
                 <input id="email" v-model="form.email" type="email" class="input" required :placeholder="t('auth.email_placeholder')" />
+            </div>
+            <div class="field">
+                <label class="field-label" for="code">{{ t('auth.reset.code') }}</label>
+                <InputOtp
+                    id="code"
+                    v-model="form.code"
+                    :length="6"
+                    autofocus
+                    autocomplete="one-time-code"
+                    :invalid="!!fieldError('code')"
+                />
+                <span v-if="fieldError('code')" class="field-error">{{ fieldError('code') }}</span>
             </div>
             <div class="field">
                 <label class="field-label" for="password">{{ t('auth.reset.password') }}</label>
@@ -53,11 +66,16 @@ async function onSubmit() {
             </Button>
         </form>
 
-        <div class="auth-foot">
+        <Button v-if="success" variant="primary" to="/auth/login" block>
+            {{ t('auth.login.action') }}
+        </Button>
+
+        <div v-else class="auth-foot">
+            <NuxtLink to="/auth/forgot-password" class="auth-link">{{ t('auth.reset.resend') }}</NuxtLink>
+            <span class="auth-foot__sep" aria-hidden="true">·</span>
             <NuxtLink to="/auth/login" class="auth-link">
                 <Icon name="arrow-left" :size="12" /> {{ t('auth.signin') }}
             </NuxtLink>
         </div>
     </NuxtLayout>
 </template>
-

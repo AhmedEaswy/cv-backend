@@ -85,7 +85,50 @@
             }
           }
         },
-        "responses": { "201": { "description": "Created. result.token is the Bearer token." } }
+        "responses": { "201": { "description": "Created unverified. result.verification_required + result.email. No token yet." } }
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Verify registration OTP",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "code"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "code": { "type": "string", "minLength": 6, "maxLength": 6 }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK. result.user + result.token." } }
+      }
+    },
+    "/auth/resend-verification": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Resend registration OTP",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK (generic)." } }
       }
     },
     "/auth/login": {
@@ -107,17 +150,54 @@
             }
           }
         },
-        "responses": { "200": { "description": "OK. result.token." } }
+        "responses": {
+          "200": { "description": "OK. result.token." },
+          "403": { "description": "Unverified email: result.verification_required + result.email." }
+        }
       }
     },
     "/auth/forgot-password": {
-      "post": { "tags": ["Auth"], "summary": "Forgot password", "responses": { "200": { "description": "OK" } } }
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Forgot password — send reset OTP",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": { "email": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK (generic)." } }
+      }
     },
     "/auth/reset-password": {
-      "post": { "tags": ["Auth"], "summary": "Reset password", "responses": { "200": { "description": "OK" } } }
-    },
-    "/auth/reset-token": {
-      "post": { "tags": ["Auth"], "summary": "Verify reset token", "responses": { "200": { "description": "OK" } } }
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Reset password with OTP",
+        "parameters": [{ "$ref": "#/components/parameters/AgentClient" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "code", "password", "password_confirmation"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "code": { "type": "string", "minLength": 6, "maxLength": 6 },
+                  "password": { "type": "string" },
+                  "password_confirmation": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
     },
     "/auth/logout": {
       "post": { "tags": ["Auth"], "summary": "Logout", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } }
@@ -125,8 +205,17 @@
     "/auth/me": {
       "get": { "tags": ["Auth"], "summary": "Current user", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } }
     },
+    "/auth/google": {
+      "post": { "tags": ["Auth"], "summary": "Exchange Google access token", "responses": { "200": { "description": "OK. result.token." } } }
+    },
+    "/auth/linkedin": {
+      "post": { "tags": ["Auth"], "summary": "Exchange LinkedIn access token and optionally import a CV", "responses": { "200": { "description": "OK. result.token, optional result.cv." } } }
+    },
+    "/auth/apple": {
+      "post": { "tags": ["Auth"], "summary": "Exchange Apple identity token", "responses": { "200": { "description": "OK. result.token." } } }
+    },
     "/auth/{provider}/redirect": {
-      "get": { "tags": ["Auth"], "summary": "Social redirect", "parameters": [{ "name": "provider", "in": "path", "required": true, "schema": { "type": "string", "enum": ["google", "linkedin"] } }], "responses": { "302": { "description": "Redirect" } } }
+      "get": { "tags": ["Auth"], "summary": "Social redirect", "parameters": [{ "name": "provider", "in": "path", "required": true, "schema": { "type": "string", "enum": ["google", "linkedin", "apple"] } }], "responses": { "302": { "description": "Redirect" } } }
     },
     "/auth/{provider}/callback": {
       "get": { "tags": ["Auth"], "summary": "Social callback", "parameters": [{ "name": "provider", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "OK" } } }
@@ -167,6 +256,14 @@
           }
         },
         "responses": { "201": { "description": "Created" }, "200": { "description": "PDF URL when template_id is set without auth" } }
+      }
+    },
+    "/cvs/import/linkedin": {
+      "post": {
+        "tags": ["CVs"],
+        "summary": "Create a CV from the LinkedIn profile of the authenticated user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "201": { "description": "Created" }, "409": { "description": "LinkedIn is not connected" } }
       }
     },
     "/cvs/{id}": {

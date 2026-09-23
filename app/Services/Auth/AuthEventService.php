@@ -2,19 +2,14 @@
 
 namespace App\Services\Auth;
 
-use App\Mail\VerifyEmailMail;
+use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\URL;
 
 /**
- * Centralized helpers for email verification, password reset link
- * dispatching, and the rate limits around them.
- *
- * Each helper returns true on success, false when throttled — callers
- * should never silently swallow a throttle; the UI must surface it.
+ * Centralized helpers for email verification OTP dispatch and
+ * the rate limits around them.
  */
 class AuthEventService
 {
@@ -22,9 +17,12 @@ class AuthEventService
 
     public const RESET_THROTTLE_SECONDS = 60;
 
+    public function __construct(private readonly EmailOtpService $otp)
+    {
+    }
+
     /**
-     * Send a fresh verification link to the user. Throttled per-user
-     * to prevent abuse (e.g. flooding mailboxes or spending quota).
+     * Send a fresh verification OTP to the user.
      */
     public function sendVerificationEmail(User $user): bool
     {
@@ -32,30 +30,15 @@ class AuthEventService
             return false;
         }
 
-        $key = $this->verificationThrottleKey($user);
-
-        if (RateLimiter::tooManyAttempts($key, 1)) {
-            return false;
-        }
-
-        $signedUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            [
-                'id' => $user->getKey(),
-                'hash' => sha1((string) $user->getEmailForVerification()),
-            ]
+        return $this->otp->issue(
+            strtolower((string) $user->email),
+            EmailOtp::PURPOSE_REGISTER,
+            $user->full_name
         );
-
-        Mail::to($user->email)->send(new VerifyEmailMail($user, $signedUrl));
-
-        RateLimiter::hit($key, self::VERIFICATION_THROTTLE_SECONDS);
-
-        return true;
     }
 
     /**
-     * Reset link throttle. Returns false when the user must wait.
+     * Reset OTP throttle. Returns false when the user must wait.
      */
     public function canSendResetLink(string $email): bool
     {
@@ -74,11 +57,11 @@ class AuthEventService
 
     public function verificationThrottleKey(User $user): string
     {
-        return 'verify-email:'.$user->getKey();
+        return $this->otp->throttleKey(strtolower((string) $user->email), EmailOtp::PURPOSE_REGISTER);
     }
 
     public function resetThrottleKey(string $email): string
     {
-        return 'password-reset:'.strtolower($email);
+        return $this->otp->throttleKey(strtolower($email), EmailOtp::PURPOSE_PASSWORD_RESET);
     }
 }
