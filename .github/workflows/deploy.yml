@@ -30,6 +30,9 @@ jobs:
 
             export COMPOSER_ALLOW_SUPERUSER=1
             export PUPPETEER_SKIP_DOWNLOAD=1
+            # pnpm aborts module-dir removal without a TTY unless CI is set.
+            export CI=true
+            export PNPM_CONFIRM_MODULES_PURGE=false
 
             APP_DIR="/var/www/edgesgate_co_usr/data/www/cv.edgesgate.com"
             APP_USER="edgesgate_co_usr"
@@ -109,9 +112,9 @@ jobs:
 
             cd frontend
             if [ -f pnpm-lock.yaml ]; then
-              pnpm install --frozen-lockfile
+              pnpm install --frozen-lockfile --config.confirmModulesPurge=false
             else
-              pnpm install
+              pnpm install --config.confirmModulesPurge=false
             fi
             # Same-origin behind nginx — public API calls hit /api on this host.
             NUXT_PUBLIC_LARAVEL_URL="$APP_URL" \
