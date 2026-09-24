@@ -43,6 +43,10 @@ class TrackingService
         $appVersion = $this->headerOrNull($request, 'X-App-Version');
         $locale = $this->resolveLocale($request);
 
+        // Native clients send no OS token in the User-Agent, so fall back to the
+        // platform they declare instead of recording "Unknown OS".
+        $os = $this->resolveOs($os, $appPlatform);
+
         $device = $this->composeDeviceLabel($deviceType, $os, $browser, $deviceModel);
 
         return [
@@ -106,6 +110,21 @@ class TrackingService
         $primary = trim($primary);
 
         return $primary !== '' && strlen($primary) <= 32 ? $primary : null;
+    }
+
+    private function resolveOs(?string $parsedOs, ?string $appPlatform): ?string
+    {
+        $hasUsableOs = $parsedOs !== null && $parsedOs !== 'Unknown OS';
+
+        if ($hasUsableOs) {
+            return $parsedOs;
+        }
+
+        return match ($appPlatform) {
+            'ios' => 'iOS',
+            'android' => 'Android',
+            default => $parsedOs,
+        };
     }
 
     private function normalizePlatform(?string $platform): ?string

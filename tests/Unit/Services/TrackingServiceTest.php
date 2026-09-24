@@ -52,6 +52,23 @@ class TrackingServiceTest extends TestCase
         $this->assertSame('ar-sa', $tracking['locale']);
     }
 
+    public function test_falls_back_to_declared_platform_for_native_clients(): void
+    {
+        $request = Request::create('/api/v1/cvs', 'POST', [], [], [], [
+            'HTTP_USER_AGENT' => 'Dart/3.8 (dart:io)',
+            'HTTP_X_APP_PLATFORM' => 'ios',
+            'HTTP_X_OS_VERSION' => '17.2',
+            'HTTP_X_DEVICE_TYPE' => 'Mobile',
+            'HTTP_X_DEVICE_MODEL' => 'iPhone15,2',
+        ]);
+
+        $tracking = $this->service->capture($request);
+
+        $this->assertSame('iOS', $tracking['os']);
+        $this->assertSame('Mobile', $tracking['device_type']);
+        $this->assertSame('iPhone15,2', $tracking['device_model']);
+    }
+
     public function test_capture_content_only_returns_legacy_fields(): void
     {
         $request = Request::create('/api/v1/cvs', 'POST', [], [], [], [
