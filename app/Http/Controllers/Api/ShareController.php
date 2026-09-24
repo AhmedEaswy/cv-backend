@@ -26,7 +26,7 @@ class ShareController extends BaseApiController
                 return [
                     'id' => $template->id,
                     'name' => $template->name,
-                    'preview' => $template->preview_url,
+                    'preview' => $template->resolvedPreviewUrl(app()->getLocale()),
                     'description' => $template->description,
                     'supports_image' => (bool) $template->supports_image,
                     'is_default' => (bool) $template->is_default,

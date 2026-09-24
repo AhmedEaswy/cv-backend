@@ -33,21 +33,47 @@ class SetLocale
 
     private function resolveLocale(Request $request): string
     {
+        // Explicit request signals win (templates preview, Nuxt i18n, etc.).
+        foreach ([
+            $request->query('locale'),
+            $request->query('language'),
+            $request->header('X-Locale'),
+        ] as $candidate) {
+            $normalized = $this->normalize($candidate);
+            if ($normalized !== null) {
+                return $normalized;
+            }
+        }
+
         $header = $request->header('Accept-Language');
         if (is_string($header) && $header !== '') {
-            $candidate = strtolower(substr(trim(explode(',', $header)[0]), 0, 2));
-            if (in_array($candidate, self::SUPPORTED, true)) {
-                return $candidate;
+            $normalized = $this->normalize(trim(explode(',', $header)[0]));
+            if ($normalized !== null) {
+                return $normalized;
             }
         }
 
         $sessionLocale = Session::get('locale');
-        if (is_string($sessionLocale) && in_array($sessionLocale, self::SUPPORTED, true)) {
-            return $sessionLocale;
+        if (is_string($sessionLocale)) {
+            $normalized = $this->normalize($sessionLocale);
+            if ($normalized !== null) {
+                return $normalized;
+            }
         }
 
         $default = config('app.locale', 'en');
 
         return is_string($default) ? $default : 'en';
+    }
+
+    private function normalize(mixed $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        $candidate = strtolower(substr(str_replace('_', '-', trim($value)), 0, 2));
+
+        return in_array($candidate, self::SUPPORTED, true) ? $candidate : null;
     }
 }

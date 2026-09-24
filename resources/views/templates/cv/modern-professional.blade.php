@@ -13,6 +13,11 @@
             margin: 0;
             padding: 0;
         }
+        a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
         .page {
             width: 210mm;
             min-height: 297mm;
@@ -210,7 +215,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">{{ $project['title'] ?? '' }}</h3>
                                     @if(!empty($project['url']))
-                                        {!! \App\Support\CvLink::tag($project['url'], 'text-blue-600 hover:underline text-sm') !!}
+                                        {!! \App\Support\CvLink::tag($project['url'], 'text-sm') !!}
                                     @endif
                                 </div>
                                 <div class="text-end text-sm text-gray-600 shrink-0">

@@ -56,6 +56,9 @@ const previewSrc = computed(() => {
     const fromApi = props.template.preview ? resolvePublicFileUrl(props.template.preview) : '';
     if (fromApi) return fromApi;
     if (props.kind === 'cover-letter') return '';
+    if (props.kind === 'public-profile') {
+        return `${laravel}/images/public-profile-templates/${props.template.name}.png`;
+    }
     return `${laravel}/images/templates/${props.template.name}.png`;
 });
 

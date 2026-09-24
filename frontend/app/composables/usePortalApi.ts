@@ -255,9 +255,14 @@ export const usePortalApi = () => {
     const { t, locale } = useI18n();
     const { user } = useAuthSession();
 
-    async function list<T>(url: string): Promise<T[]> {
+    async function list<T>(url: string, query?: Record<string, string | number | undefined>): Promise<T[]> {
         try {
-            const res = await api<ApiEnvelope<T[]>>(url);
+            const res = await api<ApiEnvelope<T[]>>(url, {
+                query: {
+                    locale: locale.value,
+                    ...query,
+                },
+            });
             const payload = unwrap(res);
             return Array.isArray(payload) ? payload : [];
         } catch (e: any) {

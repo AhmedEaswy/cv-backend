@@ -83,11 +83,17 @@ class PublicProfileTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
+            $template['preview_ar'] = preg_replace('/\.png$/', '-ar.png', $template['preview']);
+
             // Insert missing templates only — never overwrite existing rows.
-            PublicProfileTemplate::firstOrCreate(
+            $record = PublicProfileTemplate::firstOrCreate(
                 ['name' => $template['name']],
                 $template,
             );
+
+            if (! $record->preview_ar) {
+                $record->update(['preview_ar' => $template['preview_ar']]);
+            }
         }
     }
 }

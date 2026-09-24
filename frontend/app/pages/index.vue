@@ -30,6 +30,7 @@ useHead({
         <main>
             <LandingHeroSection />
             <LandingPlatformsSection />
+            <LandingPublicProfileFeature />
             <LandingAiConnectSection />
             <LandingAiConnectModal />
 

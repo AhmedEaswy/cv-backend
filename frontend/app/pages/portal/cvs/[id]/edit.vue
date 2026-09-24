@@ -16,7 +16,7 @@ import type { DropdownMenuItem } from '~/components/ui/DropdownMenu.vue';
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const portal = usePortalApi();
@@ -62,18 +62,22 @@ const actionItems = computed<DropdownMenuItem[]>(() => [
     { key: 'delete', label: t('portal.cvs.delete'), icon: 'trash', danger: true },
 ]);
 
+async function loadTemplates(lang?: string) {
+    const previewLocale = lang || form.language || locale.value;
+    templates.value = await portal.list<CvTemplateOption>('/shares/templates', {
+        locale: previewLocale,
+    });
+}
+
 onMounted(async () => {
-    const [c, tpls] = await Promise.all([
-        portal.show<CVSummary>(`/cvs/${id.value}`),
-        portal.list<CvTemplateOption>('/shares/templates'),
-    ]);
+    const c = await portal.show<CVSummary>(`/cvs/${id.value}`);
     cv.value = c;
-    templates.value = tpls;
     if (c) {
         syncingForm.value = true;
         form.name = c.name || '';
         form.language = c.language || 'en';
-        const defaultTpl = tpls.find((tpl) => tpl.is_default);
+        await loadTemplates(form.language);
+        const defaultTpl = templates.value.find((tpl) => tpl.is_default);
         form.template_id = c.template_id ?? defaultTpl?.id ?? '';
         form.is_public = !!c.is_public;
         userData.value = normalizeCvUserData(c.user_data);
@@ -84,8 +88,25 @@ onMounted(async () => {
         await nextTick();
         syncingForm.value = false;
         previewReady.value = true;
+    } else {
+        await loadTemplates();
     }
     loading.value = false;
+});
+
+watch(() => form.language, async (next, prev) => {
+    if (syncingForm.value || !next || next === prev) return;
+    const selected = form.template_id;
+    await loadTemplates(next);
+    if (selected && templates.value.some((tpl) => String(tpl.id) === String(selected))) {
+        form.template_id = selected;
+    }
+});
+
+watch(locale, async () => {
+    if (syncingForm.value) return;
+    // UI locale change: keep document language for preview selection.
+    await loadTemplates(form.language);
 });
 
 function payload() {

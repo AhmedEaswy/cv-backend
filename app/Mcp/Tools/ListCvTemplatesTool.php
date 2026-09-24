@@ -19,13 +19,15 @@ class ListCvTemplatesTool extends Tool
 
     public function handle(Request $request): Response
     {
+        $locale = is_string($request->get('locale')) ? $request->get('locale') : app()->getLocale();
+
         $templates = Template::query()
             ->where('is_active', true)
             ->get()
             ->map(fn (Template $template) => [
                 'id' => $template->id,
                 'name' => $template->name,
-                'preview' => $template->preview_url,
+                'preview' => $template->resolvedPreviewUrl($locale),
                 'description' => $template->description,
                 'supports_image' => (bool) $template->supports_image,
             ]);
@@ -35,6 +37,10 @@ class ListCvTemplatesTool extends Tool
 
     public function schema(JsonSchema $schema): array
     {
-        return [];
+        return [
+            'locale' => $schema->string()
+                ->description('UI language code (en or ar). Arabic returns Arabic preview images when available.')
+                ->optional(),
+        ];
     }
 }

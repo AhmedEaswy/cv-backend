@@ -7,7 +7,7 @@
  */
 import embeddedSkill from '~/assets/agent/skill.md?raw';
 
-export type TemplateKind = 'cv' | 'cover-letter';
+export type TemplateKind = 'cv' | 'cover-letter' | 'public-profile';
 
 export type TemplatePromptInput = {
     id: number | string;
@@ -84,6 +84,9 @@ export async function buildTemplatePrompt(template: TemplatePromptInput): Promis
     const kind = template.kind || 'cv';
     if (kind === 'cover-letter') {
         return buildCoverLetterPrompt(template);
+    }
+    if (kind === 'public-profile') {
+        return buildPublicProfilePrompt(template);
     }
     return buildCvPrompt(template);
 }
@@ -175,6 +178,57 @@ async function buildCoverLetterPrompt(template: TemplatePromptInput): Promise<st
         '---',
         '',
         'Then follow the full CV Skill (cover-letter sections):',
+        '',
+        `Origin: ${origin}`,
+        '',
+        skill.trim(),
+    ].filter((line) => line !== null).join('\n');
+}
+
+async function buildPublicProfilePrompt(template: TemplatePromptInput): Promise<string> {
+    const origin = skillOrigin();
+    const skill = await loadCvSkillText();
+    const { display, blurb } = resolveDisplay(template);
+    const site = origin.replace(/\/api\/v1\/?$/, '') || origin;
+
+    return [
+        `# Public profile template: ${display}`,
+        '',
+        `Origin: ${origin}`,
+        `Preferred public_profile_template_id: ${template.id}`,
+        `Template name (slug): ${template.name}`,
+        `Template label: ${display}`,
+        blurb ? `Description: ${blurb}` : null,
+        '',
+        'You are helping the user set up a **public profile** on the CV website. Public profiles require an authenticated account (no anonymous create).',
+        '',
+        '## Quick start for this template',
+        '',
+        `1. GET ${origin}/api/v1/public-profiles/templates — confirm id **${template.id}** (\`${template.name}\`).`,
+        '2. Sign in (or register), then open:',
+        `   ${site}/portal/public-profile?public_profile_template_id=${template.id}`,
+        '3. Or with a Sanctum bearer token, PUT/POST `/api/v1/public-profiles` with:',
+        '```json',
+        JSON.stringify({
+            language: 'en',
+            is_public: true,
+            public_profile_template_id: Number(template.id) || template.id,
+            headline: '…',
+            about: '…',
+            user_data: { firstName: '…', lastName: '…', email: '…' },
+        }, null, 2),
+        '```',
+        '4. Preview the live page at `/u/{slug}` once published.',
+        '',
+        'Headers on every call:',
+        '- `Accept: application/json`',
+        '- `Content-Type: application/json`',
+        '- `Authorization: Bearer <token>` (required for create/update)',
+        '- `X-Agent-Client: other`',
+        '',
+        '---',
+        '',
+        'Then follow the full CV Skill (public-profile sections):',
         '',
         `Origin: ${origin}`,
         '',

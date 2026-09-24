@@ -270,7 +270,7 @@ class CoverLetterController extends BaseApiController
             fn ($t) => [
                 'id' => $t->id,
                 'name' => $t->name,
-                'preview' => $t->preview_url,
+                'preview' => $t->resolvedPreviewUrl(app()->getLocale()),
                 'description' => $t->description,
                 'is_default' => $t->is_default,
             ],

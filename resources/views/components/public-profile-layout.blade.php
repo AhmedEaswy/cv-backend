@@ -24,10 +24,23 @@
     @include('components.partials.bilingual-fonts')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        a,
+        a:visited {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        a.cta, .cta, .footer-cta a, .rail nav a {
+            text-decoration: none;
+        }
+    </style>
 
     @isset($head)
         {{ $head }}
     @endisset
+
+    @include('components.partials.arabic-font-overrides')
 </head>
 <body {{ $attributes }}>
     {{ $slot }}

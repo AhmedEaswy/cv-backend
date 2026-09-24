@@ -21,10 +21,12 @@ class ListCoverLetterTemplatesTool extends Tool
 
     public function handle(Request $request): Response
     {
+        $locale = is_string($request->get('locale')) ? $request->get('locale') : app()->getLocale();
+
         $templates = $this->repository->getActiveTemplates()->map(fn ($template) => [
             'id' => $template->id,
             'name' => $template->name,
-            'preview' => $template->preview_url,
+            'preview' => $template->resolvedPreviewUrl($locale),
             'description' => $template->description,
             'is_default' => $template->is_default,
         ]);
@@ -34,6 +36,10 @@ class ListCoverLetterTemplatesTool extends Tool
 
     public function schema(JsonSchema $schema): array
     {
-        return [];
+        return [
+            'locale' => $schema->string()
+                ->description('UI language code (en or ar). Arabic returns Arabic preview images when available.')
+                ->optional(),
+        ];
     }
 }

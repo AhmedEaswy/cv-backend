@@ -8,7 +8,22 @@ namespace App\Support;
  */
 class TemplatePreviewSample
 {
-    public static function cv(): array
+    public static function cv(string $locale = 'en'): array
+    {
+        return $locale === 'ar' ? self::cvAr() : self::cvEn();
+    }
+
+    public static function coverLetter(string $locale = 'en'): array
+    {
+        return $locale === 'ar' ? self::coverLetterAr() : self::coverLetterEn();
+    }
+
+    public static function publicProfile(string $locale = 'en'): array
+    {
+        return $locale === 'ar' ? self::publicProfileAr() : self::publicProfileEn();
+    }
+
+    private static function cvEn(): array
     {
         return [
             'language' => 'en',
@@ -22,7 +37,7 @@ class TemplatePreviewSample
                 'portfolioUrl' => 'https://elenavoss.example',
                 'photo' => self::portrait(),
                 'summary' => 'Product designer who turns messy workflows into calm interfaces. Ten years shipping design systems, hiring tools, and customer portals for teams that care about clarity.',
-                'skills' => self::skills(),
+                'skills' => self::skillsEn(),
                 'experiences' => [
                     [
                         'position' => 'Senior Product Designer',
@@ -70,7 +85,69 @@ class TemplatePreviewSample
         ];
     }
 
-    public static function coverLetter(): array
+    private static function cvAr(): array
+    {
+        return [
+            'language' => 'ar',
+            'user_data' => [
+                'firstName' => 'أحمد',
+                'lastName' => 'علي',
+                'jobTitle' => 'مصمم منتجات',
+                'email' => 'ahmed.ali@example.com',
+                'phone' => '+20 100 123 4567',
+                'address' => 'القاهرة، مصر',
+                'portfolioUrl' => 'https://ahmedali.example',
+                'photo' => self::portrait(),
+                'summary' => 'مصمم منتجات يحوّل سير العمل المعقّد إلى واجهات هادئة وواضحة. عشر سنوات في بناء أنظمة التصميم وأدوات التوظيف وبوابات العملاء للفرق التي تهتم بالوضوح.',
+                'skills' => self::skillsAr(),
+                'experiences' => [
+                    [
+                        'position' => 'مصمم منتجات أول',
+                        'company' => 'نورث ويند',
+                        'location' => 'القاهرة',
+                        'from' => 'مارس 2021',
+                        'current' => true,
+                        'description' => 'قاد إعادة تصميم منصة التوظيف المستخدمة من ٤٠٠ مسؤول توظيف. بنى مكتبة مكوّنات مشتركة وقلّص زمن التصميم إلى الإطلاق من ثلاثة أسابيع إلى ستة أيام.',
+                    ],
+                    [
+                        'position' => 'مصمم منتجات',
+                        'company' => 'لومن هيلث',
+                        'location' => 'عن بُعد',
+                        'from' => 'يونيو 2018',
+                        'to' => 'فبراير 2021',
+                        'description' => 'صمّم بوابة المرضى وتدفق تسليم الأطباء. بالشراكة مع البحث استُبدلت خطوات الاستقبال الأربع عشرة بأربع خطوات فقط.',
+                    ],
+                ],
+                'educations' => [
+                    [
+                        'degree' => 'بكالوريوس فنون جميلة',
+                        'fieldOfStudy' => 'تصميم جرافيكي',
+                        'institution' => 'كلية الفنون الجميلة',
+                        'from' => '2014',
+                        'to' => '2018',
+                    ],
+                ],
+                'projects' => [
+                    [
+                        'title' => 'نظام تصميم أطلس',
+                        'url' => 'https://atlas.example',
+                        'description' => 'رموز ومكوّنات وتوثيق اعتمدتها اثنا عشر فريق منتج.',
+                    ],
+                ],
+                'languages' => [
+                    ['name' => 'العربية', 'proficiencyLevel' => 5],
+                    ['name' => 'الإنجليزية', 'proficiencyLevel' => 4],
+                ],
+                'interests' => [
+                    ['name' => 'الطباعة الفنية'],
+                    ['name' => 'الجري في الطبيعة'],
+                    ['name' => 'رسم الخرائط'],
+                ],
+            ],
+        ];
+    }
+
+    private static function coverLetterEn(): array
     {
         return [
             'language' => 'en',
@@ -96,7 +173,33 @@ class TemplatePreviewSample
         ];
     }
 
-    public static function publicProfile(): array
+    private static function coverLetterAr(): array
+    {
+        return [
+            'language' => 'ar',
+            'user_data' => [
+                'firstName' => 'أحمد',
+                'lastName' => 'علي',
+                'jobTitle' => 'مصمم منتجات',
+                'email' => 'ahmed.ali@example.com',
+                'phone' => '+20 100 123 4567',
+                'address' => 'القاهرة، مصر',
+                'recipientName' => 'سارة حسن',
+                'recipientTitle' => 'رئيسة التصميم',
+                'recipientCompany' => 'هاربر',
+                'companyName' => 'هاربر',
+                'subject' => 'طلب وظيفة مصمم منتجات أول',
+                'body' => implode("\n\n", [
+                    'أتقدم بطلبي لشغل وظيفة مصمم منتجات أول في هاربر. أعمالكم على أدوات هادئة ودقيقة للمشغّلين هي نوع المنتجات التي أرغب في العمل عليها خلال السنوات القادمة.',
+                    'في نورث ويند قدت إعادة تصميم منصة التوظيف ونظام التصميم خلفها. أصبح مسؤولو التوظيف ينهون المراجعات أسرع، واعتمد اثنا عشر فريقاً المكوّنات نفسها. قبل ذلك بسّطت استقبالاً سريرياً من أربع عشرة خطوة إلى أربع.',
+                    'يسعدني مناقشة كيف يمكن لهذه الخبرة أن تساهم في الإصدار القادم لهاربر. شكراً لوقتكم.',
+                ]),
+                'closing' => 'مع أطيب التحيات',
+            ],
+        ];
+    }
+
+    private static function publicProfileEn(): array
     {
         return [
             'language' => 'en',
@@ -167,7 +270,7 @@ class TemplatePreviewSample
                         'image' => self::swatch('#9a3412', '#7c2d12', 'Lumen'),
                     ],
                 ],
-                'skills' => self::skills(),
+                'skills' => self::skillsEn(),
                 'languages' => [
                     ['name' => 'English', 'proficiencyLevel' => 5],
                     ['name' => 'German', 'proficiencyLevel' => 3],
@@ -201,7 +304,112 @@ class TemplatePreviewSample
         ];
     }
 
-    private static function skills(): array
+    private static function publicProfileAr(): array
+    {
+        return [
+            'language' => 'ar',
+            'headline' => 'مصمم منتجات لبرمجيات هادئة ودقيقة.',
+            'about' => 'أصمّم أدوات التوظيف وبوابات المرضى وأنظمة التصميم. أحبّ الخط الواضح والتدفقات القصيرة والفرق التي تُنجز.',
+            'sections_order' => [
+                'about', 'services', 'experiences', 'projects', 'skills',
+                'educations', 'certifications', 'achievements', 'languages',
+                'testimonials', 'availability',
+            ],
+            'user_data' => [
+                'firstName' => 'أحمد',
+                'lastName' => 'علي',
+                'jobTitle' => 'مصمم منتجات',
+                'email' => 'ahmed.ali@example.com',
+                'phone' => '+20 100 123 4567',
+                'city' => 'القاهرة',
+                'country' => 'مصر',
+                'website' => 'https://ahmedali.example',
+                'photo' => self::portrait(),
+                'socialLinks' => [
+                    ['label' => 'لينكدإن', 'url' => 'https://www.linkedin.com/in/example'],
+                    ['label' => 'دريبل', 'url' => 'https://dribbble.com/example'],
+                ],
+                'experiences' => [
+                    [
+                        'position' => 'مصمم منتجات أول',
+                        'company' => 'نورث ويند',
+                        'from' => '2021-03',
+                        'current' => true,
+                        'description' => 'منصة التوظيف ونظام التصميم المستخدم من ٤٠٠ مسؤول توظيف.',
+                    ],
+                    [
+                        'position' => 'مصمم منتجات',
+                        'company' => 'لومن هيلث',
+                        'from' => '2018-06',
+                        'to' => '2021-02',
+                        'description' => 'بوابة المرضى وتدفق تسليم الأطباء.',
+                    ],
+                ],
+                'educations' => [
+                    [
+                        'degree' => 'بكالوريوس تصميم جرافيكي',
+                        'institution' => 'كلية الفنون الجميلة',
+                        'from' => '2014-09',
+                        'to' => '2018-05',
+                    ],
+                ],
+                'projects' => [
+                    [
+                        'title' => 'نظام تصميم أطلس',
+                        'description' => 'رموز ومكوّنات اعتمدتها اثنا عشر فريق منتج.',
+                        'url' => 'https://atlas.example',
+                        'technologies' => ['Figma', 'React'],
+                        'image' => self::swatch('#0f766e', '#134e4a', 'أطلس'),
+                    ],
+                    [
+                        'title' => 'توظيف هاربر',
+                        'description' => 'تدفق مراجعة أكثر هدوءاً لمسؤولي التوظيف.',
+                        'url' => 'https://harbor.example',
+                        'technologies' => ['بحث', 'واجهة'],
+                        'image' => self::swatch('#1e3a5f', '#0f172a', 'هاربر'),
+                    ],
+                    [
+                        'title' => 'استقبال لومن',
+                        'description' => 'أربع عشرة خطوة اختُصرت إلى أربع.',
+                        'technologies' => ['صحة', 'تجربة مستخدم'],
+                        'image' => self::swatch('#9a3412', '#7c2d12', 'لومن'),
+                    ],
+                ],
+                'skills' => self::skillsAr(),
+                'languages' => [
+                    ['name' => 'العربية', 'proficiencyLevel' => 5],
+                    ['name' => 'الإنجليزية', 'proficiencyLevel' => 4],
+                ],
+                'services' => [
+                    ['title' => 'تصميم المنتجات', 'description' => 'التدفقات والواجهة والنظام خلفها.'],
+                    ['title' => 'أنظمة التصميم', 'description' => 'رموز ومكوّنات وتوثيق تستخدمه الفرق فعلاً.'],
+                ],
+                'testimonials' => [
+                    [
+                        'quote' => 'جعل أحمد أداة توظيف معقّدة تبدو بديهية.',
+                        'name' => 'سارة حسن',
+                        'role' => 'رئيسة التصميم، هاربر',
+                    ],
+                ],
+                'certifications' => [
+                    ['name' => 'شهادة نيلسن نورمان لتجربة المستخدم', 'issuer' => 'NN/g', 'year' => '2020'],
+                ],
+                'achievements' => [
+                    ['title' => 'اعتماد نظام التصميم على مستوى الشركة', 'year' => '2023'],
+                ],
+                'availability' => [
+                    'status' => 'متاح لمشاريع مختارة',
+                    'note' => 'الحجز للربع الثالث.',
+                ],
+                'cta' => [
+                    'label' => 'ابدأ مشروعاً',
+                    'url' => 'mailto:ahmed.ali@example.com',
+                ],
+            ],
+        ];
+    }
+
+    private static function skillsEn(): array
     {
         return [
             ['name' => 'Product design'],
@@ -210,6 +418,18 @@ class TemplatePreviewSample
             ['name' => 'User research'],
             ['name' => 'Figma'],
             ['name' => 'Typography'],
+        ];
+    }
+
+    private static function skillsAr(): array
+    {
+        return [
+            ['name' => 'تصميم المنتجات'],
+            ['name' => 'أنظمة التصميم'],
+            ['name' => 'النماذج الأولية'],
+            ['name' => 'بحث المستخدمين'],
+            ['name' => 'فيجما'],
+            ['name' => 'الطباعة'],
         ];
     }
 

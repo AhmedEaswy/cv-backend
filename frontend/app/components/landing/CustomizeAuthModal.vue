@@ -43,6 +43,9 @@ function customizePath(template: PublicTemplate) {
     if (props.kind === 'cover-letter') {
         return `/portal/cover-letters/create?cover_letter_template_id=${template.id}`;
     }
+    if (props.kind === 'public-profile') {
+        return `/portal/public-profile?public_profile_template_id=${template.id}`;
+    }
     return `/portal/cvs/create?template_id=${template.id}`;
 }
 

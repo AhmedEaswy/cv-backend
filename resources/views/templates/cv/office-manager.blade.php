@@ -42,6 +42,11 @@
             padding: 0;
             background-color: white !important;
         }
+        a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
         .page {
             width: 210mm;
             min-height: 297mm;
@@ -125,19 +130,19 @@
             @if($email || $phone || $portfolioUrl)
                 <div class="border-t border-b border-gray-300 py-4 flex flex-col md:flex-row md:justify-between gap-4 text-sm">
                     @if($email)
-                        <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="mailto:{{ $email }}">
+                        <a class="flex items-center gap-2 text-gray-700 transition-colors" href="mailto:{{ $email }}">
                             <span class="material-icons text-lg text-gray-400" aria-hidden="true">email</span>
                             <span>{{ $email }}</span>
                         </a>
                     @endif
                     @if($phone)
-                        <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="tel:{{ $phone }}">
+                        <a class="flex items-center gap-2 text-gray-700 transition-colors" href="tel:{{ $phone }}">
                             <span class="material-icons text-lg text-gray-400" aria-hidden="true">phone</span>
                             <span>{{ $phone }}</span>
                         </a>
                     @endif
                     @if($portfolioUrl)
-                        <a class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors" href="{{ \App\Support\CvLink::href($portfolioUrl) ?? $portfolioUrl }}" target="_blank" rel="noopener noreferrer">
+                        <a class="flex items-center gap-2 text-gray-700 transition-colors" href="{{ \App\Support\CvLink::href($portfolioUrl) ?? $portfolioUrl }}" target="_blank" rel="noopener noreferrer">
                             <span class="material-icons text-lg text-gray-400" aria-hidden="true">link</span>
                             <span>{{ $portfolioUrl }}</span>
                         </a>
@@ -275,7 +280,7 @@
                                 {{ $project['title'] ?? '' }}
                             </h3>
                             @if(!empty($project['url']))
-                                {!! \App\Support\CvLink::tag($project['url'], 'text-primary hover:underline text-sm') !!}
+                                {!! \App\Support\CvLink::tag($project['url'], 'text-sm') !!}
                             @endif
                             @if(!empty($project['from']) || !empty($project['to']) || ($project['current'] ?? false))
                                 <span class="block text-xs font-semibold uppercase text-primary mt-1">

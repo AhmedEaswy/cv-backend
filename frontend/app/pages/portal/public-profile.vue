@@ -2,7 +2,9 @@
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const route = useRoute();
+const router = useRouter();
 const { user } = useAuthSession();
 const portal = usePortalApi();
 const toast = useToast();
@@ -25,6 +27,14 @@ const form = reactive({
     is_public: true,
 });
 
+function queryTemplateId(): number | null {
+    const raw = Array.isArray(route.query.public_profile_template_id)
+        ? route.query.public_profile_template_id[0]
+        : (route.query.public_profile_template_id || route.query.template_id);
+    const id = Number(raw);
+    return Number.isFinite(id) && id > 0 ? id : null;
+}
+
 function applyProfile(p: typeof profile.value) {
     const ud = p?.user_data || {};
     const fullName = [ud.firstName, ud.lastName].filter(Boolean).join(' ').trim();
@@ -35,7 +45,12 @@ function applyProfile(p: typeof profile.value) {
     form.phone = ud.phone || '';
     form.website = ud.website || '';
     form.location = ud.address || '';
-    const templateId = p?.public_profile_template_id
+    const fromQuery = queryTemplateId();
+    const templateId = (fromQuery
+        && templates.value.some((tpl) => String(tpl.id) === String(fromQuery))
+        ? fromQuery
+        : null)
+        ?? p?.public_profile_template_id
         ?? templates.value.find((tpl) => tpl.is_default)?.id
         ?? '';
     // Only keep IDs that belong to public-profile templates (never CV templates).
@@ -66,14 +81,32 @@ function payload() {
     };
 }
 
+async function loadTemplates(lang?: string) {
+    const previewLocale = lang || profile.value?.language || locale.value;
+    templates.value = await portal.list<TemplateOption>('/public-profiles/templates', {
+        locale: previewLocale,
+    });
+}
+
 onMounted(async () => {
-    const [p, tpls] = await Promise.all([
-        refreshProfile(),
-        portal.list<TemplateOption>('/public-profiles/templates'),
-    ]);
-    templates.value = tpls;
+    const p = await refreshProfile();
+    await loadTemplates(p?.language || locale.value);
     applyProfile(p);
     loading.value = false;
+
+    // Clear gallery deep-link once applied so refresh keeps the saved template.
+    if (queryTemplateId() && (route.query.public_profile_template_id || route.query.template_id)) {
+        const { public_profile_template_id: _a, template_id: _b, ...rest } = route.query;
+        await router.replace({ query: rest });
+    }
+});
+
+watch(locale, async () => {
+    const selected = form.template_id;
+    await loadTemplates(profile.value?.language || locale.value);
+    if (selected && templates.value.some((tpl) => String(tpl.id) === String(selected))) {
+        form.template_id = selected;
+    }
 });
 
 async function onSave() {

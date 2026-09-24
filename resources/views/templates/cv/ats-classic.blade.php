@@ -46,8 +46,9 @@
             margin: 0 0 8px;
         }
         a {
-            color: #000;
-            text-decoration: none;
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
         }
         .header {
             text-align: center;

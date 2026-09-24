@@ -16,6 +16,7 @@ class CaptureTemplatePreviews extends Command
 {
     protected $signature = 'templates:capture-previews
         {--type=all : cv, cover-letter, public-profile, or all}
+        {--locale=all : en, ar, or all}
         {--only= : Comma-separated template slugs}
         {--sync-only : Point database rows at existing images without recapturing}
         {--force : Replace a preview that was uploaded in the dashboard}';
@@ -25,6 +26,14 @@ class CaptureTemplatePreviews extends Command
     public function handle(): int
     {
         $type = (string) $this->option('type');
+        $locales = $this->locales((string) $this->option('locale'));
+
+        if ($locales === []) {
+            $this->error('Invalid --locale. Use en, ar, or all.');
+
+            return self::FAILURE;
+        }
+
         $only = array_values(array_filter(array_map(
             fn (string $slug) => strtolower(trim($slug)),
             explode(',', (string) $this->option('only'))
@@ -39,31 +48,41 @@ class CaptureTemplatePreviews extends Command
         }
 
         $failures = 0;
+        $previousLocale = app()->getLocale();
 
-        foreach ($targets as $target) {
-            $relative = $target['public'].'/'.$target['slug'].'.png';
-            $absolute = public_path($relative);
+        foreach ($locales as $locale) {
+            app()->setLocale($locale);
 
-            if (! $this->option('sync-only')) {
-                try {
-                    File::ensureDirectoryExists(dirname($absolute));
-                    $this->capture($target, $absolute);
-                    $this->line("saved  {$relative}");
-                } catch (Throwable $e) {
+            foreach ($targets as $target) {
+                $filename = $locale === 'ar'
+                    ? $target['slug'].'-ar.png'
+                    : $target['slug'].'.png';
+                $relative = $target['public'].'/'.$filename;
+                $absolute = public_path($relative);
+
+                if (! $this->option('sync-only')) {
+                    try {
+                        File::ensureDirectoryExists(dirname($absolute));
+                        $this->capture($target, $absolute, $locale);
+                        $this->line("saved  {$relative}");
+                    } catch (Throwable $e) {
+                        $failures++;
+                        $this->error("failed {$locale}/{$target['kind']}/{$target['slug']}: {$e->getMessage()}");
+
+                        continue;
+                    }
+                } elseif (! is_file($absolute)) {
                     $failures++;
-                    $this->error("failed {$target['kind']}/{$target['slug']}: {$e->getMessage()}");
+                    $this->error("missing {$relative} — run without --sync-only to capture it");
 
                     continue;
                 }
-            } elseif (! is_file($absolute)) {
-                $failures++;
-                $this->error("missing {$relative} — run without --sync-only to capture it");
 
-                continue;
+                $this->syncPreview($target['model'], $target['slug'], $relative, $locale);
             }
-
-            $this->syncPreview($target['model'], $target['slug'], $relative);
         }
+
+        app()->setLocale($previousLocale);
 
         if ($failures > 0) {
             $this->warn("{$failures} template(s) were not captured.");
@@ -74,6 +93,19 @@ class CaptureTemplatePreviews extends Command
         $this->info('Preview images are in public/images. Commit them so production uses the same files.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function locales(string $locale): array
+    {
+        return match ($locale) {
+            'en' => ['en'],
+            'ar' => ['ar'],
+            'all' => ['en', 'ar'],
+            default => [],
+        };
     }
 
     /**
@@ -159,9 +191,9 @@ class CaptureTemplatePreviews extends Command
     /**
      * @param  array{kind: string, slug: string, view: string, width: int, height: int, scale: int, selector: ?string}  $target
      */
-    private function capture(array $target, string $absolute): void
+    private function capture(array $target, string $absolute, string $locale): void
     {
-        $html = view($target['view'], $this->viewData($target['kind']))->render();
+        $html = view($target['view'], $this->viewData($target['kind'], $locale))->render();
         $html = str_replace(
             '</head>',
             '<style>::-webkit-scrollbar{display:none} html{scrollbar-width:none}</style></head>',
@@ -208,12 +240,12 @@ class CaptureTemplatePreviews extends Command
     /**
      * @return array<string, mixed>
      */
-    private function viewData(string $kind): array
+    private function viewData(string $kind, string $locale): array
     {
         return match ($kind) {
-            'cv' => ['cv' => TemplatePreviewSample::cv(), 'preview' => false],
-            'cover-letter' => ['coverLetter' => TemplatePreviewSample::coverLetter(), 'preview' => false],
-            'public-profile' => ['profile' => TemplatePreviewSample::publicProfile(), 'preview' => false],
+            'cv' => ['cv' => TemplatePreviewSample::cv($locale), 'preview' => false],
+            'cover-letter' => ['coverLetter' => TemplatePreviewSample::coverLetter($locale), 'preview' => false],
+            'public-profile' => ['profile' => TemplatePreviewSample::publicProfile($locale), 'preview' => false],
             default => [],
         };
     }
@@ -221,7 +253,7 @@ class CaptureTemplatePreviews extends Command
     /**
      * @param  class-string<Model>  $model
      */
-    private function syncPreview(string $model, string $slug, string $relative): void
+    private function syncPreview(string $model, string $slug, string $relative, string $locale): void
     {
         /** @var Model|null $record */
         $record = $model::query()->where('name', $slug)->first();
@@ -232,16 +264,17 @@ class CaptureTemplatePreviews extends Command
             return;
         }
 
-        $current = $record->getAttribute('preview');
+        $column = $locale === 'ar' ? 'preview_ar' : 'preview';
+        $current = $record->getAttribute($column);
 
         if (! $this->shouldReplacePreview(is_string($current) ? $current : null)) {
-            $this->line("kept   {$slug} (dashboard upload; pass --force to replace)");
+            $this->line("kept   {$slug} {$column} (dashboard upload; pass --force to replace)");
 
             return;
         }
 
-        $record->update(['preview' => $relative]);
-        $this->line("synced {$slug}");
+        $record->update([$column => $relative]);
+        $this->line("synced {$slug} {$column}");
     }
 
     private function shouldReplacePreview(?string $current): bool

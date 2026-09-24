@@ -7,10 +7,20 @@
     <title>{{ ($cv['user_data']['firstName'] ?? '') . ' ' . ($cv['user_data']['lastName'] ?? '') }} - CV</title>
 
     @include('components.partials.bilingual-fonts')
+    <style>
+        a,
+        a:visited {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+    </style>
 
     @isset($head)
         {{ $head }}
     @endisset
+
+    @include('components.partials.arabic-font-overrides')
 
     @if($preview)
         <style>

@@ -40,6 +40,7 @@ export const useApi = () => {
             const locale = useNuxtApp().$i18n?.locale?.value;
             if (locale) {
                 headers.set('Accept-Language', locale);
+                headers.set('X-Locale', locale);
             }
 
             // Server: forward the cookie so /auth/me works during SSR

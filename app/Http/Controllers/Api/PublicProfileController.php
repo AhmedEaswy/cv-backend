@@ -105,16 +105,21 @@ class PublicProfileController extends BaseApiController
         return $this->successResponse(null, __('messages.public_profile_deleted'));
     }
 
-    public function templates()
+    public function templates(Request $request)
     {
-        $templates = $this->repository->getActiveTemplates()->map(fn ($t) => [
-            'id' => $t->id,
-            'name' => $t->name,
-            'preview' => $t->preview_url,
-            'description' => $t->description,
-            'is_default' => $t->is_default,
-        ]);
+        $locale = app()->getLocale();
 
-        return $this->successResponse($templates, __('messages.templates_retrieved'));
+        return $this->paginatedOrAll(
+            $this->repository->activeTemplatesQuery(),
+            $request,
+            fn ($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'preview' => $t->resolvedPreviewUrl($locale),
+                'description' => $t->description,
+                'is_default' => $t->is_default,
+            ],
+            __('messages.templates_retrieved')
+        );
     }
 }

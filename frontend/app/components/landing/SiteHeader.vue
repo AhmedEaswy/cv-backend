@@ -20,7 +20,7 @@ const menuOpen = ref(false);
 const onHome = computed(() => route.path === '/' || route.path === '');
 const activeSection = ref<string | null>(null);
 
-const navSections = ['platforms', 'ai-connect', 'mockup', 'pricing', 'download'] as const;
+const navSections = ['platforms', 'public-profile', 'ai-connect', 'mockup', 'pricing', 'download'] as const;
 
 /** Section anchors work from any page via `/#…`. */
 const section = (id: string) => (onHome.value ? `#${id}` : `/#${id}`);
@@ -132,6 +132,11 @@ function onCtaPointerLeave(e: PointerEvent) {
                     :aria-current="isSectionActive('platforms') ? 'true' : undefined"
                 >{{ t('landing.nav.platforms') }}</a>
                 <a
+                    :href="section('public-profile')"
+                    :class="{ 'is-active': isSectionActive('public-profile') }"
+                    :aria-current="isSectionActive('public-profile') ? 'true' : undefined"
+                >{{ t('landing.nav.public_profile') }}</a>
+                <a
                     :href="section('ai-connect')"
                     :class="{ 'is-active': isSectionActive('ai-connect') }"
                     :aria-current="isSectionActive('ai-connect') ? 'true' : undefined"
@@ -141,11 +146,6 @@ function onCtaPointerLeave(e: PointerEvent) {
                     :class="{ 'is-active': isTemplatesActive }"
                     :aria-current="isTemplatesActive ? 'page' : undefined"
                 >{{ t('landing.nav.templates') }}</NuxtLink>
-                <a
-                    :href="section('mockup')"
-                    :class="{ 'is-active': isSectionActive('mockup') }"
-                    :aria-current="isSectionActive('mockup') ? 'true' : undefined"
-                >{{ t('landing.nav.mockup') }}</a>
                 <a
                     :href="section('pricing')"
                     :class="{ 'is-active': isSectionActive('pricing') }"
@@ -222,6 +222,11 @@ function onCtaPointerLeave(e: PointerEvent) {
                 @click="closeMenu"
             >{{ t('landing.nav.platforms') }}</a>
             <a
+                :href="section('public-profile')"
+                :class="{ 'is-active': isSectionActive('public-profile') }"
+                @click="closeMenu"
+            >{{ t('landing.nav.public_profile') }}</a>
+            <a
                 :href="section('ai-connect')"
                 :class="{ 'is-active': isSectionActive('ai-connect') }"
                 @click="closeMenu"
@@ -231,11 +236,6 @@ function onCtaPointerLeave(e: PointerEvent) {
                 :class="{ 'is-active': isTemplatesActive }"
                 @click="closeMenu"
             >{{ t('landing.nav.templates') }}</NuxtLink>
-            <a
-                :href="section('mockup')"
-                :class="{ 'is-active': isSectionActive('mockup') }"
-                @click="closeMenu"
-            >{{ t('landing.nav.mockup') }}</a>
             <a
                 :href="section('pricing')"
                 :class="{ 'is-active': isSectionActive('pricing') }"

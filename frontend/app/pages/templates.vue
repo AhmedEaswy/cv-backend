@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * /templates — public gallery of CV + cover-letter templates with
- * preview, AI prompt copy, load-more pagination, and auth-gated customize.
+ * /templates — public gallery of CV, cover-letter, and public-profile templates
+ * with preview, AI prompt copy, load-more pagination, and auth-gated customize.
  */
 import type { PublicTemplate } from '~/components/landing/TemplateCard.vue';
 import { prefetchCvSkill, type TemplateKind } from '~/composables/useTemplatePrompt';
@@ -19,7 +19,7 @@ type PaginatedTemplates = {
 
 const PER_PAGE = 9;
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const config = useRuntimeConfig();
 const appName = config.public.appName as string;
 const { user } = await useAuthUser();
@@ -37,13 +37,18 @@ useHead({
     ],
 });
 
-const kind = computed<TemplateKind>(() => (
-    route.query.type === 'cover-letter' ? 'cover-letter' : 'cv'
-));
+const kind = computed<TemplateKind>(() => {
+    const type = String(route.query.type || '');
+    if (type === 'cover-letter') return 'cover-letter';
+    if (type === 'public-profile') return 'public-profile';
+    return 'cv';
+});
 
-const endpoint = computed(() => (
-    kind.value === 'cover-letter' ? '/cover-letters/templates' : '/shares/templates'
-));
+const endpoint = computed(() => {
+    if (kind.value === 'cover-letter') return '/cover-letters/templates';
+    if (kind.value === 'public-profile') return '/public-profiles/templates';
+    return '/shares/templates';
+});
 
 const templates = ref<PublicTemplate[]>([]);
 const page = ref(1);
@@ -60,7 +65,7 @@ async function fetchPage(pageNum: number, append: boolean) {
 
     try {
         const res = await api<{ result: PaginatedTemplates }>(endpoint.value, {
-            query: { page: pageNum, per_page: PER_PAGE },
+            query: { page: pageNum, per_page: PER_PAGE, locale: locale.value },
         });
         const payload = res?.result;
         const rows = Array.isArray(payload?.data) ? payload.data : [];
@@ -92,11 +97,18 @@ watch(kind, async (next, prev) => {
     await fetchPage(1, false);
 });
 
+watch(locale, async () => {
+    templates.value = [];
+    hasMore.value = false;
+    await fetchPage(1, false);
+});
+
 async function setKind(next: TemplateKind) {
     if (next === kind.value) return;
-    await router.replace({
-        query: next === 'cover-letter' ? { type: 'cover-letter' } : {},
-    });
+    const query = next === 'cv'
+        ? {}
+        : { type: next };
+    await router.replace({ query });
 }
 
 async function loadMore() {
@@ -107,12 +119,19 @@ async function loadMore() {
 const authOpen = ref(false);
 const pendingTemplate = ref<PublicTemplate | null>(null);
 
+function customizePath(template: PublicTemplate) {
+    if (kind.value === 'cover-letter') {
+        return `/portal/cover-letters/create?cover_letter_template_id=${template.id}`;
+    }
+    if (kind.value === 'public-profile') {
+        return `/portal/public-profile?public_profile_template_id=${template.id}`;
+    }
+    return `/portal/cvs/create?template_id=${template.id}`;
+}
+
 function onCustomize(template: PublicTemplate) {
     if (user.value) {
-        const path = kind.value === 'cover-letter'
-            ? `/portal/cover-letters/create?cover_letter_template_id=${template.id}`
-            : `/portal/cvs/create?template_id=${template.id}`;
-        navigateTo(path);
+        navigateTo(customizePath(template));
         return;
     }
     pendingTemplate.value = template;
@@ -150,6 +169,15 @@ function onCustomize(template: PublicTemplate) {
                             @click="setKind('cover-letter')"
                         >
                             {{ t('landing.templates_page.tab_cover_letter') }}
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            :aria-selected="kind === 'public-profile'"
+                            :class="{ 'is-active': kind === 'public-profile' }"
+                            @click="setKind('public-profile')"
+                        >
+                            {{ t('landing.templates_page.tab_public_profile') }}
                         </button>
                     </div>
 

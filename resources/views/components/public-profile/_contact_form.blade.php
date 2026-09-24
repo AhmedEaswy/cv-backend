@@ -69,7 +69,7 @@
 
     <style>
         .cv-contact { margin: 48px auto; max-width: 640px; padding: 28px; border-radius: 18px; background: var(--paper, #fbfaf7); border: 1px solid var(--line, #e8e3d7); font-family: 'Inter', 'Figtree', system-ui, sans-serif; }
-        html[dir="rtl"] .cv-contact { font-family: 'Cairo', 'Inter', system-ui, sans-serif; }
+        html[dir="rtl"] .cv-contact { font-family: var(--font-ar-sans, 'Cairo', 'IBM Plex Sans Arabic', sans-serif); }
         .cv-contact__head { margin-bottom: 18px; }
         .cv-contact__eyebrow { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--brand-primary, #5c17e7); margin-bottom: 6px; }
         .cv-contact__title { font-size: 1.4rem; font-weight: 700; color: var(--ink, #1a1623); margin: 0 0 6px; letter-spacing: -0.01em; }

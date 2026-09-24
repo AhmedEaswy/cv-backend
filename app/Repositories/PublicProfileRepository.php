@@ -52,7 +52,18 @@ class PublicProfileRepository
 
     public function getActiveTemplates(): Collection
     {
-        return PublicProfileTemplate::where('is_active', true)->get();
+        return $this->activeTemplatesQuery()->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder<\App\Models\PublicProfileTemplate>
+     */
+    public function activeTemplatesQuery()
+    {
+        return PublicProfileTemplate::query()
+            ->where('is_active', true)
+            ->orderByDesc('is_default')
+            ->orderBy('name');
     }
 
     public function getDefaultTemplate(): ?PublicProfileTemplate

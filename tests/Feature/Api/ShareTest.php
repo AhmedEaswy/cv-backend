@@ -112,4 +112,34 @@ class ShareTest extends TestCase
             ->assertJsonPath('result.meta.has_more', false);
         $this->assertCount(1, $page3->json('result.data'));
     }
+
+    public function test_templates_preview_follows_request_locale(): void
+    {
+        Template::create([
+            'name' => 'portrait-modern',
+            'preview' => 'images/cv-templates/portrait-modern.png',
+            'preview_ar' => 'images/cv-templates/portrait-modern-ar.png',
+            'is_active' => true,
+            'is_default' => true,
+        ]);
+
+        $en = $this->getJson('/api/v1/shares/templates?locale=en');
+        $en->assertOk();
+        $this->assertStringContainsString('portrait-modern.png', (string) $en->json('result.0.preview'));
+        $this->assertStringNotContainsString('-ar.png', (string) $en->json('result.0.preview'));
+
+        $ar = $this->getJson('/api/v1/shares/templates?locale=ar');
+        $ar->assertOk();
+        $this->assertStringContainsString('portrait-modern-ar.png', (string) $ar->json('result.0.preview'));
+
+        $header = $this->withHeader('Accept-Language', 'ar')
+            ->getJson('/api/v1/shares/templates');
+        $header->assertOk();
+        $this->assertStringContainsString('portrait-modern-ar.png', (string) $header->json('result.0.preview'));
+
+        $xLocale = $this->withHeader('X-Locale', 'ar')
+            ->getJson('/api/v1/shares/templates');
+        $xLocale->assertOk();
+        $this->assertStringContainsString('portrait-modern-ar.png', (string) $xLocale->json('result.0.preview'));
+    }
 }

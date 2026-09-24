@@ -8,7 +8,7 @@ import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const portal = usePortalApi();
@@ -67,20 +67,34 @@ function payload() {
     };
 }
 
-onMounted(async () => {
-    const [l, t1, t2] = await Promise.all([
-        portal.show<CoverLetterSummary>(`/cover-letters/${id.value}`),
-        portal.list<TemplateOption>('/cover-letters/templates').catch(() => []),
-        portal.list<TemplateOption>('/shares/templates').catch(() => []),
+async function loadTemplates(lang?: string) {
+    const previewLocale = lang || letter.value?.language || locale.value;
+    const [t1, t2] = await Promise.all([
+        portal.list<TemplateOption>('/cover-letters/templates', { locale: previewLocale }).catch(() => []),
+        portal.list<TemplateOption>('/shares/templates', { locale: previewLocale }).catch(() => []),
     ]);
-    letter.value = l;
     templates.value = (t1 && t1.length ? t1 : t2);
+}
+
+onMounted(async () => {
+    const l = await portal.show<CoverLetterSummary>(`/cover-letters/${id.value}`);
+    letter.value = l;
+    await loadTemplates(l?.language || locale.value);
     if (l) {
         applyLetter(l);
         previewRevision.value = Date.now();
         previewReady.value = true;
     }
     loading.value = false;
+});
+
+watch(locale, async () => {
+    if (syncingForm.value) return;
+    const selected = form.template_id;
+    await loadTemplates(letter.value?.language || locale.value);
+    if (selected && templates.value.some((tpl) => String(tpl.id) === String(selected))) {
+        form.template_id = selected;
+    }
 });
 
 async function persist(opts?: { silent?: boolean }) {

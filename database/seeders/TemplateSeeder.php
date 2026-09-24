@@ -97,6 +97,8 @@ class TemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $data) {
+            $data['preview_ar'] = preg_replace('/\.png$/', '-ar.png', $data['preview']);
+
             // Insert missing templates only — never overwrite existing rows wholesale.
             $template = Template::firstOrCreate(
                 ['name' => $data['name']],
@@ -106,6 +108,10 @@ class TemplateSeeder extends Seeder
             // Repair broken preview paths (e.g. old storage/*.svg that were never shipped).
             if ($this->previewMissing($template->preview) && ! $this->previewMissing($data['preview'])) {
                 $template->update(['preview' => $data['preview']]);
+            }
+
+            if ($this->previewMissing($template->preview_ar) && ! $this->previewMissing($data['preview_ar'])) {
+                $template->update(['preview_ar' => $data['preview_ar']]);
             }
         }
     }
