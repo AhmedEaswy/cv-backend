@@ -54,6 +54,14 @@ class CoverLetterInfolist
                             ->label('Email')
                             ->icon('heroicon-m-envelope')
                             ->placeholder('—'),
+                        TextEntry::make('anonymous_user_id')
+                            ->label('Anonymous install ID')
+                            ->copyable()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        TextEntry::make('client_ref')
+                            ->label('Client document ID')
+                            ->placeholder('—'),
                         TextEntry::make('ip_address')
                             ->placeholder('—'),
                         TextEntry::make('country')

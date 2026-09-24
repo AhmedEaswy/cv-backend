@@ -237,6 +237,10 @@ class AuthController extends BaseApiController
                 'phone' => $user->phone,
                 'active' => $user->active,
                 'email_verified_at' => $user->email_verified_at,
+                'last_used_at' => $user->last_used_at,
+                'last_app_platform' => $user->last_app_platform,
+                'used_platforms' => $user->used_platforms ?? [],
+                'uses_both_platforms' => (bool) $user->uses_both_platforms,
                 'created_at' => $user->created_at,
             ],
         ], __('messages.me_success'));

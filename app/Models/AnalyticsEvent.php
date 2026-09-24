@@ -15,8 +15,17 @@ class AnalyticsEvent extends Model
         'ip_address',
         'country',
         'device',
+        'device_type',
+        'os',
+        'os_version',
+        'browser',
+        'device_model',
+        'app_platform',
+        'app_version',
+        'locale',
         'user_agent',
         'user_id',
+        'anonymous_user_id',
         'profile_id',
         'action_type',
         'channel',
@@ -25,6 +34,7 @@ class AnalyticsEvent extends Model
         'tool_name',
         'is_agent',
         'request_data',
+        'meta',
         'response_status',
         'duration_ms',
         'created_at',
@@ -34,6 +44,7 @@ class AnalyticsEvent extends Model
     {
         return [
             'request_data' => 'array',
+            'meta' => 'array',
             'created_at' => 'datetime',
             'is_agent' => 'boolean',
         ];
@@ -42,6 +53,11 @@ class AnalyticsEvent extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function anonymousUser(): BelongsTo
+    {
+        return $this->belongsTo(AnonymousUser::class);
     }
 
     public function profile(): BelongsTo

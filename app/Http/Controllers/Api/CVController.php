@@ -6,8 +6,10 @@ use App\Http\Requests\Api\PrintCVRequest;
 use App\Http\Requests\Api\StoreCVRequest;
 use App\Http\Requests\Api\UpdateCVRequest;
 use App\Models\AtsCheck;
+use App\Models\Profile;
 use App\Models\Template;
 use App\Repositories\CVRepositoryInterface;
+use App\Services\AnonymousUserService;
 use App\Services\CVDataMapper;
 use App\Services\CVPDFService;
 use App\Services\CvPhotoService;
@@ -22,7 +24,8 @@ class CVController extends BaseApiController
         private CVDataMapper $dataMapper,
         private CVPDFService $pdfService,
         private TrackingService $trackingService,
-        private CvPhotoService $photoService
+        private CvPhotoService $photoService,
+        private AnonymousUserService $anonymousUserService
     ) {
     }
 
@@ -72,12 +75,27 @@ class CVController extends BaseApiController
         $user = $request->user() ?? $request->user('sanctum');
 
         // If unauthenticated user provides template_id, generate PDF instead of creating profile
-        if (!$user && $request->has('template_id')) {
+        if (! $user && $request->has('template_id')) {
             return $this->generatePdfFromRequest($request);
         }
 
         // Authenticated callers always own the CV; guests may still pass user_id.
         $userId = $user?->id ?? $request->input('user_id');
+        $anonymousUser = $user ? null : $this->anonymousUserService->resolve($request);
+        $clientRef = $this->anonymousUserService->clientRef($request);
+
+        // Guest upsert: same install + client_ref updates existing row.
+        if (! $user && $anonymousUser) {
+            $existing = $this->anonymousUserService->findGuestProfile(
+                $anonymousUser,
+                null,
+                $clientRef
+            );
+
+            if ($existing) {
+                return $this->updateGuestProfile($request, $existing, $validated);
+            }
+        }
 
         // Map user_data to Profile structure
         $userData = $this->photoService->processUserDataPhoto($request->input('user_data', []));
@@ -99,6 +117,20 @@ class CVController extends BaseApiController
                 ->where('is_default', true)
                 ->value('id');
 
+        $ownership = [];
+        if ($user) {
+            // Authenticated creates may store the install id for attribution.
+            $authAnonymous = $this->anonymousUserService->resolve($request);
+            if ($authAnonymous) {
+                $ownership['anonymous_user_id'] = $authAnonymous->id;
+                if ($clientRef) {
+                    $ownership['client_ref'] = $clientRef;
+                }
+            }
+        } elseif ($anonymousUser) {
+            $ownership = $this->anonymousUserService->ownershipAttributes($request, $anonymousUser);
+        }
+
         $profile = $this->cvRepository->create(array_merge([
             'user_id' => $userId,
             'name' => $validated['name'],
@@ -112,7 +144,7 @@ class CVController extends BaseApiController
             'experiences' => $mappedData['experiences'] ?? null,
             'projects' => $mappedData['projects'] ?? null,
             'educations' => $mappedData['educations'] ?? null,
-        ], $tracking));
+        ], $tracking, $ownership));
 
         return $this->successResponse(
             $this->dataMapper->formatProfileResponse($profile),
@@ -130,7 +162,7 @@ class CVController extends BaseApiController
 
         $profile = $this->cvRepository->findByIdForUser($id, $user->id);
 
-        if (!$profile) {
+        if (! $profile) {
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
@@ -145,11 +177,10 @@ class CVController extends BaseApiController
      */
     public function update(UpdateCVRequest $request, string $id)
     {
-        $user = $request->user();
+        $user = $request->user() ?? $request->user('sanctum');
+        $profile = $this->resolveOwnedProfile($request, (int) $id, $user);
 
-        $profile = $this->cvRepository->findByIdForUser($id, $user->id);
-
-        if (!$profile) {
+        if (! $profile) {
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
@@ -226,7 +257,7 @@ class CVController extends BaseApiController
 
         $profile = $this->cvRepository->findByIdForUser($id, $user->id);
 
-        if (!$profile) {
+        if (! $profile) {
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
@@ -245,7 +276,7 @@ class CVController extends BaseApiController
 
         $original = $this->cvRepository->findByIdForUser($id, $user->id);
 
-        if (!$original) {
+        if (! $original) {
             return $this->errorResponse(__('messages.cv_not_found'), 404);
         }
 
@@ -276,72 +307,113 @@ class CVController extends BaseApiController
      */
     public function print(PrintCVRequest $request)
     {
-        // $shouldReturnUrl = $request->boolean('return_url');
         $shouldReturnUrl = true;
         $templateId = $request->input('template_id');
         $profileId = $request->input('profile_id');
 
-        // Load template
         $template = $this->cvRepository->findActiveTemplate($templateId);
 
-        if (!$template) {
+        if (! $template) {
             return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
         }
 
-        // Load existing profile or create temporary one
+        $user = $request->user() ?? $request->user('sanctum');
+        $anonymousUser = $user ? null : $this->anonymousUserService->resolve($request);
+        $clientRef = $this->anonymousUserService->clientRef($request);
+
         if ($profileId) {
-            $user = $request->user();
             $profile = $this->cvRepository->findById($profileId);
 
-            // If user is authenticated, verify ownership
             if ($user && $profile && $profile->user_id !== $user->id) {
                 return $this->errorResponse(__('messages.cv_not_found'), 404);
             }
 
-            if (!$profile) {
+            if (! $user && $profile) {
+                $ownsGuest = $anonymousUser
+                    && $profile->user_id === null
+                    && $profile->anonymous_user_id === $anonymousUser->id;
+
+                if (! $ownsGuest) {
+                    return $this->errorResponse(__('messages.cv_not_found'), 404);
+                }
+            }
+
+            if (! $profile) {
                 return $this->errorResponse(__('messages.cv_not_found'), 404);
             }
 
-            $this->cvRepository->update($profile, $this->trackingService->capture($request));
-        } else {
-            $profile = $this->pdfService->createTemporaryProfile(
-                $this->photoService->processUserDataPhoto($request->input('user_data', [])),
-                $request->user()?->id,
-                $request->input('name', 'CV'),
-                $request->input('language', 'en'),
-                $request->input('sections_order')
-            );
-
-            if (! $profile->exists) {
-                $profile->save();
-                $profile->fill($this->trackingService->capture($request))->save();
+            $updateData = $this->trackingService->capture($request);
+            if ($request->filled('user_data')) {
+                $updateData = array_merge($updateData, $this->mappedProfileFields($request));
             }
-        }
+            if ($request->filled('name')) {
+                $updateData['name'] = $request->input('name');
+            }
+            if ($request->filled('language')) {
+                $updateData['language'] = $request->input('language');
+            }
+            if ($request->has('sections_order')) {
+                $updateData['sections_order'] = $request->input('sections_order');
+            }
 
-        // Generate PDF using the service
-        try {
-            if ($shouldReturnUrl) {
-                $url = $this->pdfService->generatePdf($profile, $template, true);
+            $this->cvRepository->update($profile, $updateData);
+        } else {
+            $profile = null;
 
-                return $this->successResponse(
-                    ['url' => $url],
-                    __('messages.pdf_generated_successfully')
+            if (! $user && $anonymousUser) {
+                $profile = $this->anonymousUserService->findGuestProfile(
+                    $anonymousUser,
+                    null,
+                    $clientRef
                 );
             }
 
-            return $this->pdfService->generatePdf($profile, $template);
-        } catch (\RuntimeException $e) {
-            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
-        } catch (\Exception $e) {
-            $errorMessage = __('messages.pdf_generation_failed');
-            if (app()->environment('production')) {
-                $errorMessage .= ' ' . __('messages.contact_support');
+            if ($profile) {
+                $updateData = array_merge(
+                    $this->trackingService->capture($request),
+                    $this->mappedProfileFields($request)
+                );
+                if ($request->filled('name')) {
+                    $updateData['name'] = $request->input('name');
+                }
+                if ($request->filled('language')) {
+                    $updateData['language'] = $request->input('language');
+                }
+                if ($request->has('sections_order')) {
+                    $updateData['sections_order'] = $request->input('sections_order');
+                }
+                $this->cvRepository->update($profile, $updateData);
             } else {
-                $errorMessage .= ': ' . $e->getMessage();
-            }
+                $ownership = [];
+                if ($user) {
+                    $authAnonymous = $this->anonymousUserService->resolve($request);
+                    if ($authAnonymous) {
+                        $ownership['anonymous_user_id'] = $authAnonymous->id;
+                        if ($clientRef) {
+                            $ownership['client_ref'] = $clientRef;
+                        }
+                    }
+                } elseif ($anonymousUser) {
+                    $ownership = $this->anonymousUserService->ownershipAttributes($request, $anonymousUser);
+                }
 
-            return $this->errorResponse($errorMessage, 500);
+                $profile = $this->pdfService->createTemporaryProfile(
+                    $this->photoService->processUserDataPhoto($request->input('user_data', [])),
+                    $user?->id,
+                    $request->input('name', 'CV'),
+                    $request->input('language', 'en'),
+                    $request->input('sections_order')
+                );
+
+                $profile->fill(array_merge(
+                    $this->trackingService->capture($request),
+                    $ownership
+                ));
+                $profile->save();
+            }
         }
+
+        return $this->respondWithPdf($profile, $template, $shouldReturnUrl);
     }
 
     /**
@@ -349,50 +421,150 @@ class CVController extends BaseApiController
      */
     private function generatePdfFromRequest(Request $request)
     {
-        // $shouldReturnUrl = $request->boolean('return_url');
         $shouldReturnUrl = true;
         $templateId = $request->input('template_id');
 
-        // Load template
         $template = $this->cvRepository->findActiveTemplate($templateId);
 
-        if (!$template) {
+        if (! $template) {
             return $this->errorResponse(__('messages.template_not_found_or_inactive'), 404);
         }
 
-        // Create temporary profile
-        $profile = $this->pdfService->createTemporaryProfile(
-            $this->photoService->processUserDataPhoto($request->input('user_data', [])),
-            null,
-            $request->input('name', 'CV'),
-            $request->input('language', 'en'),
-            $request->input('sections_order')
+        $anonymousUser = $this->anonymousUserService->resolve($request);
+        $clientRef = $this->anonymousUserService->clientRef($request);
+        $profile = null;
+
+        if ($anonymousUser) {
+            $profile = $this->anonymousUserService->findGuestProfile(
+                $anonymousUser,
+                $request->integer('profile_id') ?: null,
+                $clientRef
+            );
+        }
+
+        if ($profile) {
+            $updateData = array_merge(
+                $this->trackingService->capture($request),
+                $this->mappedProfileFields($request)
+            );
+            if ($request->filled('name')) {
+                $updateData['name'] = $request->input('name');
+            }
+            if ($request->filled('language')) {
+                $updateData['language'] = $request->input('language');
+            }
+            if ($request->has('sections_order')) {
+                $updateData['sections_order'] = $request->input('sections_order');
+            }
+            $this->cvRepository->update($profile, $updateData);
+        } else {
+            $ownership = $anonymousUser
+                ? $this->anonymousUserService->ownershipAttributes($request, $anonymousUser)
+                : [];
+
+            $profile = $this->pdfService->createTemporaryProfile(
+                $this->photoService->processUserDataPhoto($request->input('user_data', [])),
+                null,
+                $request->input('name', 'CV'),
+                $request->input('language', 'en'),
+                $request->input('sections_order')
+            );
+
+            $profile->fill(array_merge(
+                $this->trackingService->capture($request),
+                $ownership
+            ));
+            $profile->save();
+        }
+
+        return $this->respondWithPdf($profile, $template, $shouldReturnUrl);
+    }
+
+    private function updateGuestProfile(Request $request, Profile $profile, array $validated)
+    {
+        $updateData = $this->trackingService->capture($request);
+
+        if (isset($validated['name'])) {
+            $updateData['name'] = $validated['name'];
+        }
+        if (isset($validated['language'])) {
+            $updateData['language'] = $validated['language'];
+        }
+        if (isset($validated['sections_order'])) {
+            $updateData['sections_order'] = $validated['sections_order'];
+        }
+        if (array_key_exists('template_id', $validated)) {
+            $updateData['template_id'] = $validated['template_id'];
+        }
+        if ($request->filled('user_data')) {
+            $updateData = array_merge($updateData, $this->mappedProfileFields($request));
+        }
+
+        $updated = $this->cvRepository->update($profile, $updateData);
+
+        return $this->successResponse(
+            $this->dataMapper->formatProfileResponse($updated),
+            __('messages.cv_updated')
         );
+    }
 
-        // Save profile to database with tracking data
-        $profile->save();
-        $profile->fill($this->trackingService->capture($request))->save();
+    /**
+     * @return array<string, mixed>
+     */
+    private function mappedProfileFields(Request $request): array
+    {
+        $userData = $this->photoService->processUserDataPhoto($request->input('user_data', []));
+        $mappedData = $this->dataMapper->mapUserDataToProfile($userData);
 
-        // Generate PDF using the service
+        return array_filter([
+            'info' => $mappedData['info'] ?? null,
+            'interests' => $mappedData['interests'] ?? null,
+            'languages' => $mappedData['languages'] ?? null,
+            'experiences' => $mappedData['experiences'] ?? null,
+            'projects' => $mappedData['projects'] ?? null,
+            'educations' => $mappedData['educations'] ?? null,
+        ], fn ($value) => $value !== null);
+    }
+
+    private function resolveOwnedProfile(Request $request, int $id, $user): ?Profile
+    {
+        if ($user) {
+            return $this->cvRepository->findByIdForUser($id, $user->id);
+        }
+
+        $anonymousUser = $this->anonymousUserService->resolve($request);
+
+        if (! $anonymousUser) {
+            return null;
+        }
+
+        return $this->anonymousUserService->findGuestProfile($anonymousUser, $id);
+    }
+
+    private function respondWithPdf(Profile $profile, Template $template, bool $shouldReturnUrl)
+    {
         try {
             if ($shouldReturnUrl) {
                 $url = $this->pdfService->generatePdf($profile, $template, true);
 
                 return $this->successResponse(
-                    ['url' => $url],
+                    [
+                        'url' => $url,
+                        'profile_id' => $profile->id,
+                    ],
                     __('messages.pdf_generated_successfully')
                 );
             }
 
             return $this->pdfService->generatePdf($profile, $template);
         } catch (\RuntimeException $e) {
-            return $this->errorResponse(__('messages.pdf_generation_failed') . ': ' . $e->getMessage(), 500);
+            return $this->errorResponse(__('messages.pdf_generation_failed').': '.$e->getMessage(), 500);
         } catch (\Exception $e) {
             $errorMessage = __('messages.pdf_generation_failed');
             if (app()->environment('production')) {
-                $errorMessage .= ' ' . __('messages.contact_support');
+                $errorMessage .= ' '.__('messages.contact_support');
             } else {
-                $errorMessage .= ': ' . $e->getMessage();
+                $errorMessage .= ': '.$e->getMessage();
             }
 
             return $this->errorResponse($errorMessage, 500);

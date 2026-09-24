@@ -35,6 +35,7 @@ export const useApi = () => {
         onRequest({ options }) {
             const headers = new Headers(options.headers as HeadersInit | undefined);
             headers.set('Accept', 'application/json');
+            headers.set('X-App-Platform', 'web');
 
             const locale = useNuxtApp().$i18n?.locale?.value;
             if (locale) {
@@ -43,7 +44,7 @@ export const useApi = () => {
 
             // Server: forward the cookie so /auth/me works during SSR
             if (import.meta.server) {
-                const incoming = useRequestHeaders(['cookie']);
+                const incoming = useRequestHeaders(['cookie', 'user-agent']);
                 if (incoming.cookie) {
                     headers.set('cookie', incoming.cookie);
                 }
@@ -52,6 +53,15 @@ export const useApi = () => {
                 const token = getToken();
                 if (token) {
                     headers.set('Authorization', `Bearer ${token}`);
+                }
+                if (typeof navigator !== 'undefined') {
+                    const ua = navigator.userAgent || '';
+                    const mobile = /iPhone|iPad|Android/i.test(ua);
+                    headers.set('X-Device-Type', mobile ? 'Mobile' : 'Desktop');
+                }
+                const anonymousId = useAnonymousId().getOrCreate();
+                if (anonymousId) {
+                    headers.set('X-Anonymous-Id', anonymousId);
                 }
             }
 

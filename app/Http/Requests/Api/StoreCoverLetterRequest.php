@@ -18,6 +18,8 @@ class StoreCoverLetterRequest extends BaseFormRequest
             'sections_order.*' => 'string',
             'user_id' => 'sometimes|nullable|exists:users,id',
             'cover_letter_template_id' => 'sometimes|nullable|exists:cover_letter_templates,id',
+            'client_ref' => 'sometimes|nullable|string|max:64',
+            'anonymous_id' => 'sometimes|nullable|uuid',
             'user_data' => 'sometimes|array',
             'user_data.firstName' => 'sometimes|string|max:255',
             'user_data.lastName' => 'sometimes|string|max:255',

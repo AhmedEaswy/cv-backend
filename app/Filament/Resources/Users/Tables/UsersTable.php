@@ -74,6 +74,32 @@ class UsersTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('last_used_at')
+                    ->label('Last used')
+                    ->dateTime()
+                    ->sortable()
+                    ->placeholder('—'),
+                TextColumn::make('last_app_platform')
+                    ->label('Last platform')
+                    ->badge()
+                    ->placeholder('—')
+                    ->toggleable(),
+                TextColumn::make('used_platforms')
+                    ->label('Platforms')
+                    ->formatStateUsing(function ($state): string {
+                        if (! is_array($state) || $state === []) {
+                            return '—';
+                        }
+
+                        return implode(', ', $state);
+                    })
+                    ->toggleable(),
+                TextColumn::make('uses_both_platforms')
+                    ->label('Web + mobile')
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state ? __('Yes') : __('No'))
+                    ->color(fn ($state): string => $state ? 'success' : 'gray')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime()
@@ -89,6 +115,8 @@ class UsersTable
                 TrashedFilter::make(),
                 TernaryFilter::make('active')
                     ->label('Active Status'),
+                TernaryFilter::make('uses_both_platforms')
+                    ->label('Uses web + mobile'),
             ])
             ->recordActions([
                 ViewAction::make(),

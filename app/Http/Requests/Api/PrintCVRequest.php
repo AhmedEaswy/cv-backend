@@ -22,6 +22,12 @@ class PrintCVRequest extends BaseFormRequest
         return [
             'profile_id' => 'sometimes|nullable|exists:profiles,id',
             'template_id' => 'required|exists:templates,id',
+            'client_ref' => 'sometimes|nullable|string|max:64',
+            'anonymous_id' => 'sometimes|nullable|uuid',
+            'name' => 'sometimes|nullable|string|max:255',
+            'language' => 'sometimes|nullable|string|max:10|in:en,ar,tr,es,fr,de,ur',
+            'sections_order' => 'sometimes|array',
+            'sections_order.*' => 'string',
             // If no profile_id, require user_data to create temporary profile
             'user_data' => 'required_without:profile_id|array',
             'user_data.firstName' => 'required_with:user_data|string|max:255',

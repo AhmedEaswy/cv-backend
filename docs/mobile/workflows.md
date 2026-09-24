@@ -54,7 +54,7 @@ Do not use the browser redirect/callback endpoints unless you intentionally embe
 4. Save: `POST /cvs` with Bearer → store returned `id`
 5. Export: `POST /cvs/print`
 
-Guest mode (no account): `POST /cvs` with `template_id` + `user_data` returns PDF `{ url }` without requiring login.
+Guest mode (no account): `POST /cvs` with `template_id` + `user_data` returns PDF `{ url, profile_id }` without requiring login. Send a stable install UUID as `X-Anonymous-Id` (or body `anonymous_id`) and the local document id as `client_ref` so reprints update the same profile.
 
 ---
 

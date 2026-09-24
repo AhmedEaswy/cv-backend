@@ -52,6 +52,26 @@ class UserInfolist
                             ->label('Email verified')
                             ->dateTime()
                             ->placeholder(__('Not verified')),
+                        TextEntry::make('last_used_at')
+                            ->label('Last used')
+                            ->dateTime()
+                            ->placeholder('—'),
+                        TextEntry::make('last_app_platform')
+                            ->label('Last platform')
+                            ->badge()
+                            ->placeholder('—'),
+                        TextEntry::make('used_platforms')
+                            ->label('Platforms used')
+                            ->formatStateUsing(function ($state): string {
+                                if (! is_array($state) || $state === []) {
+                                    return '—';
+                                }
+
+                                return implode(', ', $state);
+                            }),
+                        IconEntry::make('uses_both_platforms')
+                            ->label('Uses web + mobile')
+                            ->boolean(),
                         TextEntry::make('created_at')
                             ->dateTime(),
                         TextEntry::make('updated_at')

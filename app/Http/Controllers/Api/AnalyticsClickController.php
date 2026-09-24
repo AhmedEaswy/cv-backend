@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Jobs\RecordAnalyticsEvent;
 use App\Services\Agent\AgentDetector;
+use App\Services\AnonymousUserService;
 use App\Services\TrackingService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,7 @@ class AnalyticsClickController extends BaseApiController
     public function __construct(
         private TrackingService $trackingService,
         private AgentDetector $agentDetector,
+        private AnonymousUserService $anonymousUserService,
     ) {}
 
     /**
@@ -23,23 +25,32 @@ class AnalyticsClickController extends BaseApiController
         $data = $request->validate([
             'target' => ['required', 'string', 'max:80', 'regex:/^[a-z][a-z0-9_]*$/'],
             'page' => ['nullable', 'string', 'max:255'],
+            'meta' => ['nullable', 'array'],
         ]);
 
         $tracking = $this->trackingService->capture($request);
         $agent = $this->agentDetector->detect($request);
         $actionType = 'click_'.$data['target'];
+        $anonymousUser = $this->anonymousUserService->resolve($request);
+
+        $meta = array_filter([
+            'page' => $data['page'] ?? null,
+            ...($data['meta'] ?? []),
+        ], fn ($v) => $v !== null && $v !== '');
 
         try {
             RecordAnalyticsEvent::dispatch(array_merge($tracking, $agent, [
                 'endpoint' => $request->path(),
                 'method' => $request->method(),
                 'user_agent' => $request->header('User-Agent'),
-                'user_id' => $request->user()?->id,
+                'user_id' => $request->user()?->id ?? $request->user('sanctum')?->id,
+                'anonymous_user_id' => $anonymousUser?->id,
                 'action_type' => $actionType,
                 'request_data' => [
                     'target' => $data['target'],
                     'page' => $data['page'] ?? null,
                 ],
+                'meta' => $meta === [] ? null : $meta,
                 'response_status' => 200,
                 'duration_ms' => 0,
                 'created_at' => now(),

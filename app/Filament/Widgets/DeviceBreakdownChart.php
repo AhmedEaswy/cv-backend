@@ -39,19 +39,30 @@ class DeviceBreakdownChart extends ChartWidget
      */
     protected function getData(): array
     {
-        $rows = AnalyticsEvent::query()
-            ->whereNotNull('device')
-            ->select('device', DB::raw('COUNT(*) as total'))
-            ->groupBy('device')
-            ->get();
+        $typed = AnalyticsEvent::query()
+            ->whereNotNull('device_type')
+            ->select('device_type', DB::raw('COUNT(*) as total'))
+            ->groupBy('device_type')
+            ->pluck('total', 'device_type');
 
-        $mobile = 0;
-        $desktop = 0;
-        foreach ($rows as $row) {
-            if (str_starts_with($row->device, 'Mobile')) {
-                $mobile += (int) $row->total;
-            } else {
-                $desktop += (int) $row->total;
+        if ($typed->isNotEmpty()) {
+            $mobile = (int) ($typed->get('Mobile', 0) + $typed->get('Tablet', 0));
+            $desktop = (int) $typed->get('Desktop', 0);
+        } else {
+            $rows = AnalyticsEvent::query()
+                ->whereNotNull('device')
+                ->select('device', DB::raw('COUNT(*) as total'))
+                ->groupBy('device')
+                ->get();
+
+            $mobile = 0;
+            $desktop = 0;
+            foreach ($rows as $row) {
+                if (str_starts_with($row->device, 'Mobile') || str_starts_with($row->device, 'Tablet')) {
+                    $mobile += (int) $row->total;
+                } else {
+                    $desktop += (int) $row->total;
+                }
             }
         }
 

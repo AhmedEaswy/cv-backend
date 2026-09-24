@@ -48,9 +48,10 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     // Public shares routes
     Route::get('/shares/templates', [ShareController::class, 'templates']);
 
-    // Public CV routes
+    // Public CV routes (optional Bearer / anonymous install id)
     Route::post('/cvs', [CVController::class, 'store']);
     Route::post('/cvs/print', [CVController::class, 'print']);
+    Route::put('/cvs/{id}', [CVController::class, 'update']);
     Route::post('/cvs/ats-check', [AtsCheckController::class, 'check']);
     Route::post('/cvs/ats-check/upload', [AtsCheckController::class, 'checkUpload']);
 
@@ -58,6 +59,7 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     Route::get('/cover-letters/templates', [CoverLetterController::class, 'templates']);
     Route::post('/cover-letters', [CoverLetterController::class, 'store']);
     Route::post('/cover-letters/print', [CoverLetterController::class, 'print']);
+    Route::put('/cover-letters/{id}', [CoverLetterController::class, 'update']);
 
     // Public profile template list
     Route::get('/public-profiles/templates', [PublicProfileController::class, 'templates']);
@@ -68,7 +70,6 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::post('/cvs/import/linkedin', [LinkedInCvController::class, 'store'])->middleware('throttle:10,1');
         Route::post('/cvs/{id}/duplicate', [CVController::class, 'duplicate']);
         Route::get('/cvs/{id}', [CVController::class, 'show']);
-        Route::put('/cvs/{id}', [CVController::class, 'update']);
         Route::delete('/cvs/{id}', [CVController::class, 'destroy']);
     });
 
@@ -76,7 +77,6 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/cover-letters', [CoverLetterController::class, 'index']);
         Route::get('/cover-letters/{id}', [CoverLetterController::class, 'show']);
-        Route::put('/cover-letters/{id}', [CoverLetterController::class, 'update']);
         Route::delete('/cover-letters/{id}', [CoverLetterController::class, 'destroy']);
     });
 

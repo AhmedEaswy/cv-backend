@@ -32,6 +32,12 @@ class CoverLettersTable
                     ->label('User')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('anonymous_user_id')
+                    ->label('Anonymous ID')
+                    ->searchable()
+                    ->toggleable()
+                    ->limit(12)
+                    ->tooltip(fn ($state) => $state),
                 TextColumn::make('name')
                     ->label('Name')
                     ->sortable()

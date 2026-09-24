@@ -33,6 +33,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'type',
         'active',
+        'last_used_at',
+        'last_app_platform',
+        'used_platforms',
+        'uses_both_platforms',
     ];
 
     /**
@@ -54,9 +58,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_used_at' => 'datetime',
             'password' => 'hashed',
             'type' => UserType::class,
             'active' => 'boolean',
+            'used_platforms' => 'array',
+            'uses_both_platforms' => 'boolean',
         ];
     }
 

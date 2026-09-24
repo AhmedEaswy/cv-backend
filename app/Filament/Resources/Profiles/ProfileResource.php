@@ -72,7 +72,7 @@ class ProfileResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\SiblingProfilesRelationManager::class,
         ];
     }
 

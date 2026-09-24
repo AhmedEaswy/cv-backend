@@ -14,6 +14,8 @@ class Profile extends Model
 
     protected $fillable = [
         'user_id',
+        'anonymous_user_id',
+        'client_ref',
         'name',
         'language',
         'is_public',
@@ -53,6 +55,20 @@ class Profile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function anonymousUser(): BelongsTo
+    {
+        return $this->belongsTo(AnonymousUser::class);
+    }
+
+    /**
+     * Other profiles from the same anonymous install.
+     */
+    public function siblingProfiles(): HasMany
+    {
+        return $this->hasMany(self::class, 'anonymous_user_id', 'anonymous_user_id')
+            ->where('profiles.id', '!=', $this->getKey() ?? 0);
     }
 
     /**

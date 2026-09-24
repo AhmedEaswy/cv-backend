@@ -14,6 +14,12 @@ class PrintCoverLetterRequest extends BaseFormRequest
         return [
             'cover_letter_id' => 'sometimes|nullable|exists:cover_letters,id',
             'template_id' => 'required|exists:cover_letter_templates,id',
+            'client_ref' => 'sometimes|nullable|string|max:64',
+            'anonymous_id' => 'sometimes|nullable|uuid',
+            'name' => 'sometimes|nullable|string|max:255',
+            'language' => 'sometimes|nullable|string|max:10|in:en,ar,tr',
+            'sections_order' => 'sometimes|array',
+            'sections_order.*' => 'string',
             'user_data' => 'required_without:cover_letter_id|array',
             'user_data.firstName' => 'required_with:user_data|string|max:255',
             'user_data.lastName' => 'required_with:user_data|string|max:255',

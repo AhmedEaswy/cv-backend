@@ -26,6 +26,8 @@ class StoreCVRequest extends BaseFormRequest
             'sections_order.*' => 'string',
             'user_id' => 'sometimes|nullable|exists:users,id',
             'template_id' => 'sometimes|nullable|exists:templates,id',
+            'client_ref' => 'sometimes|nullable|string|max:64',
+            'anonymous_id' => 'sometimes|nullable|uuid',
             'user_data' => 'sometimes|array',
             'user_data.firstName' => 'sometimes|nullable|string|max:255',
             'user_data.lastName' => 'sometimes|nullable|string|max:255',

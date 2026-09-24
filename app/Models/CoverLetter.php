@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CoverLetter extends Model
@@ -13,6 +14,8 @@ class CoverLetter extends Model
 
     protected $fillable = [
         'user_id',
+        'anonymous_user_id',
+        'client_ref',
         'cover_letter_template_id',
         'name',
         'language',
@@ -38,6 +41,20 @@ class CoverLetter extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function anonymousUser(): BelongsTo
+    {
+        return $this->belongsTo(AnonymousUser::class);
+    }
+
+    /**
+     * Other cover letters from the same anonymous install.
+     */
+    public function siblingCoverLetters(): HasMany
+    {
+        return $this->hasMany(self::class, 'anonymous_user_id', 'anonymous_user_id')
+            ->where('cover_letters.id', '!=', $this->getKey() ?? 0);
     }
 
     public function template(): BelongsTo

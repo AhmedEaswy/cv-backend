@@ -100,18 +100,44 @@ Errors:
 | Access | Examples |
 |--------|----------|
 | Public | register, login, password reset, Google exchange, template lists, guest CV/cover-letter create & print, ATS check, analytics click |
-| Optional Bearer | `POST /cvs`, `POST /cvs/print`, `POST /cover-letters`, `POST /cover-letters/print` — if a token is present, resources attach to that user |
-| Required Bearer | logout, me, CV/CL list/show/update/delete/duplicate, public-profile CRUD, portal stats, AI settings, agent tokens |
+| Optional Bearer | `POST /cvs`, `POST /cvs/print`, `PUT /cvs/{id}`, `POST /cover-letters`, `POST /cover-letters/print`, `PUT /cover-letters/{id}` — Bearer attaches to a user; guests send `X-Anonymous-Id` + `client_ref` instead |
+| Required Bearer | logout, me, CV/CL list/show/delete/duplicate, public-profile CRUD, portal stats, AI settings, agent tokens |
+
+## Anonymous install id
+
+Guests should send a stable UUID per app install on every request:
+
+```http
+X-Anonymous-Id: 550e8400-e29b-41d4-a716-446655440000
+```
+
+Include `client_ref` (local document id) on create/print so the same CV or cover letter is updated instead of duplicated. PDF responses also return `profile_id` / `cover_letter_id`.
+
+## Device / app metadata (analytics)
+
+Send these headers on every request so admin Reports can segment by platform and OS:
+
+| Header | Example | Notes |
+|--------|---------|--------|
+| `X-App-Platform` | `ios` / `android` / `web` | Required for mobile/web segmentation |
+| `X-App-Version` | `1.3.0+16` | App store version + build |
+| `X-OS-Version` | `17.2` / `14` | OS version string |
+| `X-Device-Model` | `iPhone` / `Pixel 8` | Device model when known |
+| `X-Device-Type` | `Mobile` / `Desktop` / `Tablet` | Optional override |
+
+The API also parses `User-Agent` and `Accept-Language` as fallbacks.
+
+For **logged-in** users, each API call updates `last_used_at` and accumulates `used_platforms`. When both `web` and a mobile platform (`ios`/`android`) have been seen, `uses_both_platforms` becomes true (visible in admin Users + Reports).
 
 ## PDF behaviour (important)
 
 `POST /cvs/print` and `POST /cover-letters/print` (and guest create-with-`template_id`) return **JSON**, not binary PDF:
 
 ```json
-{ "success": true, "result": { "url": "https://…/storage/cvs/….pdf" } }
+{ "success": true, "result": { "url": "https://…/storage/cvs/….pdf", "profile_id": 12 } }
 ```
 
-Open `result.url` in the system browser / download manager / `url_launcher`.
+Open `result.url` in the system browser / download manager / `url_launcher`. Store `profile_id` / `cover_letter_id` for later updates.
 
 ## CORS
 
