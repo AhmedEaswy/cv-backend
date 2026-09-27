@@ -50,6 +50,7 @@ class PortalStatsService
             'public_profile_is_published' => $publicProfile?->is_public ?? false,
             'public_profile_slug' => $publicProfile?->slug,
             'public_profile_url' => $publicProfile?->public_url,
+            'inbox_enabled' => $publicProfile?->inboxIsEnabled() ?? false,
             'latest_cv' => $latestCv ? [
                 'id' => $latestCv->id,
                 'name' => $latestCv->name,

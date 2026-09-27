@@ -21,7 +21,12 @@ class PublicProfile extends Model
         'is_public',
         'views_count',
         'enable_contact_form',
+        'enable_inbox',
         'enable_subdomain',
+        'profile_url_mode',
+        'custom_domain',
+        'custom_domain_dns_token',
+        'custom_domain_verified_at',
         'contact_form_recipient',
         'language',
         'headline',
@@ -49,7 +54,9 @@ class PublicProfile extends Model
             'is_public' => 'boolean',
             'views_count' => 'integer',
             'enable_contact_form' => 'boolean',
+            'enable_inbox' => 'boolean',
             'enable_subdomain' => 'boolean',
+            'custom_domain_verified_at' => 'datetime',
             'info' => 'array',
             'social_links' => 'array',
             'experiences' => 'array',
@@ -75,6 +82,16 @@ class PublicProfile extends Model
                 $profile->slug = static::generateUniqueSlug($profile);
             } else {
                 $profile->slug = Str::slug($profile->slug);
+            }
+
+            $profile->syncProfileUrlModeFields();
+
+            if ($profile->isDirty('custom_domain') && filled($profile->custom_domain)) {
+                $profile->custom_domain = strtolower(trim((string) $profile->custom_domain));
+                $profile->custom_domain_verified_at = null;
+                if (blank($profile->custom_domain_dns_token)) {
+                    $profile->custom_domain_dns_token = Str::random(32);
+                }
             }
         });
     }
@@ -127,20 +144,79 @@ class PublicProfile extends Model
 
     public function subdomainUrl(): ?string
     {
-        if (! $this->enable_subdomain) {
+        if ($this->profileUrlMode() !== 'subdomain') {
             return null;
         }
 
         return app(ProfileDomain::class)->subdomainUrl((string) $this->slug);
     }
 
+    public function customDomainUrl(): ?string
+    {
+        if ($this->profileUrlMode() !== 'custom_domain') {
+            return null;
+        }
+
+        if (! filled($this->custom_domain) || ! $this->custom_domain_verified_at) {
+            return null;
+        }
+
+        $scheme = parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https';
+
+        return $scheme.'://'.strtolower((string) $this->custom_domain);
+    }
+
+    public function profileUrlMode(): string
+    {
+        $mode = $this->profile_url_mode ?: 'slug';
+
+        if (! in_array($mode, ['slug', 'subdomain', 'custom_domain'], true)) {
+            return 'slug';
+        }
+
+        return $mode;
+    }
+
+    public function syncProfileUrlModeFields(): void
+    {
+        if (($this->profile_url_mode === null || $this->profile_url_mode === 'slug')
+            && $this->enable_subdomain) {
+            $this->profile_url_mode = 'subdomain';
+        }
+
+        if ($this->isDirty('enable_subdomain') && ! $this->isDirty('profile_url_mode')) {
+            $this->profile_url_mode = $this->enable_subdomain ? 'subdomain' : 'slug';
+        }
+
+        $mode = $this->profileUrlMode();
+        $this->enable_subdomain = $mode === 'subdomain';
+
+        if ($mode !== 'custom_domain') {
+            return;
+        }
+
+        if (blank($this->custom_domain_dns_token) && filled($this->custom_domain)) {
+            $this->custom_domain_dns_token = Str::random(32);
+        }
+    }
+
     public function preferredPublicUrl(): string
     {
-        if ($this->enable_subdomain) {
+        $custom = $this->customDomainUrl();
+        if ($custom !== null) {
+            return $custom;
+        }
+
+        if ($this->profileUrlMode() === 'subdomain') {
             return $this->subdomainUrl() ?? $this->pathUrl();
         }
 
         return $this->pathUrl();
+    }
+
+    public function inboxIsEnabled(): bool
+    {
+        return (bool) ($this->enable_inbox ?? true);
     }
 
     /**
@@ -148,7 +224,9 @@ class PublicProfile extends Model
      */
     public function showsContactForm(): bool
     {
-        return $this->is_public && (bool) $this->enable_contact_form;
+        return $this->is_public
+            && $this->inboxIsEnabled()
+            && (bool) $this->enable_contact_form;
     }
 
     /**

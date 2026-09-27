@@ -25,6 +25,10 @@ class PublicProfileInboxController extends BaseApiController
             return $this->successResponse([], __('messages.public_profile_not_found'));
         }
 
+        if (! $profile->inboxIsEnabled()) {
+            return $this->successResponse([], __('messages.inbox_disabled'));
+        }
+
         $query = $profile->contactMessages()
             ->visible()
             ->with(['replies' => fn ($q) => $q->orderBy('created_at')]);
@@ -147,7 +151,7 @@ class PublicProfileInboxController extends BaseApiController
     private function findOwnedMessage(Request $request, int $id)
     {
         $profile = $this->repository->findForUser($request->user()->id);
-        if (! $profile) {
+        if (! $profile || ! $profile->inboxIsEnabled()) {
             return null;
         }
 

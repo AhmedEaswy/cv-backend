@@ -34,7 +34,10 @@ trait ValidatesPublicProfileFields
             'language' => 'sometimes|string|max:10|in:en,ar,tr,es,fr,de,ur',
             'is_public' => 'sometimes|boolean',
             'enable_contact_form' => 'sometimes|boolean',
+            'enable_inbox' => 'sometimes|boolean',
             'enable_subdomain' => 'sometimes|boolean',
+            'profile_url_mode' => 'sometimes|string|in:slug,subdomain,custom_domain',
+            'custom_domain' => 'sometimes|nullable|string|max:191',
             'contact_form_recipient' => 'sometimes|nullable|email:rfc|max:191',
             'headline' => 'sometimes|nullable|string|max:255',
             'about' => 'sometimes|nullable|string',
@@ -93,17 +96,29 @@ trait ValidatesPublicProfileFields
                 $slug = $this->user()->publicProfile->slug;
             }
 
-            $enableSubdomain = $this->has('enable_subdomain')
-                ? $this->boolean('enable_subdomain')
-                : (bool) ($this->user()?->publicProfile?->enable_subdomain ?? false);
+            $urlMode = $this->input('profile_url_mode');
+            if ($urlMode === null && $this->has('enable_subdomain')) {
+                $urlMode = $this->boolean('enable_subdomain') ? 'subdomain' : null;
+            }
+            if ($urlMode === null) {
+                $urlMode = $this->user()?->publicProfile?->profile_url_mode
+                    ?? ($this->user()?->publicProfile?->enable_subdomain ? 'subdomain' : 'slug');
+            }
 
             if (is_string($slug) && $slug !== '') {
                 if ($profileDomain->isReserved($slug)) {
                     $v->errors()->add('slug', __('messages.slug_reserved'));
                 }
 
-                if ($enableSubdomain && $profileDomain->isReserved($slug)) {
-                    $v->errors()->add('enable_subdomain', __('messages.subdomain_slug_reserved'));
+                if ($urlMode === 'subdomain' && $profileDomain->isReserved($slug)) {
+                    $v->errors()->add('profile_url_mode', __('messages.subdomain_slug_reserved'));
+                }
+            }
+
+            if ($urlMode === 'custom_domain') {
+                $domain = strtolower(trim((string) $this->input('custom_domain', $this->user()?->publicProfile?->custom_domain ?? '')));
+                if ($domain === '' || ! preg_match('/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/i', $domain)) {
+                    $v->errors()->add('custom_domain', __('messages.custom_domain_invalid'));
                 }
             }
 

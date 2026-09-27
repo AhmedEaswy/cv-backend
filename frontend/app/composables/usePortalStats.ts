@@ -9,6 +9,7 @@ export interface PortalStats {
     public_profile_is_published: boolean
     public_profile_slug?: string | null
     public_profile_url?: string | null
+    inbox_enabled?: boolean
 }
 
 /**

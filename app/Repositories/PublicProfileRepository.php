@@ -25,6 +25,22 @@ class PublicProfileRepository
             ->first();
     }
 
+    public function findPublicByCustomDomain(string $host): ?PublicProfile
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '') {
+            return null;
+        }
+
+        return PublicProfile::query()
+            ->where('is_public', true)
+            ->where('profile_url_mode', 'custom_domain')
+            ->whereNotNull('custom_domain_verified_at')
+            ->whereRaw('LOWER(custom_domain) = ?', [$host])
+            ->first();
+    }
+
     public function create(array $data): PublicProfile
     {
         return PublicProfile::create($data);

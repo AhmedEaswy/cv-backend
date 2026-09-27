@@ -152,6 +152,11 @@ const encryptionOptions = [
     <form v-else class="cv-builder" @submit.prevent="save">
         <div class="cv-builder__main">
             <section class="surface form-card">
+                <h2 class="form-card__title">{{ t('portal.settings.sending_email.platform_title') }}</h2>
+                <p class="form-card__sub">{{ t('portal.settings.sending_email.platform_subtitle') }}</p>
+            </section>
+
+            <section class="surface form-card">
                 <h2 class="form-card__title">{{ t('portal.settings.sending_email.domain_title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.settings.sending_email.domain_subtitle') }}</p>
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth', layout: 'portal' });
-import type { InboxMessage, InboxMessageReply, OutboundMailSettings } from '~/composables/usePortalApi';
+import type { InboxMessage, InboxMessageReply } from '~/composables/usePortalApi';
 
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
-const { refresh: refreshStats } = usePortalStats();
+const { stats, refresh: refreshStats } = usePortalStats();
+const inboxEnabled = computed(() => stats.value?.inbox_enabled !== false);
 
 const messages = ref<InboxMessage[]>([]);
 const loading = ref(true);
@@ -15,23 +16,11 @@ const replyBody = ref('');
 const sendingReply = ref(false);
 const reportingSpam = ref(false);
 const retryingReplyId = ref<number | null>(null);
-const outboundReady = ref(true);
-
 function unwrapList<T>(res: { result?: T; data?: T } | null | undefined): T | null {
     if (!res) return null;
     if (res.result !== undefined) return res.result ?? null;
     if (res.data !== undefined) return res.data ?? null;
     return null;
-}
-
-async function loadOutbound() {
-    try {
-        const res = await api<{ result?: OutboundMailSettings }>('/settings/outbound-mail');
-        const settings = res?.result;
-        outboundReady.value = !!settings?.ready_for_sending;
-    } catch {
-        outboundReady.value = true;
-    }
 }
 
 async function load() {
@@ -50,7 +39,7 @@ async function load() {
 }
 
 onMounted(async () => {
-    await Promise.all([load(), loadOutbound()]);
+    await Promise.all([load(), refreshStats()]);
 });
 
 async function markRead(m: InboxMessage) {
@@ -180,7 +169,16 @@ const filtered = computed(() => {
         </div>
     </header>
 
-    <div v-if="!outboundReady" class="portal-banner portal-banner--info">
+    <div v-if="!inboxEnabled" class="empty">
+        <span class="empty__icon"><Icon name="inbox" :size="22" /></span>
+        <p class="empty__title">{{ t('portal.inbox.disabled_title') }}</p>
+        <p class="empty__text">{{ t('portal.inbox.disabled_text') }}</p>
+        <NuxtLink to="/portal/public-profile" class="btn btn--secondary btn--sm">
+            {{ t('portal.inbox.disabled_action') }}
+        </NuxtLink>
+    </div>
+
+    <div v-else class="portal-banner portal-banner--info">
         <Icon name="alert" :size="16" />
         <p>{{ t('portal.inbox.smtp_banner') }}</p>
         <NuxtLink to="/portal/settings/sending-email" class="portal-banner__link">
@@ -188,15 +186,15 @@ const filtered = computed(() => {
         </NuxtLink>
     </div>
 
-    <InboxSkeleton v-if="loading" />
+    <InboxSkeleton v-if="inboxEnabled && loading" />
 
-    <div v-else-if="messages.length === 0" class="empty">
+    <div v-else-if="inboxEnabled && messages.length === 0" class="empty">
         <span class="empty__icon"><Icon name="inbox" :size="22" /></span>
         <p class="empty__title">{{ t('portal.inbox.empty') }}</p>
         <p class="empty__text">{{ t('portal.inbox.empty_text') }}</p>
     </div>
 
-    <div v-else class="inbox-layout">
+    <div v-else-if="inboxEnabled" class="inbox-layout">
         <div class="inbox-list">
             <button
                 v-for="m in filtered"

@@ -90,6 +90,8 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::get('/public-profiles', [PublicProfileController::class, 'show']);
         Route::post('/public-profiles', [PublicProfileController::class, 'store']);
         Route::put('/public-profiles', [PublicProfileController::class, 'update']);
+        Route::post('/public-profiles/verify-custom-domain-dns', [PublicProfileController::class, 'verifyCustomDomainDns'])
+            ->middleware('throttle:10,1');
         Route::delete('/public-profiles', [PublicProfileController::class, 'destroy']);
 
         Route::get('/public-profiles/inbox', [PublicProfileInboxController::class, 'index']);

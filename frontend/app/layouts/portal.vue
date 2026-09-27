@@ -21,6 +21,12 @@ interface NavItem {
     match?: (path: string) => boolean;
 }
 
+interface SettingsNavItem {
+    id: string;
+    to: string;
+    label: string;
+}
+
 const { stats, refresh: refreshStats } = usePortalStats();
 
 const primaryNav = computed<NavItem[]>(() => [
@@ -40,13 +46,55 @@ const primaryNav = computed<NavItem[]>(() => [
         match: (p) => p.startsWith('/portal/cover-letters'),
     },
     { to: '/portal/public-profile', label: t('portal.nav.public_profile'), icon: 'user', match: (p) => p.startsWith('/portal/public-profile') },
-    { to: '/portal/inbox', label: t('portal.nav.inbox'), icon: 'inbox', match: (p) => p.startsWith('/portal/inbox') },
+    ...(stats.value?.inbox_enabled !== false
+        ? [{ to: '/portal/inbox', label: t('portal.nav.inbox'), icon: 'inbox', match: (p: string) => p.startsWith('/portal/inbox') }]
+        : []),
 ]);
 
-const secondaryNav = computed<NavItem[]>(() => [
-    { to: '/portal/settings', label: t('portal.nav.settings'), icon: 'settings', match: (p) => p.startsWith('/portal/settings') && !p.startsWith('/portal/settings/ai-access') },
-    { to: '/portal/settings/ai-access', label: t('portal.nav.ai_access'), icon: 'sparkles', match: (p) => p.startsWith('/portal/settings/ai-access') },
+const settingsNavItems = computed<SettingsNavItem[]>(() => [
+    { id: 'profile', to: '/portal/settings', label: t('portal.settings.profile.title') },
+    { id: 'password', to: '/portal/settings?tab=password', label: t('portal.settings.password.title') },
+    { id: 'notifications', to: '/portal/settings/notifications', label: t('portal.settings.notifications.title') },
+    { id: 'sending', to: '/portal/settings/sending-email', label: t('portal.settings.sending_email.smtp_title') },
+    { id: 'ai', to: '/portal/settings/ai-access', label: t('portal.settings.ai.title') },
 ]);
+
+const settingsOpen = ref(false);
+
+const isOnSettingsRoute = computed(() => route.path.startsWith('/portal/settings'));
+
+function isSettingsSubActive(item: SettingsNavItem): boolean {
+    const path = route.path;
+    const tab = route.query.tab;
+    switch (item.id) {
+        case 'profile':
+            return path === '/portal/settings' && tab !== 'password';
+        case 'password':
+            return path === '/portal/settings' && tab === 'password';
+        case 'notifications':
+            return path.startsWith('/portal/settings/notifications');
+        case 'sending':
+            return path.startsWith('/portal/settings/sending-email');
+        case 'ai':
+            return path.startsWith('/portal/settings/ai-access');
+        default:
+            return false;
+    }
+}
+
+const isSettingsSectionActive = computed(() =>
+    settingsNavItems.value.some((item) => isSettingsSubActive(item)),
+);
+
+function syncSettingsOpen() {
+    if (isOnSettingsRoute.value) {
+        settingsOpen.value = true;
+    }
+}
+
+function toggleSettingsMenu() {
+    settingsOpen.value = !settingsOpen.value;
+}
 
 const initials = computed(() => {
     const n = user.value?.name || user.value?.email || '?';
@@ -90,6 +138,7 @@ function closeSidebar() {
 watch(() => route.fullPath, () => {
     closeSidebar();
     refreshStats();
+    syncSettingsOpen();
 });
 
 function onKeydown(e: KeyboardEvent) {
@@ -101,6 +150,7 @@ onMounted(() => {
     window.addEventListener('resize', syncViewportMode);
     document.addEventListener('keydown', onKeydown);
     refreshStats();
+    syncSettingsOpen();
 });
 
 onBeforeUnmount(() => {
@@ -192,17 +242,43 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="portal-sidebar__group portal-sidebar__group--secondary">
-                    <NuxtLink
-                        v-for="item in secondaryNav"
-                        :key="item.to"
-                        :to="item.to"
-                        class="portal-sidebar__link"
-                        :aria-current="isActive(item) ? 'page' : undefined"
-                        @click="closeSidebar"
-                    >
-                        <Icon :name="item.icon" :size="16" />
-                        <span>{{ item.label }}</span>
-                    </NuxtLink>
+                    <div class="portal-sidebar__nav-section">
+                        <button
+                            type="button"
+                            class="portal-sidebar__link portal-sidebar__link--parent"
+                            :class="{ 'is-section-active': isSettingsSectionActive, 'is-open': settingsOpen }"
+                            :aria-expanded="settingsOpen"
+                            aria-controls="portal-settings-subnav"
+                            @click="toggleSettingsMenu"
+                        >
+                            <Icon name="settings" :size="16" />
+                            <span class="portal-sidebar__link-label">{{ t('portal.nav.settings') }}</span>
+                            <Icon
+                                name="chevron-down"
+                                :size="16"
+                                class="portal-sidebar__chevron"
+                            />
+                        </button>
+                        <Collapse :open="settingsOpen">
+                            <div
+                                id="portal-settings-subnav"
+                                class="portal-sidebar__subnav"
+                                role="group"
+                                :aria-label="t('portal.nav.settings')"
+                            >
+                                <NuxtLink
+                                    v-for="item in settingsNavItems"
+                                    :key="item.id"
+                                    :to="item.to"
+                                    class="portal-sidebar__link portal-sidebar__link--sub"
+                                    :aria-current="isSettingsSubActive(item) ? 'page' : undefined"
+                                    @click="closeSidebar"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </NuxtLink>
+                            </div>
+                        </Collapse>
+                    </div>
                 </div>
             </nav>
 

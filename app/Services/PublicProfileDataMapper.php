@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PublicProfile;
 use App\Services\Contact\SocialLinksNormalizer;
+use App\Services\Profile\ProfileDomain;
 
 class PublicProfileDataMapper
 {
@@ -84,6 +85,10 @@ class PublicProfileDataMapper
             'seo' => $profile->seo ?? null,
         ]);
 
+        $profileDomain = app(ProfileDomain::class);
+        $customDomain = $profile->custom_domain;
+        $customDomainToken = $profile->custom_domain_dns_token;
+
         return [
             'id' => $profile->id,
             'user_id' => $profile->user_id,
@@ -91,9 +96,20 @@ class PublicProfileDataMapper
             'public_url' => $profile->preferredPublicUrl(),
             'path_url' => $profile->pathUrl(),
             'subdomain_url' => $profile->subdomainUrl(),
+            'custom_domain_url' => $profile->customDomainUrl(),
+            'profile_url_mode' => $profile->profileUrlMode(),
             'is_public' => $profile->is_public,
             'enable_contact_form' => (bool) $profile->enable_contact_form,
+            'enable_inbox' => $profile->inboxIsEnabled(),
             'enable_subdomain' => (bool) $profile->enable_subdomain,
+            'custom_domain' => $customDomain,
+            'custom_domain_verified_at' => $profile->custom_domain_verified_at?->toIso8601String(),
+            'custom_domain_dns_host' => filled($customDomain) && $customDomainToken
+                ? $profileDomain->customDomainDnsHost((string) $customDomain)
+                : null,
+            'custom_domain_dns_value' => $customDomainToken
+                ? $profileDomain->customDomainDnsValue((string) $customDomainToken)
+                : null,
             'contact_form_recipient' => $profile->contact_form_recipient,
             'language' => $profile->language,
             'headline' => $profile->headline,

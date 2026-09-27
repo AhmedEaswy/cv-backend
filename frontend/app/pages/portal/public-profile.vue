@@ -13,8 +13,10 @@ const route = useRoute();
 const router = useRouter();
 const { user } = useAuthSession();
 const portal = usePortalApi();
+const api = useApi();
 const toast = useToast();
 const { profile, refresh: refreshProfile, setProfile } = usePortalPublicProfile();
+const { refresh: refreshStats } = usePortalStats();
 
 const templates = ref<TemplateOption[]>([]);
 const loading = ref(true);
@@ -32,7 +34,10 @@ const form = reactive({
     template_id: '' as string | number,
     is_public: true,
     slug: '',
+    enable_inbox: true,
+    profile_url_mode: 'slug' as 'slug' | 'subdomain' | 'custom_domain',
     enable_subdomain: false,
+    custom_domain: '',
     enable_contact_form: false,
     contact_form_recipient: '',
     seo: {
@@ -46,6 +51,11 @@ const form = reactive({
 
 const pathUrl = ref('');
 const subdomainUrl = ref('');
+const customDomainUrl = ref('');
+const customDomainDnsHost = ref('');
+const customDomainDnsValue = ref('');
+const customDomainVerified = ref(false);
+const verifyingProfileDns = ref(false);
 
 const socialPlatformOptions = computed(() =>
     SOCIAL_PLATFORMS.map((platform) => ({
@@ -90,7 +100,10 @@ function applyProfile(p: typeof profile.value) {
     form.template_id = valid ? templateId : (templates.value.find((tpl) => tpl.is_default)?.id ?? templates.value[0]?.id ?? '');
     form.is_public = p ? !!p.is_public : true;
     form.slug = p?.slug || '';
-    form.enable_subdomain = !!p?.enable_subdomain;
+    form.enable_inbox = p?.enable_inbox !== false;
+    form.profile_url_mode = (p?.profile_url_mode as typeof form.profile_url_mode) || (p?.enable_subdomain ? 'subdomain' : 'slug');
+    form.enable_subdomain = form.profile_url_mode === 'subdomain';
+    form.custom_domain = p?.custom_domain || '';
     form.enable_contact_form = !!p?.enable_contact_form;
     form.contact_form_recipient = p?.contact_form_recipient || '';
     const seo = (p?.user_data?.seo || {}) as PublicProfileSeo;
@@ -105,7 +118,21 @@ function applyProfile(p: typeof profile.value) {
     }));
     pathUrl.value = p?.path_url || (p?.slug ? `/u/${p.slug}` : '');
     subdomainUrl.value = p?.subdomain_url || '';
+    customDomainUrl.value = p?.custom_domain_url || '';
+    customDomainDnsHost.value = p?.custom_domain_dns_host || '';
+    customDomainDnsValue.value = p?.custom_domain_dns_value || '';
+    customDomainVerified.value = !!p?.custom_domain_verified_at;
 }
+
+const urlModeOptions = computed(() => [
+    { value: 'slug', label: t('portal.public_profile.url.mode_slug') },
+    { value: 'subdomain', label: t('portal.public_profile.url.mode_subdomain') },
+    { value: 'custom_domain', label: t('portal.public_profile.url.mode_custom_domain') },
+]);
+
+watch(() => form.profile_url_mode, (mode) => {
+    form.enable_subdomain = mode === 'subdomain';
+});
 
 function addSocialLink() {
     form.socialLinks.push({ platform: 'linkedin', url: '', label: '' });
@@ -134,7 +161,10 @@ function payload() {
         about: form.bio || null,
         is_public: !!form.is_public,
         slug: form.slug.trim() || null,
-        enable_subdomain: !!form.enable_subdomain,
+        enable_inbox: !!form.enable_inbox,
+        profile_url_mode: form.profile_url_mode,
+        enable_subdomain: form.profile_url_mode === 'subdomain',
+        custom_domain: form.profile_url_mode === 'custom_domain' ? (form.custom_domain.trim() || null) : null,
         enable_contact_form: !!form.enable_contact_form,
         contact_form_recipient: form.contact_form_recipient.trim() || null,
         public_profile_template_id: templateId,
@@ -193,6 +223,7 @@ async function onSave() {
     if (updated?.id) {
         setProfile(updated);
         applyProfile(updated);
+        await refreshStats();
     }
     saving.value = false;
 }
@@ -226,6 +257,25 @@ async function copyAbsoluteUrl(url: string) {
 async function onCopyLink() {
     const url = profile.value?.public_url || pathUrl.value || (profile.value?.slug ? `/u/${profile.value.slug}` : '');
     await copyAbsoluteUrl(url);
+}
+
+async function verifyCustomDomainDns() {
+    verifyingProfileDns.value = true;
+    try {
+        const res = await api<{ result?: NonNullable<typeof profile.value>; message?: string }>(
+            '/public-profiles/verify-custom-domain-dns',
+            { method: 'POST' },
+        );
+        if (res?.result?.id) {
+            setProfile(res.result);
+            applyProfile(res.result);
+        }
+        toast.success(res?.message || t('portal.public_profile.url.custom_dns_verified'));
+    } catch (e: any) {
+        toast.error(e?.data?.message || t('portal.public_profile.url.custom_dns_pending'));
+    } finally {
+        verifyingProfileDns.value = false;
+    }
 }
 
 const previewUrl = computed(() => {
@@ -308,7 +358,13 @@ const previewUrl = computed(() => {
                 <h2 class="form-card__title">{{ t('portal.public_profile.contact.title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.public_profile.contact.subtitle') }}</p>
                 <div class="field">
-                    <Switch v-model="form.enable_contact_form" size="sm">
+                    <Switch v-model="form.enable_inbox" size="sm">
+                        <span>{{ t('portal.public_profile.inbox.enable') }}</span>
+                    </Switch>
+                    <span class="field-hint">{{ t('portal.public_profile.inbox.enable_help') }}</span>
+                </div>
+                <div class="field">
+                    <Switch v-model="form.enable_contact_form" size="sm" :disabled="!form.enable_inbox">
                         <span>{{ t('portal.public_profile.contact.enable') }}</span>
                     </Switch>
                     <span class="field-hint">{{ t('portal.public_profile.contact.enable_help') }}</span>
@@ -335,10 +391,45 @@ const previewUrl = computed(() => {
                     <span class="field-hint">{{ t('portal.public_profile.field.slug_help') }}</span>
                 </div>
                 <div class="field">
-                    <Switch v-model="form.enable_subdomain" size="sm">
-                        <span>{{ t('portal.public_profile.url.enable_subdomain') }}</span>
-                    </Switch>
-                    <span class="field-hint">{{ t('portal.public_profile.url.enable_subdomain_help') }}</span>
+                    <span class="field-label">{{ t('portal.public_profile.url.mode_label') }}</span>
+                    <SelectInput v-model="form.profile_url_mode" :options="urlModeOptions" />
+                </div>
+                <div v-if="form.profile_url_mode === 'custom_domain'" class="field">
+                    <label class="field-label" for="custom-domain">{{ t('portal.public_profile.url.custom_domain_field') }}</label>
+                    <input
+                        id="custom-domain"
+                        v-model="form.custom_domain"
+                        class="input"
+                        dir="ltr"
+                        :placeholder="t('portal.public_profile.url.custom_domain_placeholder')"
+                    />
+                </div>
+                <div
+                    v-if="form.profile_url_mode === 'custom_domain' && customDomainDnsHost && customDomainDnsValue"
+                    class="dns-instructions"
+                >
+                    <h3 class="form-card__title form-card__title--sm">{{ t('portal.public_profile.url.custom_dns_title') }}</h3>
+                    <p class="form-card__sub">{{ t('portal.public_profile.url.custom_dns_subtitle') }}</p>
+                    <div class="dns-instructions__row">
+                        <code class="dns-instructions__code">{{ customDomainDnsHost }}</code>
+                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainDnsHost)">
+                            <Icon name="copy" :size="14" />
+                        </Button>
+                    </div>
+                    <div class="dns-instructions__row">
+                        <code class="dns-instructions__code">{{ customDomainDnsValue }}</code>
+                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainDnsValue)">
+                            <Icon name="copy" :size="14" />
+                        </Button>
+                    </div>
+                    <div class="dns-instructions__actions">
+                        <Tag :variant="customDomainVerified ? 'success' : 'outline'">
+                            {{ customDomainVerified ? t('portal.public_profile.url.custom_dns_verified') : t('portal.public_profile.url.custom_dns_pending') }}
+                        </Tag>
+                        <Button type="button" variant="secondary" :loading="verifyingProfileDns" @click="verifyCustomDomainDns">
+                            {{ t('portal.public_profile.url.verify_custom_dns') }}
+                        </Button>
+                    </div>
                 </div>
                 <div v-if="pathUrl" class="field">
                     <span class="field-label">{{ t('portal.public_profile.url.path') }}</span>
@@ -349,11 +440,20 @@ const previewUrl = computed(() => {
                         </Button>
                     </div>
                 </div>
-                <div v-if="subdomainUrl" class="field">
+                <div v-if="subdomainUrl && form.profile_url_mode === 'subdomain'" class="field">
                     <span class="field-label">{{ t('portal.public_profile.url.subdomain') }}</span>
                     <div class="url-copy-row">
                         <code class="url-copy-row__text">{{ subdomainUrl }}</code>
                         <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(subdomainUrl)">
+                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                        </Button>
+                    </div>
+                </div>
+                <div v-if="customDomainUrl && form.profile_url_mode === 'custom_domain'" class="field">
+                    <span class="field-label">{{ t('portal.public_profile.url.custom_domain') }}</span>
+                    <div class="url-copy-row">
+                        <code class="url-copy-row__text">{{ customDomainUrl }}</code>
+                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainUrl)">
                             <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
                         </Button>
                     </div>

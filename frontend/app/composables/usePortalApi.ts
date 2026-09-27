@@ -152,7 +152,14 @@ export interface ProfileData {
     path_url?: string | null;
     subdomain_url?: string | null;
     enable_contact_form?: boolean;
+    enable_inbox?: boolean;
     enable_subdomain?: boolean;
+    profile_url_mode?: 'slug' | 'subdomain' | 'custom_domain';
+    custom_domain?: string | null;
+    custom_domain_url?: string | null;
+    custom_domain_verified_at?: string | null;
+    custom_domain_dns_host?: string | null;
+    custom_domain_dns_value?: string | null;
     contact_form_recipient?: string | null;
     is_public?: boolean;
     headline?: string;

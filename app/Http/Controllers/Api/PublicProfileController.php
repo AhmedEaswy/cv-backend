@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\StorePublicProfileRequest;
 use App\Http\Requests\Api\UpdatePublicProfileRequest;
 use App\Repositories\PublicProfileRepository;
+use App\Services\Profile\ProfileDomain;
 use App\Services\PublicProfileDataMapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PublicProfileController extends BaseApiController
 {
@@ -50,7 +52,10 @@ class PublicProfileController extends BaseApiController
             'language' => $validated['language'] ?? 'en',
             'is_public' => $validated['is_public'] ?? true,
             'enable_contact_form' => $validated['enable_contact_form'] ?? false,
+            'enable_inbox' => $validated['enable_inbox'] ?? true,
             'enable_subdomain' => $validated['enable_subdomain'] ?? false,
+            'profile_url_mode' => $validated['profile_url_mode'] ?? 'slug',
+            'custom_domain' => $validated['custom_domain'] ?? null,
             'contact_form_recipient' => $validated['contact_form_recipient'] ?? null,
             'headline' => $validated['headline'] ?? null,
             'about' => $validated['about'] ?? null,
@@ -81,7 +86,10 @@ class PublicProfileController extends BaseApiController
             'language',
             'is_public',
             'enable_contact_form',
+            'enable_inbox',
             'enable_subdomain',
+            'profile_url_mode',
+            'custom_domain',
             'contact_form_recipient',
             'headline',
             'about',
@@ -117,6 +125,51 @@ class PublicProfileController extends BaseApiController
         $this->repository->delete($profile);
 
         return $this->successResponse(null, __('messages.public_profile_deleted'));
+    }
+
+    public function verifyCustomDomainDns(Request $request, ProfileDomain $profileDomain)
+    {
+        $profile = $this->repository->findForUser($request->user()->id);
+
+        if (! $profile) {
+            return $this->errorResponse(__('messages.public_profile_not_found'), 404);
+        }
+
+        if ($profile->profileUrlMode() !== 'custom_domain' || ! filled($profile->custom_domain)) {
+            return $this->errorResponse(__('messages.custom_domain_required'), 422);
+        }
+
+        if (! $profile->custom_domain_dns_token) {
+            $profile->custom_domain_dns_token = Str::random(32);
+            $profile->save();
+        }
+
+        $expected = $profileDomain->customDomainDnsValue((string) $profile->custom_domain_dns_token);
+        $domain = strtolower((string) $profile->custom_domain);
+        $hosts = [$profileDomain->customDomainDnsHost($domain), $domain];
+        $verified = false;
+
+        foreach ($hosts as $host) {
+            $records = @dns_get_record($host, DNS_TXT) ?: [];
+            foreach ($records as $row) {
+                $txt = $row['txt'] ?? '';
+                if (is_string($txt) && str_contains($txt, $expected)) {
+                    $verified = true;
+                    break 2;
+                }
+            }
+        }
+
+        if (! $verified) {
+            return $this->errorResponse(__('messages.custom_domain_dns_failed'), 422);
+        }
+
+        $profile->forceFill(['custom_domain_verified_at' => now()])->save();
+
+        return $this->successResponse(
+            $this->dataMapper->formatPublicProfileResponse($profile->fresh()),
+            __('messages.custom_domain_dns_verified')
+        );
     }
 
     public function templates(Request $request)

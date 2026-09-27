@@ -20,11 +20,22 @@ class ResolvePublicProfileSubdomain
 
     public function handle(Request $request, Closure $next): Response
     {
+        $customProfile = $this->repository->findPublicByCustomDomain($request->getHost());
+        if ($customProfile !== null) {
+            return $this->serveProfileHost($request, $next, (string) $customProfile->slug, $customProfile);
+        }
+
         $slug = $this->profileDomain->slugFromHost($request->getHost());
 
         if ($slug === null) {
             return $next($request);
         }
+
+        return $this->serveProfileHost($request, $next, $slug, null);
+    }
+
+    private function serveProfileHost(Request $request, Closure $next, string $slug, ?\App\Models\PublicProfile $knownProfile): Response
+    {
 
         $path = '/'.ltrim($request->path(), '/');
         $isRoot = $path === '/' || $path === '';
@@ -45,9 +56,17 @@ class ResolvePublicProfileSubdomain
         }
 
         if ($isRoot || $isContactGet) {
-            $profile = $this->repository->findPublicBySlug($slug);
+            $profile = $knownProfile ?? $this->repository->findPublicBySlug($slug);
 
-            if (! $profile || ! $profile->enable_subdomain) {
+            if (! $profile) {
+                abort(404, __('messages.public_profile_not_found'));
+            }
+
+            $subdomainAllowed = $profile->profileUrlMode() === 'subdomain' && $profile->enable_subdomain;
+            $customDomainAllowed = $profile->profileUrlMode() === 'custom_domain'
+                && $knownProfile !== null;
+
+            if (! $subdomainAllowed && ! $customDomainAllowed) {
                 abort(404, __('messages.public_profile_not_found'));
             }
 

@@ -60,6 +60,16 @@ class ProfileDomain
         return url('/u/'.$slug);
     }
 
+    public function customDomainDnsHost(string $domain): string
+    {
+        return '_cv-profile.'.strtolower(trim($domain));
+    }
+
+    public function customDomainDnsValue(string $token): string
+    {
+        return 'cv-profile-verify='.$token;
+    }
+
     /**
      * Extract profile slug from request host when on a vanity subdomain.
      */
