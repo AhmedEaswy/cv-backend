@@ -22,6 +22,13 @@
             .bio a { color: #fff; }
             @media (max-width: 900px) { .masonry { column-count: 2; } }
             @media (max-width: 560px) { .masonry { column-count: 1; padding: 16px; } .bar { padding: 20px 16px; } }
+            .gallery-social { padding: 0 28px 24px; --pp-social-color: #fff; --pp-social-bg: #1a1a1a; --pp-social-border: #333; }
+            .gallery-contact { margin: 0 28px 60px; max-width: 560px; padding: 24px; background: #1a1a1a; border-radius: 8px; border: 1px solid #2a2a2a; }
+            .gallery-contact h2 { font-family: "Playfair Display", serif; margin: 0 0 8px; color: #fff; }
+            .gallery-contact .cv-contact__label { color: #ccc; }
+            .gallery-contact .cv-contact__input { width: 100%; padding: 10px 12px; background: #111; border: 1px solid #333; color: #f5f5f5; font-family: inherit; border-radius: 4px; }
+            .gallery-contact .cv-contact__form { display: flex; flex-direction: column; gap: 12px; position: relative; }
+            .gallery-contact .cv-contact__submit { background: #fff; color: #111; border: none; padding: 12px 20px; font-weight: 600; cursor: pointer; align-self: flex-start; border-radius: 4px; }
         </style>
     @endslot
 
@@ -32,6 +39,7 @@
         </div>
         <div class="meta">{{ $d->headline }}</div>
     </header>
+    <div class="gallery-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'row'])</div>
 
     @if($d->about)
         <p class="bio">{{ $d->about }}
@@ -73,5 +81,11 @@
             @endforeach
         @endforelse
     </div>
-    @include('components.public-profile._contact_form')
+    @if($profile['enable_contact_form'] ?? false)
+        <section id="contact-form" class="gallery-contact" aria-labelledby="gallery-contact-heading">
+            <h2 id="gallery-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+            <p style="color:#aaa;margin:0 0 16px;font-size:0.9rem">{{ __('messages.public_profile.contact.text') }}</p>
+            @include('components.public-profile._contact_fields', ['profile' => $profile])
+        </section>
+    @endif
 </x-public-profile-layout>

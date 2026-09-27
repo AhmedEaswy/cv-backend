@@ -4,6 +4,7 @@ export interface PortalStats {
     top_ats_score: number | null
     views_count: number
     unread_messages: number
+    unread_notifications: number
     has_public_profile: boolean
     public_profile_is_published: boolean
     public_profile_slug?: string | null

@@ -68,6 +68,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public profile vanity subdomain apex domain
+    |--------------------------------------------------------------------------
+    |
+    | Host used for slug.example.com profile URLs (defaults to APP_URL host).
+    |
+    */
+
+    'profile_domain' => env('PROFILE_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

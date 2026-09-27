@@ -5,6 +5,9 @@
         ?? trim(($profile['user_data']['firstName'] ?? '') . ' ' . ($profile['user_data']['lastName'] ?? ''))
         ?: 'Public Profile';
     $description = $seo['meta_description'] ?? ($profile['headline'] ?? $profile['about'] ?? '');
+    $canonical = $profile['public_url'] ?? url()->current();
+    $robots = $seo['robots'] ?? 'index,follow';
+    $ogDescription = \Illuminate\Support\Str::limit(strip_tags((string) $description), 160);
     $lang = $profile['language'] ?? 'en';
     $dir = in_array($lang, ['ar', 'ur']) ? 'rtl' : 'ltr';
 @endphp
@@ -15,8 +18,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }}</title>
     @if($description)
-        <meta name="description" content="{{ \Illuminate\Support\Str::limit(strip_tags($description), 160) }}">
+        <meta name="description" content="{{ $ogDescription }}">
     @endif
+    @if($robots)
+        <meta name="robots" content="{{ $robots }}">
+    @endif
+    <link rel="canonical" href="{{ $canonical }}">
+    <meta property="og:type" content="profile">
+    <meta property="og:title" content="{{ $title }}">
+    @if($ogDescription)
+        <meta property="og:description" content="{{ $ogDescription }}">
+    @endif
+    <meta property="og:url" content="{{ $canonical }}">
     @if(!empty($seo['og_image']))
         <meta property="og:image" content="{{ $seo['og_image'] }}">
     @endif

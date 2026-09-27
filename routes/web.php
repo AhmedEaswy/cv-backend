@@ -69,6 +69,9 @@ Route::post('/u/{slug}/contact', [\App\Http\Controllers\Public\ContactMessageCon
     ->name('public-profile.contact')
     ->middleware('throttle:5,1');
 
+// Vanity subdomain profiles ({slug}.profile_domain) are handled by
+// ResolvePublicProfileSubdomain (GET /, GET /contact, POST /contact).
+
 // Template test pages — used by the landing template carousel.
 Route::get('/test/cv/{template}', [\App\Http\Controllers\TemplateTestController::class, 'cv'])
     ->name('templates.cv.test');

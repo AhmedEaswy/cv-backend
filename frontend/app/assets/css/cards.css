@@ -304,7 +304,19 @@
 .inbox-detail__email:hover { text-decoration: underline; }
 .inbox-detail__subject { font-weight: 600; color: var(--color-ink); margin: 0 0 0.85rem; }
 .inbox-detail__msg { color: var(--color-ink); line-height: 1.6; white-space: pre-wrap; }
-.inbox-detail__actions { margin-top: 1.5rem; display: flex; gap: 0.5rem; }
+.inbox-detail__actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.inbox-compose { margin-top: 1.5rem; }
+.inbox-replies { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-line); }
+.inbox-replies__title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-ink-soft); margin: 0 0 0.75rem; }
+.inbox-reply {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-line);
+}
+.inbox-reply:last-child { border-bottom: none; }
+.inbox-reply__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+.inbox-reply__time { font-size: 0.75rem; color: var(--color-muted); }
+.inbox-reply__body { margin: 0; white-space: pre-wrap; line-height: 1.55; font-size: 0.9rem; }
+.inbox-reply__error { margin: 0.35rem 0 0; font-size: 0.78rem; color: var(--color-danger, #b42318); }
 
 /* pages/portal/cvs/index.vue */
 .list { display: flex; flex-direction: column; gap: 0.65rem; }

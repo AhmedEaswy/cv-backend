@@ -98,10 +98,62 @@ export interface CoverLetterSummary {
     [k: string]: any;
 }
 
+export type SocialLinkPlatform =
+    | 'linkedin'
+    | 'github'
+    | 'x'
+    | 'instagram'
+    | 'youtube'
+    | 'facebook'
+    | 'tiktok'
+    | 'snapchat'
+    | 'calendly'
+    | 'behance'
+    | 'dribbble'
+    | 'medium'
+    | 'whatsapp'
+    | 'telegram'
+    | 'website'
+    | 'custom';
+
+export interface PublicProfileSocialLink {
+    platform: SocialLinkPlatform | string;
+    url: string;
+    label?: string;
+}
+
+export interface PublicProfileSeo {
+    meta_title?: string | null;
+    meta_description?: string | null;
+    og_image?: string | null;
+    robots?: string | null;
+}
+
+export type InboxReplyDeliveryStatus = 'pending' | 'queued' | 'sent' | 'failed';
+
+export interface InboxMessageReply {
+    id: number;
+    body: string;
+    from_email?: string | null;
+    from_name?: string | null;
+    mail_mode?: string | null;
+    delivery_status: InboxReplyDeliveryStatus;
+    error_message?: string | null;
+    queued_at?: string | null;
+    sent_at?: string | null;
+    failed_at?: string | null;
+    created_at?: string | null;
+}
+
 export interface ProfileData {
     id?: number;
     slug?: string;
     public_url?: string;
+    path_url?: string | null;
+    subdomain_url?: string | null;
+    enable_contact_form?: boolean;
+    enable_subdomain?: boolean;
+    contact_form_recipient?: string | null;
     is_public?: boolean;
     headline?: string;
     about?: string;
@@ -115,6 +167,8 @@ export interface ProfileData {
         website?: string;
         address?: string;
         photo?: string;
+        socialLinks?: PublicProfileSocialLink[];
+        seo?: PublicProfileSeo | null;
         [k: string]: any;
     };
     created_at?: string;
@@ -131,8 +185,38 @@ export interface InboxMessage {
     subject?: string;
     message?: string;
     is_read?: boolean;
+    is_spam?: boolean;
     created_at?: string;
+    read_at?: string | null;
+    replies?: InboxMessageReply[];
     [k: string]: any;
+}
+
+export interface OutboundMailSettings {
+    domain?: string | null;
+    from_email?: string | null;
+    from_name?: string | null;
+    dns_verification_token?: string | null;
+    dns_verified_at?: string | null;
+    smtp_host?: string | null;
+    smtp_port?: number | null;
+    smtp_encryption?: string | null;
+    smtp_username?: string | null;
+    has_smtp_password?: boolean;
+    smtp_verified_at?: string | null;
+    is_active?: boolean;
+    ready_for_sending?: boolean;
+    dns_txt_host?: string | null;
+    dns_txt_value?: string | null;
+}
+
+export interface PortalNotificationItem {
+    id: string;
+    type?: string;
+    title?: string;
+    data?: Record<string, unknown>;
+    read_at?: string | null;
+    created_at?: string | null;
 }
 
 export interface AtsResult {

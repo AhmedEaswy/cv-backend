@@ -33,6 +33,12 @@
             .chip { background: #e2e8f0; color: #0f172a; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: 500; }
             .photo { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; margin-bottom: 16px; }
             @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .rail { position: relative; height: auto; } }
+            .rail-social { margin-top: 20px; --pp-social-color: #94a3b8; --pp-social-bg: rgba(255,255,255,0.06); --pp-social-border: rgba(148,163,184,0.25); }
+            .rail-social .pp-social__link:hover { color: #fff; }
+            .corp-contact-form { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 22px 24px; }
+            .corp-contact-form .cv-contact__form { display: flex; flex-direction: column; gap: 12px; position: relative; }
+            .corp-contact-form .cv-contact__input { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: inherit; }
+            .corp-contact-form .cv-contact__submit { background: #0b1f3a; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; align-self: flex-start; }
         </style>
     @endslot
 
@@ -45,7 +51,11 @@
                 @foreach($nav as $id => $_)
                     <a href="#{{ $id }}">{{ ucfirst($id) }}</a>
                 @endforeach
+                @if($profile['enable_contact_form'] ?? false)
+                    <a href="#contact-form">{{ __('messages.public_profile.contact.title') }}</a>
+                @endif
             </nav>
+            <div class="rail-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'stack'])</div>
         </aside>
         <main class="main">
             @if($d->about)
@@ -110,7 +120,13 @@
                     @endif
                 </section>
             @endif
+            @if($profile['enable_contact_form'] ?? false)
+                <section id="contact-form" class="corp-contact-form" aria-labelledby="corp-contact-heading">
+                    <h2 id="corp-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                    <p class="meta" style="margin-bottom:16px">{{ __('messages.public_profile.contact.text') }}</p>
+                    @include('components.public-profile._contact_fields', ['profile' => $profile])
+                </section>
+            @endif
         </main>
     </div>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

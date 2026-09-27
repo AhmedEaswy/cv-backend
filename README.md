@@ -6,7 +6,7 @@ AI-ready CV, cover letter, and public profile builder. Laravel powers the API, a
 
 - **CVs** — multi-template resumes, section editing, LinkedIn import, PDF export
 - **Cover letters** — templates, print/PDF, CRUD
-- **Public profiles** — shareable `/u/{slug}` pages with contact form
+- **Public profiles** — shareable `/u/{slug}` (optional `{slug}.domain` subdomain), contact inbox, replies, SEO, social links
 - **ATS check** — score CVs (paste or upload)
 - **Auth** — email verification, password reset; Google, LinkedIn, Apple
 - **i18n** — `en`, `ar`, `de`, `es`, `fr`, `tr`, `ur` (RTL where needed)
@@ -73,10 +73,11 @@ UI: [http://localhost:3000](http://localhost:3000)
 
 **Laragon** (recommended on Windows):
 
-1. Copy `scripts/laragon/cv.test.conf` → `E:/laragon/etc/nginx/sites-enabled/cv.test.conf`
+1. Copy `scripts/laragon/cv.test.conf` → `E:/laragon/etc/nginx/sites-enabled/cv.test.conf` (includes `{slug}.cv.test` → Laravel for vanity profiles)
 2. Remove conflicting `auto.cv.test.conf` if present; reload Nginx
-3. `cd frontend && pnpm dev`
-4. Open [https://cv.test](https://cv.test)
+3. Optional `.env`: `PROFILE_DOMAIN=cv.test`, `FIREBASE_CREDENTIALS=` (path to service account JSON for mobile push)
+4. `cd frontend && pnpm dev`
+5. Open [https://cv.test](https://cv.test)
 
 ## Environment
 

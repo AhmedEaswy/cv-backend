@@ -24,6 +24,15 @@
             .tag { border: 1px solid #1f3d2a; padding: 4px 10px; color: #86efac; }
             .blink { animation: blink 1.1s step-end infinite; }
             @keyframes blink { 50% { opacity: 0; } }
+            .term-social { margin-bottom: 18px; --pp-social-color: #4ade80; --pp-social-bg: #0d140f; --pp-social-border: #1f3d2a; }
+            .term-contact { margin-top: 24px; }
+            .term-contact .cv-contact__head { margin-bottom: 14px; }
+            .term-contact .cv-contact__title { color: #ecfdf5; font-size: 0.85rem; margin: 0 0 8px; }
+            .term-contact .cv-contact__text { color: #64748b; font-size: 0.85rem; margin: 0 0 12px; }
+            .term-contact .cv-contact__form { display: flex; flex-direction: column; gap: 12px; position: relative; }
+            .term-contact .cv-contact__label { color: #86efac; font-size: 0.75rem; }
+            .term-contact .cv-contact__input { background: #0a0e0a; border: 1px solid #1f3d2a; color: #ecfdf5; padding: 8px 10px; font-family: inherit; width: 100%; }
+            .term-contact .cv-contact__submit { background: #4ade80; color: #0a0e0a; border: none; padding: 10px 16px; font-weight: 600; cursor: pointer; align-self: flex-start; font-family: inherit; }
         </style>
     @endslot
 
@@ -31,6 +40,7 @@
         <div class="prompt">guest@portfolio<span>:~$</span> whoami<span class="blink">_</span></div>
         <h1 class="title">{{ $d->fullName }}</h1>
         <p class="sub">{{ $d->headline ?? $d->jobTitle }} @if($d->location())// {{ $d->location() }}@endif</p>
+        <div class="term-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'mono'])</div>
 
         @if($d->about)
             <div class="block">
@@ -84,16 +94,15 @@
             </div>
         @endif
 
-        @if($d->socialLinks)
-            <div class="block">
-                <h2>links</h2>
-                @foreach($d->socialLinks as $key => $url)
-                    @if($url)<div><span class="muted">{{ is_int($key) ? ($url['platform'] ?? 'link') : $key }}:</span>
-                        <a href="{{ is_array($url) ? ($url['url'] ?? '#') : $url }}">{{ is_array($url) ? ($url['url'] ?? '') : $url }}</a>
-                    </div>@endif
-                @endforeach
+        @if($profile['enable_contact_form'] ?? false)
+            <div class="block term-contact" id="contact-form">
+                <h2>contact.sh</h2>
+                <div class="cv-contact__head">
+                    <p class="cv-contact__title">{{ __('messages.public_profile.contact.title') }}</p>
+                    <p class="cv-contact__text">{{ __('messages.public_profile.contact.text') }}</p>
+                </div>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
             </div>
         @endif
     </div>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

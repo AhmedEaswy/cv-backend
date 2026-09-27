@@ -3,9 +3,15 @@
 namespace App\Services;
 
 use App\Models\PublicProfile;
+use App\Services\Contact\SocialLinksNormalizer;
 
 class PublicProfileDataMapper
 {
+    public function __construct(
+        private SocialLinksNormalizer $socialLinksNormalizer,
+    ) {
+    }
+
     public function mapUserDataToPublicProfile(array $userData): array
     {
         $mapped = [];
@@ -49,6 +55,10 @@ class PublicProfileDataMapper
             }
         }
 
+        if (array_key_exists('social_links', $mapped)) {
+            $mapped['social_links'] = $this->socialLinksNormalizer->normalize($mapped['social_links']);
+        }
+
         return $mapped;
     }
 
@@ -56,8 +66,10 @@ class PublicProfileDataMapper
     {
         $info = $profile->info ?? [];
 
+        $socialLinks = $this->socialLinksNormalizer->normalize($profile->social_links ?? []);
+
         $userData = array_merge($info, [
-            'socialLinks' => $profile->social_links ?? [],
+            'socialLinks' => $socialLinks,
             'experiences' => $profile->experiences ?? [],
             'educations' => $profile->educations ?? [],
             'projects' => $profile->projects ?? [],
@@ -76,9 +88,12 @@ class PublicProfileDataMapper
             'id' => $profile->id,
             'user_id' => $profile->user_id,
             'slug' => $profile->slug,
-            'public_url' => $profile->public_url,
+            'public_url' => $profile->preferredPublicUrl(),
+            'path_url' => $profile->pathUrl(),
+            'subdomain_url' => $profile->subdomainUrl(),
             'is_public' => $profile->is_public,
             'enable_contact_form' => (bool) $profile->enable_contact_form,
+            'enable_subdomain' => (bool) $profile->enable_subdomain,
             'contact_form_recipient' => $profile->contact_form_recipient,
             'language' => $profile->language,
             'headline' => $profile->headline,

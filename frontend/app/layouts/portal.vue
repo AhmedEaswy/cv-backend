@@ -135,6 +135,7 @@ onBeforeUnmount(() => {
                 </NuxtLink>
 
                 <div class="portal-topbar__right">
+                    <PortalNotificationBell />
                     <LangSwitcher />
                     <NuxtLink to="/" class="portal-topbar__site">
                         {{ t('portal.nav.back_to_site') }}

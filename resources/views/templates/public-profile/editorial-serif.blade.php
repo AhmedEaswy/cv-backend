@@ -26,12 +26,20 @@
             .side ul { list-style: none; padding: 0; margin: 0; }
             .side li { padding: 6px 0; border-bottom: 1px dotted #a8a29e; }
             @media (max-width: 800px) { .masthead, .grid { grid-template-columns: 1fr; } }
+            .edit-social { grid-column: 1 / -1; margin-top: 8px; --pp-social-border: #1c1917; --pp-social-bg: transparent; }
+            .edit-contact { max-width: 1100px; margin: 0 auto; padding: 0 28px 80px; }
+            .edit-contact .panel { border-top: 2px solid #1c1917; padding-top: 24px; }
+            .edit-contact h2 { font-family: "Cormorant Garamond", serif; font-size: 2rem; margin: 0 0 12px; }
+            .edit-contact .cv-contact__form { display: flex; flex-direction: column; gap: 14px; position: relative; max-width: 520px; }
+            .edit-contact .cv-contact__input { width: 100%; padding: 10px 12px; border: 1px solid #1c1917; background: #f3eee4; font-family: inherit; }
+            .edit-contact .cv-contact__submit { background: #1c1917; color: #f3eee4; border: none; padding: 12px 20px; font-weight: 600; cursor: pointer; align-self: flex-start; }
         </style>
     @endslot
 
     <header class="masthead">
         <h1>{{ $d->fullName }}</h1>
         <p class="deck">{{ $d->headline ?? $d->jobTitle }}@if($d->about)<br><em style="font-family:'Cormorant Garamond',serif;font-size:1.25rem">{{ \Illuminate\Support\Str::limit($d->about, 140) }}</em>@endif</p>
+        <div class="edit-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'stack'])</div>
     </header>
 
     <div class="grid">
@@ -65,6 +73,10 @@
                 <h2>Contact</h2>
                 @foreach($d->contactParts as $part)<p>{{ $part }}</p>@endforeach
             @endif
+            @if($d->socialLinks)
+                <h2>Connect</h2>
+                @include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'mono'])
+            @endif
             @if($d->skills)
                 <h2>Expertise</h2>
                 <ul>@foreach($d->skills as $skill)<li>{{ is_array($skill) ? ($skill['name'] ?? '') : $skill }}</li>@endforeach</ul>
@@ -84,5 +96,13 @@
             @endif
         </aside>
     </div>
-    @include('components.public-profile._contact_form')
+    @if($profile['enable_contact_form'] ?? false)
+        <section id="contact-form" class="edit-contact" aria-labelledby="edit-contact-heading">
+            <div class="panel">
+                <h2 id="edit-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                <p style="margin:0 0 18px;color:#78716c">{{ __('messages.public_profile.contact.text') }}</p>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
+            </div>
+        </section>
+    @endif
 </x-public-profile-layout>

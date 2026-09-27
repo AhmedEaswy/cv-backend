@@ -49,6 +49,9 @@ class PublicProfileController extends BaseApiController
             'slug' => $validated['slug'] ?? null,
             'language' => $validated['language'] ?? 'en',
             'is_public' => $validated['is_public'] ?? true,
+            'enable_contact_form' => $validated['enable_contact_form'] ?? false,
+            'enable_subdomain' => $validated['enable_subdomain'] ?? false,
+            'contact_form_recipient' => $validated['contact_form_recipient'] ?? null,
             'headline' => $validated['headline'] ?? null,
             'about' => $validated['about'] ?? null,
             'sections_order' => $validated['sections_order'] ?? null,
@@ -73,7 +76,18 @@ class PublicProfileController extends BaseApiController
         $validated = $request->validated();
         $updateData = [];
 
-        foreach (['slug', 'language', 'is_public', 'headline', 'about', 'sections_order', 'public_profile_template_id'] as $field) {
+        foreach ([
+            'slug',
+            'language',
+            'is_public',
+            'enable_contact_form',
+            'enable_subdomain',
+            'contact_form_recipient',
+            'headline',
+            'about',
+            'sections_order',
+            'public_profile_template_id',
+        ] as $field) {
             if (array_key_exists($field, $validated)) {
                 $updateData[$field] = $validated[$field];
             }

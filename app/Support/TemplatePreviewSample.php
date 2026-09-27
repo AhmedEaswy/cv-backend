@@ -221,8 +221,8 @@ class TemplatePreviewSample
                 'website' => 'https://elenavoss.example',
                 'photo' => self::portrait(),
                 'socialLinks' => [
-                    ['label' => 'LinkedIn', 'url' => 'https://www.linkedin.com/in/example'],
-                    ['label' => 'Dribbble', 'url' => 'https://dribbble.com/example'],
+                    ['platform' => 'linkedin', 'url' => 'https://www.linkedin.com/in/example'],
+                    ['platform' => 'dribbble', 'url' => 'https://dribbble.com/example'],
                 ],
                 'experiences' => [
                     [
@@ -326,8 +326,8 @@ class TemplatePreviewSample
                 'website' => 'https://ahmedali.example',
                 'photo' => self::portrait(),
                 'socialLinks' => [
-                    ['label' => 'لينكدإن', 'url' => 'https://www.linkedin.com/in/example'],
-                    ['label' => 'دريبل', 'url' => 'https://dribbble.com/example'],
+                    ['platform' => 'linkedin', 'url' => 'https://www.linkedin.com/in/example'],
+                    ['platform' => 'dribbble', 'url' => 'https://dribbble.com/example'],
                 ],
                 'experiences' => [
                     [

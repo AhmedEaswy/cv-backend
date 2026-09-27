@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Services\Contact\SocialLinksNormalizer;
+
 class PublicProfileTemplateData
 {
     public function __construct(
@@ -84,7 +86,7 @@ class PublicProfileTemplateData
             website: $website,
             pronouns: $userData['pronouns'] ?? null,
             language: $profile['language'] ?? 'en',
-            socialLinks: $userData['socialLinks'] ?? [],
+            socialLinks: app(SocialLinksNormalizer::class)->normalize($userData['socialLinks'] ?? []),
             experiences: $userData['experiences'] ?? [],
             educations: $userData['educations'] ?? [],
             projects: $userData['projects'] ?? [],

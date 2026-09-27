@@ -37,6 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_app_platform',
         'used_platforms',
         'uses_both_platforms',
+        'notify_contact_email',
+        'notify_contact_push',
     ];
 
     /**
@@ -64,6 +66,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'active' => 'boolean',
             'used_platforms' => 'array',
             'uses_both_platforms' => 'boolean',
+            'notify_contact_email' => 'boolean',
+            'notify_contact_push' => 'boolean',
         ];
     }
 
@@ -188,5 +192,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function aiSetting(): HasOne
     {
         return $this->hasOne(UserAiSetting::class);
+    }
+
+    public function outboundMail(): HasOne
+    {
+        return $this->hasOne(UserOutboundMail::class);
+    }
+
+    public function devicePushTokens(): HasMany
+    {
+        return $this->hasMany(DevicePushToken::class);
     }
 }

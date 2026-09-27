@@ -181,11 +181,37 @@ One profile per authenticated user. Soft-deleted.
 
 ### Create / update fields
 
-`slug`, `language` (`en`\|`ar`\|`tr`), `is_public`, `headline`, `about`, `sections_order`, `public_profile_template_id`, `user_data`
+`slug`, `language`, `is_public`, `enable_contact_form`, `enable_subdomain`, `contact_form_recipient`, `headline`, `about`, `sections_order`, `public_profile_template_id`, `user_data` (includes `seo`, `socialLinks` as `[{ platform, url, label? }]`)
 
-Response extras: `public_url` (e.g. `https://host/u/{slug}`), `enable_contact_form`, `contact_form_recipient`.
+Response extras: `public_url` (preferred), `path_url`, `subdomain_url`, `enable_contact_form`, `enable_subdomain`, `contact_form_recipient`.
 
-Contact form submissions go to **web** `POST /u/{slug}/contact` (not under `/api/v1`). Inbox mark-read is portal-web only today.
+Contact form: **web** `POST /u/{slug}/contact` (also available on vanity subdomain when enabled).
+
+### Inbox & replies
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| GET | `/public-profiles/inbox` | Bearer | Messages + nested replies |
+| POST | `/public-profiles/inbox/{id}/read` | Bearer | Mark read |
+| POST | `/public-profiles/inbox/{id}/spam` | Bearer | Hide + global blocklist |
+| POST | `/public-profiles/inbox/{id}/reply` | Bearer | `{ body }` · queues send (201) |
+| POST | `/public-profiles/inbox/{id}/replies/{replyId}/retry` | Bearer | Re-queue failed reply |
+
+### Notifications & devices
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| GET | `/notifications` | Bearer | In-app notification center |
+| POST | `/notifications/{id}/read` | Bearer | |
+| POST | `/notifications/read-all` | Bearer | |
+| GET/PUT | `/settings/notifications` | Bearer | `notify_contact_email`, `notify_contact_push` |
+| GET/PUT | `/settings/outbound-mail` | Bearer | Custom domain + SMTP (password write-only) |
+| POST | `/settings/outbound-mail/verify-dns` | Bearer | TXT `_cv-mail.{domain}` |
+| POST | `/settings/outbound-mail/test` | Bearer | Test send via user SMTP |
+| POST | `/devices/push-token` | Bearer | FCM token register `{ token, platform }` |
+| DELETE | `/devices/push-token` | Bearer | `{ token }` |
+
+Requires a queue worker for reply email and FCM push delivery.
 
 ---
 
@@ -195,7 +221,7 @@ Contact form submissions go to **web** `POST /u/{slug}/contact` (not under `/api
 |--------|------|------|-------|
 | GET | `/portal/stats` | Bearer | Dashboard aggregate |
 
-Typical `result` keys: `cvs_count`, `cover_letters_count`, `top_ats_score`, `views_count`, `unread_messages`, `has_public_profile`, `public_profile_is_published`, `public_profile_slug`, `public_profile_url`, `latest_cv`, `latest_cover_letter`.
+Typical `result` keys: `cvs_count`, `cover_letters_count`, `top_ats_score`, `views_count`, `unread_messages`, `unread_notifications`, `has_public_profile`, `public_profile_is_published`, `public_profile_slug`, `public_profile_url`, `latest_cv`, `latest_cover_letter`.
 
 ---
 

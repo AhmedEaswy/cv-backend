@@ -1,6 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
+import type { PublicProfileSeo, PublicProfileSocialLink, SocialLinkPlatform } from '~/composables/usePortalApi';
+
+const SOCIAL_PLATFORMS: SocialLinkPlatform[] = [
+    'linkedin', 'github', 'x', 'instagram', 'youtube', 'facebook', 'tiktok', 'snapchat',
+    'calendly', 'behance', 'dribbble', 'medium', 'whatsapp', 'telegram', 'website', 'custom',
+];
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -25,7 +31,33 @@ const form = reactive({
     location: '',
     template_id: '' as string | number,
     is_public: true,
+    slug: '',
+    enable_subdomain: false,
+    enable_contact_form: false,
+    contact_form_recipient: '',
+    seo: {
+        meta_title: '',
+        meta_description: '',
+        og_image: '',
+        robots: 'index,follow',
+    } as PublicProfileSeo,
+    socialLinks: [] as PublicProfileSocialLink[],
 });
+
+const pathUrl = ref('');
+const subdomainUrl = ref('');
+
+const socialPlatformOptions = computed(() =>
+    SOCIAL_PLATFORMS.map((platform) => ({
+        value: platform,
+        label: t(`portal.public_profile.social.platform.${platform}`),
+    })),
+);
+
+const robotsOptions = computed(() => [
+    { value: 'index,follow', label: t('portal.public_profile.seo.robots_default') },
+    { value: 'noindex,nofollow', label: t('portal.public_profile.seo.robots_noindex') },
+]);
 
 function queryTemplateId(): number | null {
     const raw = Array.isArray(route.query.public_profile_template_id)
@@ -57,6 +89,30 @@ function applyProfile(p: typeof profile.value) {
     const valid = templates.value.some((tpl) => String(tpl.id) === String(templateId));
     form.template_id = valid ? templateId : (templates.value.find((tpl) => tpl.is_default)?.id ?? templates.value[0]?.id ?? '');
     form.is_public = p ? !!p.is_public : true;
+    form.slug = p?.slug || '';
+    form.enable_subdomain = !!p?.enable_subdomain;
+    form.enable_contact_form = !!p?.enable_contact_form;
+    form.contact_form_recipient = p?.contact_form_recipient || '';
+    const seo = (p?.user_data?.seo || {}) as PublicProfileSeo;
+    form.seo.meta_title = seo.meta_title || '';
+    form.seo.meta_description = seo.meta_description || '';
+    form.seo.og_image = seo.og_image || '';
+    form.seo.robots = seo.robots || 'index,follow';
+    form.socialLinks = (p?.user_data?.socialLinks || []).map((link) => ({
+        platform: link.platform || 'website',
+        url: link.url || '',
+        label: link.label || '',
+    }));
+    pathUrl.value = p?.path_url || (p?.slug ? `/u/${p.slug}` : '');
+    subdomainUrl.value = p?.subdomain_url || '';
+}
+
+function addSocialLink() {
+    form.socialLinks.push({ platform: 'linkedin', url: '', label: '' });
+}
+
+function removeSocialLink(index: number) {
+    form.socialLinks.splice(index, 1);
 }
 
 function payload() {
@@ -65,10 +121,22 @@ function payload() {
         && templates.value.some((tpl) => String(tpl.id) === String(form.template_id))
         ? form.template_id
         : null;
+    const socialLinks = form.socialLinks
+        .map((link) => ({
+            platform: link.platform,
+            url: link.url?.trim() || '',
+            ...(link.platform === 'custom' && link.label?.trim() ? { label: link.label.trim() } : {}),
+        }))
+        .filter((link) => link.url);
+
     return {
         headline: form.headline || null,
         about: form.bio || null,
         is_public: !!form.is_public,
+        slug: form.slug.trim() || null,
+        enable_subdomain: !!form.enable_subdomain,
+        enable_contact_form: !!form.enable_contact_form,
+        contact_form_recipient: form.contact_form_recipient.trim() || null,
         public_profile_template_id: templateId,
         user_data: {
             firstName: parts[0] || '',
@@ -77,6 +145,13 @@ function payload() {
             phone: form.phone || null,
             website: form.website || null,
             address: form.location || null,
+            seo: {
+                meta_title: form.seo.meta_title?.trim() || null,
+                meta_description: form.seo.meta_description?.trim() || null,
+                og_image: form.seo.og_image?.trim() || null,
+                robots: form.seo.robots?.trim() || null,
+            },
+            socialLinks,
         },
     };
 }
@@ -139,13 +214,18 @@ async function onTogglePublic(value: boolean | number | string | null) {
     toggling.value = false;
 }
 
-async function onCopyLink() {
-    const url = profile.value?.public_url || (profile.value?.slug ? `${window.location.origin}/u/${profile.value.slug}` : '');
+async function copyAbsoluteUrl(url: string) {
     if (!url) return;
+    const absolute = /^https?:\/\//i.test(url) ? url : `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
     try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(absolute);
         toast.success(t('portal.public_profile.link_copied'));
     } catch { /* ignore */ }
+}
+
+async function onCopyLink() {
+    const url = profile.value?.public_url || pathUrl.value || (profile.value?.slug ? `/u/${profile.value.slug}` : '');
+    await copyAbsoluteUrl(url);
 }
 
 const previewUrl = computed(() => {
@@ -222,6 +302,116 @@ const previewUrl = computed(() => {
                         <input id="location" v-model="form.location" class="input" :placeholder="t('portal.public_profile.field.location_placeholder')" />
                     </div>
                 </div>
+            </div>
+
+            <div class="surface form-card">
+                <h2 class="form-card__title">{{ t('portal.public_profile.contact.title') }}</h2>
+                <p class="form-card__sub">{{ t('portal.public_profile.contact.subtitle') }}</p>
+                <div class="field">
+                    <Switch v-model="form.enable_contact_form" size="sm">
+                        <span>{{ t('portal.public_profile.contact.enable') }}</span>
+                    </Switch>
+                    <span class="field-hint">{{ t('portal.public_profile.contact.enable_help') }}</span>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="contact-recipient">{{ t('portal.public_profile.contact.recipient') }}</label>
+                    <input
+                        id="contact-recipient"
+                        v-model="form.contact_form_recipient"
+                        type="email"
+                        class="input"
+                        :placeholder="t('portal.public_profile.field.email_placeholder')"
+                    />
+                    <span class="field-hint">{{ t('portal.public_profile.contact.recipient_help') }}</span>
+                </div>
+            </div>
+
+            <div class="surface form-card">
+                <h2 class="form-card__title">{{ t('portal.public_profile.url.title') }}</h2>
+                <p class="form-card__sub">{{ t('portal.public_profile.url.subtitle') }}</p>
+                <div class="field">
+                    <label class="field-label" for="slug">{{ t('portal.public_profile.field.slug') }}</label>
+                    <input id="slug" v-model="form.slug" class="input" dir="ltr" :placeholder="t('portal.public_profile.field.slug_help')" />
+                    <span class="field-hint">{{ t('portal.public_profile.field.slug_help') }}</span>
+                </div>
+                <div class="field">
+                    <Switch v-model="form.enable_subdomain" size="sm">
+                        <span>{{ t('portal.public_profile.url.enable_subdomain') }}</span>
+                    </Switch>
+                    <span class="field-hint">{{ t('portal.public_profile.url.enable_subdomain_help') }}</span>
+                </div>
+                <div v-if="pathUrl" class="field">
+                    <span class="field-label">{{ t('portal.public_profile.url.path') }}</span>
+                    <div class="url-copy-row">
+                        <code class="url-copy-row__text">{{ pathUrl }}</code>
+                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(pathUrl)">
+                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                        </Button>
+                    </div>
+                </div>
+                <div v-if="subdomainUrl" class="field">
+                    <span class="field-label">{{ t('portal.public_profile.url.subdomain') }}</span>
+                    <div class="url-copy-row">
+                        <code class="url-copy-row__text">{{ subdomainUrl }}</code>
+                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(subdomainUrl)">
+                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface form-card">
+                <h2 class="form-card__title">{{ t('portal.public_profile.seo.title') }}</h2>
+                <p class="form-card__sub">{{ t('portal.public_profile.seo.subtitle') }}</p>
+                <div class="field">
+                    <label class="field-label" for="seo-title">{{ t('portal.public_profile.seo.meta_title') }}</label>
+                    <input id="seo-title" v-model="form.seo.meta_title" class="input" :placeholder="t('portal.public_profile.seo.meta_title_placeholder')" />
+                </div>
+                <div class="field">
+                    <label class="field-label" for="seo-desc">{{ t('portal.public_profile.seo.meta_description') }}</label>
+                    <textarea id="seo-desc" v-model="form.seo.meta_description" class="textarea" rows="3" :placeholder="t('portal.public_profile.seo.meta_description_placeholder')" />
+                </div>
+                <div class="field-grid">
+                    <div class="field">
+                        <label class="field-label" for="seo-og">{{ t('portal.public_profile.seo.og_image') }}</label>
+                        <input id="seo-og" v-model="form.seo.og_image" class="input" dir="ltr" :placeholder="t('portal.public_profile.seo.og_image_placeholder')" />
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="seo-robots">{{ t('portal.public_profile.seo.robots') }}</label>
+                        <SelectInput id="seo-robots" v-model="form.seo.robots" :options="robotsOptions" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface form-card">
+                <h2 class="form-card__title">{{ t('portal.public_profile.social.title') }}</h2>
+                <p class="form-card__sub">{{ t('portal.public_profile.social.subtitle') }}</p>
+                <p v-if="form.socialLinks.length === 0" class="field-hint">{{ t('portal.public_profile.social.empty') }}</p>
+                <article v-for="(link, index) in form.socialLinks" :key="index" class="cv-entry">
+                    <div class="cv-entry__head">
+                        <span class="field-label">{{ t('portal.public_profile.social.platform') }} #{{ index + 1 }}</span>
+                        <button type="button" class="btn btn--ghost btn--sm" @click="removeSocialLink(index)">
+                            <Icon name="trash" :size="14" /> {{ t('portal.public_profile.social.remove') }}
+                        </button>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field" style="margin-bottom: 0">
+                            <label class="field-label">{{ t('portal.public_profile.social.platform') }}</label>
+                            <SelectInput v-model="link.platform" :options="socialPlatformOptions" />
+                        </div>
+                        <div class="field" style="margin-bottom: 0">
+                            <label class="field-label">{{ t('portal.public_profile.social.url') }}</label>
+                            <input v-model="link.url" type="url" class="input" dir="ltr" />
+                        </div>
+                    </div>
+                    <div v-if="link.platform === 'custom'" class="field" style="margin-top: 0.75rem; margin-bottom: 0">
+                        <label class="field-label">{{ t('portal.public_profile.social.label') }}</label>
+                        <input v-model="link.label" class="input" :placeholder="t('portal.public_profile.social.label_placeholder')" />
+                    </div>
+                </article>
+                <button type="button" class="btn btn--secondary btn--sm" @click="addSocialLink">
+                    <Icon name="plus" :size="14" /> {{ t('portal.public_profile.social.add') }}
+                </button>
             </div>
         </div>
 

@@ -1,20 +1,14 @@
 {{--
-    Shared contact form partial for public profile templates.
-
-    Renders a styled contact form when the profile owner has enabled
-    the contact form. Each template should include this partial in
-    the same spot so every template gains the section consistently.
+    Default wrapped contact form for public profile templates.
 
     Expected locals:
-      - $profile  — array from PublicProfileDataMapper::formatPublicProfileResponse
+      - $profile — array from PublicProfileDataMapper::formatPublicProfileResponse
 --}}
 @php
-    /** @var array $profile */
-    $slug = $profile['slug'] ?? '';
     $enableContact = (bool) ($profile['enable_contact_form'] ?? false);
 @endphp
 
-@if($enableContact && $slug !== '')
+@if($enableContact)
     <section id="contact-form" class="cv-contact" aria-labelledby="cv-contact-heading">
         <div class="cv-contact__head">
             <span class="cv-contact__eyebrow">{{ __('messages.public_profile.contact.eyebrow') }}</span>
@@ -22,49 +16,7 @@
             <p class="cv-contact__text">{{ __('messages.public_profile.contact.text') }}</p>
         </div>
 
-        @if(session('status'))
-            <div class="cv-contact__alert cv-contact__alert--success" role="status">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                <span>{{ session('status') }}</span>
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="cv-contact__alert cv-contact__alert--error" role="alert">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-                <ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('public-profile.contact', $slug) }}" class="cv-contact__form" novalidate>
-            @csrf
-
-            <div style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
-                <label for="website-hp">Leave this empty</label>
-                <input type="text" name="website" id="website-hp" tabindex="-1" autocomplete="off">
-            </div>
-
-            <div class="cv-contact__row">
-                <div class="cv-contact__field">
-                    <label for="cf-name" class="cv-contact__label">{{ __('messages.public_profile.contact.name') }}</label>
-                    <input id="cf-name" name="name" type="text" required maxlength="120" autocomplete="name" value="{{ old('name') }}" class="cv-contact__input">
-                </div>
-                <div class="cv-contact__field">
-                    <label for="cf-email" class="cv-contact__label">{{ __('messages.public_profile.contact.email') }}</label>
-                    <input id="cf-email" name="email" type="email" required maxlength="191" autocomplete="email" inputmode="email" value="{{ old('email') }}" class="cv-contact__input">
-                </div>
-            </div>
-            <div class="cv-contact__field">
-                <label for="cf-subject" class="cv-contact__label">{{ __('messages.public_profile.contact.subject') }}</label>
-                <input id="cf-subject" name="subject" type="text" maxlength="180" value="{{ old('subject') }}" class="cv-contact__input">
-            </div>
-            <div class="cv-contact__field">
-                <label for="cf-message" class="cv-contact__label">{{ __('messages.public_profile.contact.message') }}</label>
-                <textarea id="cf-message" name="message" required minlength="10" maxlength="4000" rows="5" class="cv-contact__input cv-contact__input--textarea">{{ old('message') }}</textarea>
-            </div>
-
-            <button type="submit" class="cv-contact__submit">{{ __('messages.public_profile.contact.send') }}</button>
-        </form>
+        @include('components.public-profile._contact_fields', ['profile' => $profile])
     </section>
 
     <style>

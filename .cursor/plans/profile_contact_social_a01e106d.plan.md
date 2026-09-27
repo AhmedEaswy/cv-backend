@@ -1,43 +1,46 @@
 ---
 name: Profile contact social
-overview: Wire public-profile contact (inbox, replies, custom SMTP), vanity subdomain + /u/slug URLs with SEO controls, spam blocking, in-app notifications + Firebase FCM, and per-template contact + social links.
+overview: Wire public-profile contact (inbox, replies, custom SMTP), vanity subdomain + /u/slug with SEO, spam blocking, notifications + FCM, per-template contact/social — with all new copy in resources/lang for every locale.
 todos:
   - id: spam-blocklist
     content: Add contact_spam_blocklist + enforce/auto-block/report-spam flow
-    status: pending
+    status: completed
   - id: inbox-api
     content: Add Sanctum inbox list/read/spam routes and wire inbox.vue
-    status: pending
+    status: completed
   - id: inbox-replies
     content: Queued replies with delivery status; company mail fallback; reply API + inbox UI
-    status: pending
+    status: completed
   - id: custom-smtp-dns
     content: User domain DNS verify + encrypted SMTP; reply From own name when verified
-    status: pending
+    status: completed
   - id: subdomain-urls
     content: Serve profile on slug.app-domain subdomain beside /u/slug; toggle + reserved names
-    status: pending
+    status: completed
   - id: contact-seo-editor
     content: Portal editor for contact, slug, subdomain toggle, and SEO fields
-    status: pending
+    status: completed
   - id: notify-settings
     content: Add notify_contact_email + notify_contact_push prefs; Settings Notifications tab
-    status: pending
+    status: completed
   - id: notification-center
     content: Laravel database notifications + portal bell center + REST list/read/read-all
-    status: pending
+    status: completed
   - id: firebase-fcm
     content: device_push_tokens + FCM channel/job + register/unregister mobile APIs + docs
-    status: pending
+    status: completed
   - id: social-editor
     content: Normalize social_links; platform repeater in public-profile editor
-    status: pending
+    status: completed
   - id: template-ui
     content: Per-template contact sections + shared social icons partial on all 10 templates
-    status: pending
+    status: completed
+  - id: i18n-all-locales
+    content: Add all new UI strings to resources/lang (source of truth) for en/ar/de/es/fr/tr/ur; fix missing landing.nav.public_profile + landing.templates_page.tab_public_profile; never edit frontend/locales directly
+    status: completed
   - id: tests
     content: Feature tests for contact, spam, inbox, replies, subdomain, SEO, FCM
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -366,6 +369,25 @@ Update [`TemplatePreviewSample`](app/Support/TemplatePreviewSample.php) with sam
 - Notifications list/read/read-all
 - Push-token register/unregister
 - social_links normalize in public profile response
+
+## 9. i18n — all new copy in every locale
+
+**Source of truth:** [`resources/lang/{locale}.json`](resources/lang/) (en, ar, de, es, fr, tr, ur). [`frontend/scripts/sync-locales.mjs`](frontend/scripts/sync-locales.mjs) copies into `frontend/locales/` on `pnpm dev` / `build`. **Never add keys only under `frontend/locales/`** — they are overwritten on sync.
+
+**Immediate gap (since last commit):** Vue already calls:
+
+- `landing.nav.public_profile` ([`SiteHeader.vue`](frontend/app/components/landing/SiteHeader.vue))
+- `landing.templates_page.tab_public_profile` ([`templates.vue`](frontend/app/pages/templates.vue))
+
+These keys are **missing from `resources/lang/*.json`** (present only as stale leftovers in `frontend/locales/`). Add them next to sibling `landing.nav.*` / `landing.templates_page.tab_*` keys in **all seven** locale files, then run `pnpm sync:locales`.
+
+**For this feature set**, every new UI string must land in all seven `resources/lang` files before merge, including:
+
+- Portal: contact toggle, SEO fields, slug/subdomain, social links editor, inbox reply/spam/status, notification center, Settings → Notifications / Sending email
+- Blade/Laravel `__()` for contact form, reply mail, spam/throttle messages (same JSON keys)
+- Mobile-facing API error messages if user-visible
+
+Checklist before done: grep new keys in `en.json`, then confirm each exists in ar/de/es/fr/tr/ur; sync; spot-check RTL locales for portal strings.
 
 ## Out of scope
 

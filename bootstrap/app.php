@@ -21,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(prepend: [
+            \App\Http\Middleware\ResolvePublicProfileSubdomain::class,
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);

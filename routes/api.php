@@ -8,8 +8,13 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CoverLetterController;
 use App\Http\Controllers\Api\CVController;
 use App\Http\Controllers\Api\LinkedInCvController;
+use App\Http\Controllers\Api\DevicePushTokenController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\NotificationSettingsController;
+use App\Http\Controllers\Api\OutboundMailSettingsController;
 use App\Http\Controllers\Api\PortalStatsController;
 use App\Http\Controllers\Api\PublicProfileController;
+use App\Http\Controllers\Api\PublicProfileInboxController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Middleware\AnalyticsMiddleware;
@@ -86,6 +91,12 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::post('/public-profiles', [PublicProfileController::class, 'store']);
         Route::put('/public-profiles', [PublicProfileController::class, 'update']);
         Route::delete('/public-profiles', [PublicProfileController::class, 'destroy']);
+
+        Route::get('/public-profiles/inbox', [PublicProfileInboxController::class, 'index']);
+        Route::post('/public-profiles/inbox/{id}/read', [PublicProfileInboxController::class, 'markRead']);
+        Route::post('/public-profiles/inbox/{id}/spam', [PublicProfileInboxController::class, 'reportSpam']);
+        Route::post('/public-profiles/inbox/{id}/reply', [PublicProfileInboxController::class, 'reply']);
+        Route::post('/public-profiles/inbox/{id}/replies/{replyId}/retry', [PublicProfileInboxController::class, 'retryReply']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -97,5 +108,22 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
 
         Route::get('/ai-settings', [AiSettingController::class, 'show']);
         Route::put('/ai-settings', [AiSettingController::class, 'update']);
+
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+
+        Route::get('/settings/notifications', [NotificationSettingsController::class, 'show']);
+        Route::put('/settings/notifications', [NotificationSettingsController::class, 'update']);
+
+        Route::get('/settings/outbound-mail', [OutboundMailSettingsController::class, 'show']);
+        Route::put('/settings/outbound-mail', [OutboundMailSettingsController::class, 'update']);
+        Route::post('/settings/outbound-mail/verify-dns', [OutboundMailSettingsController::class, 'verifyDns'])
+            ->middleware('throttle:10,1');
+        Route::post('/settings/outbound-mail/test', [OutboundMailSettingsController::class, 'test'])
+            ->middleware('throttle:5,1');
+
+        Route::post('/devices/push-token', [DevicePushTokenController::class, 'store']);
+        Route::delete('/devices/push-token', [DevicePushTokenController::class, 'destroy']);
     });
 });

@@ -83,12 +83,29 @@ Structured path: `POST /cvs/ats-check` with either `profile_id` or in-progress `
 
 1. `GET /public-profiles` — if 404, show create flow
 2. `GET /public-profiles/templates`
-3. Create: `POST /public-profiles` (409 if already exists)
+3. Create: `POST /public-profiles` (409 if already exists) — include `enable_contact_form`, `enable_subdomain`, `user_data.seo`, `user_data.socialLinks` as needed
 4. Update: `PUT /public-profiles`
-5. Share `result.public_url` (`/u/{slug}`)
+5. Share `result.public_url` (path `/u/{slug}` or `{slug}.{domain}` when subdomain enabled)
 6. Delete: `DELETE /public-profiles`
 
-Contact inbox UI is not fully exposed on REST; `unread_messages` on portal stats may still be useful as a badge.
+### Inbox
+
+1. Badge: `GET /portal/stats` → `unread_messages` / `unread_notifications`
+2. List: `GET /public-profiles/inbox`
+3. Mark read: `POST /public-profiles/inbox/{id}/read`
+4. Report spam: `POST /public-profiles/inbox/{id}/spam` (blocks sender platform-wide)
+5. Reply: `POST /public-profiles/inbox/{id}/reply` with `{ body }` — returns pending reply; queue worker sends mail
+6. Retry failed: `POST /public-profiles/inbox/{id}/replies/{replyId}/retry`
+
+### Notifications & push
+
+1. Register FCM: `POST /devices/push-token` `{ token, platform: ios|android }`
+2. Unregister on logout: `DELETE /devices/push-token` `{ token }`
+3. In-app feed: `GET /notifications`; mark read / read-all
+4. Prefs: `GET/PUT /settings/notifications` (`notify_contact_email`, `notify_contact_push`)
+5. Optional custom From: `GET/PUT /settings/outbound-mail` + verify-dns / test
+
+Requires a running queue worker for reply email and FCM delivery.
 
 ---
 

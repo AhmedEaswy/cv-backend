@@ -24,6 +24,7 @@ class PortalStatsService
 
         $unreadMessages = $publicProfile
             ? ContactMessage::where('public_profile_id', $publicProfile->id)
+                ->visible()
                 ->whereNull('read_at')
                 ->count()
             : 0;
@@ -44,6 +45,7 @@ class PortalStatsService
             'top_ats_score' => $topAtsScore !== null ? (int) $topAtsScore : null,
             'views_count' => (int) ($publicProfile?->views_count ?? 0),
             'unread_messages' => $unreadMessages,
+            'unread_notifications' => $user->unreadNotifications()->count(),
             'has_public_profile' => $publicProfile !== null,
             'public_profile_is_published' => $publicProfile?->is_public ?? false,
             'public_profile_slug' => $publicProfile?->slug,

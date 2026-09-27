@@ -24,6 +24,13 @@
             .meta { color: #555; font-size: 0.85rem; margin-bottom: 8px; }
             .cta { display: inline-block; margin-top: 16px; background: #000; color: #fff; padding: 14px 22px; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
             @media (max-width: 800px) { .hero, .content { grid-template-columns: 1fr; } .panel { border-right: none; } }
+            .poster-social { padding: 0 40px 8px; background: #ff3b00; --pp-social-color: #000; --pp-social-bg: #fff; --pp-social-border: #000; }
+            .poster-social .pp-social { gap: 12px; }
+            .poster-contact { border-top: 4px solid #000; background: #fff; padding: 40px; }
+            .poster-contact h2 { font-family: "Archivo Black", sans-serif; text-transform: uppercase; margin: 0 0 12px; }
+            .poster-contact .cv-contact__form { display: flex; flex-direction: column; gap: 14px; position: relative; max-width: 640px; }
+            .poster-contact .cv-contact__input { width: 100%; padding: 12px; border: 3px solid #000; font-family: inherit; font-size: 1rem; }
+            .poster-contact .cv-contact__submit { background: #ff3b00; color: #000; border: 3px solid #000; padding: 14px 22px; font-weight: 700; text-transform: uppercase; cursor: pointer; align-self: flex-start; }
         </style>
     @endslot
 
@@ -43,6 +50,7 @@
     <div class="band">
         @foreach($d->contactParts as $part)<span>{{ $part }}</span>@endforeach
     </div>
+    <div class="poster-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'pills'])</div>
     <div class="content">
         @if($d->about)
             <div class="panel">
@@ -82,5 +90,11 @@
             </div>
         @endif
     </div>
-    @include('components.public-profile._contact_form')
+    @if($profile['enable_contact_form'] ?? false)
+        <section id="contact-form" class="poster-contact" aria-labelledby="poster-contact-heading">
+            <h2 id="poster-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+            <p style="margin:0 0 20px;max-width:40ch">{{ __('messages.public_profile.contact.text') }}</p>
+            @include('components.public-profile._contact_fields', ['profile' => $profile])
+        </section>
+    @endif
 </x-public-profile-layout>

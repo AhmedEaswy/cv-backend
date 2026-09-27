@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\Profile\ProfileDomain;
 use Illuminate\Support\Str;
 
 class PublicProfile extends Model
@@ -20,6 +21,7 @@ class PublicProfile extends Model
         'is_public',
         'views_count',
         'enable_contact_form',
+        'enable_subdomain',
         'contact_form_recipient',
         'language',
         'headline',
@@ -47,6 +49,7 @@ class PublicProfile extends Model
             'is_public' => 'boolean',
             'views_count' => 'integer',
             'enable_contact_form' => 'boolean',
+            'enable_subdomain' => 'boolean',
             'info' => 'array',
             'social_links' => 'array',
             'experiences' => 'array',
@@ -114,7 +117,30 @@ class PublicProfile extends Model
 
     public function getPublicUrlAttribute(): string
     {
-        return url('/u/'.$this->slug);
+        return $this->preferredPublicUrl();
+    }
+
+    public function pathUrl(): string
+    {
+        return app(ProfileDomain::class)->pathUrl((string) $this->slug);
+    }
+
+    public function subdomainUrl(): ?string
+    {
+        if (! $this->enable_subdomain) {
+            return null;
+        }
+
+        return app(ProfileDomain::class)->subdomainUrl((string) $this->slug);
+    }
+
+    public function preferredPublicUrl(): string
+    {
+        if ($this->enable_subdomain) {
+            return $this->subdomainUrl() ?? $this->pathUrl();
+        }
+
+        return $this->pathUrl();
     }
 
     /**

@@ -1115,6 +1115,163 @@ html[dir="rtl"] .portal-sidebar { transform: translateX(105%); }
 .cv-order__label { font-size: 0.9rem; font-weight: 500; }
 .cv-order__actions { display: inline-flex; gap: 0.15rem; }
 
+.portal-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem 1rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-paper-2);
+    font-size: 0.875rem;
+    color: var(--color-ink-soft);
+}
+.portal-banner--info { border-inline-start: 3px solid var(--color-ink); }
+.portal-banner p { margin: 0; flex: 1; min-width: 12rem; }
+.portal-banner__link {
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.portal-notif { position: relative; }
+.portal-notif__trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    color: var(--color-ink);
+    cursor: pointer;
+}
+.portal-notif__trigger:hover { border-color: var(--color-ink); }
+.portal-notif__badge {
+    position: absolute;
+    top: -0.35rem;
+    inset-inline-end: -0.35rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1.1rem;
+    text-align: center;
+}
+.portal-notif__menu {
+    padding: 0.65rem 0;
+    box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.08));
+}
+.portal-notif__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0 0.85rem 0.5rem;
+    border-bottom: 1px solid var(--color-line);
+}
+.portal-notif__title { font-weight: 600; font-size: 0.875rem; }
+.portal-notif__mark-all {
+    border: none;
+    background: none;
+    font-size: 0.75rem;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    text-decoration: underline;
+}
+.portal-notif__loading,
+.portal-notif__empty {
+    padding: 1rem 0.85rem;
+    font-size: 0.825rem;
+    color: var(--color-ink-soft);
+    margin: 0;
+}
+.portal-notif__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 18rem;
+    overflow-y: auto;
+}
+.portal-notif__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: none;
+    background: none;
+    text-align: start;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+.portal-notif__item:hover { background: var(--color-paper-2); }
+.portal-notif__item--unread { font-weight: 600; }
+.portal-notif__item-title { font-size: 0.825rem; }
+.portal-notif__item-time { font-size: 0.72rem; color: var(--color-muted); }
+.portal-notif__foot {
+    display: block;
+    padding: 0.65rem 0.85rem 0.25rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: none;
+}
+
+.url-copy-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.url-copy-row__text {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-paper-2);
+    font-size: 0.8rem;
+    word-break: break-all;
+}
+
+.dns-instructions {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px dashed var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-paper-2);
+}
+.dns-instructions__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.dns-instructions__code {
+    flex: 1;
+    font-size: 0.78rem;
+    word-break: break-all;
+}
+.dns-instructions__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
 /* Print-only helpers */
 @media print {
     .no-print { display: none !important; }

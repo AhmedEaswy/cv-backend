@@ -26,6 +26,12 @@
             .skills { display: flex; flex-wrap: wrap; gap: 10px; }
             .skill { background: #fff; border-radius: 16px; padding: 10px 16px; font-weight: 600; font-size: 0.9rem; }
             .cta { display: inline-block; background: #3d2c4a; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 999px; font-weight: 700; margin-top: 8px; }
+            .pastel-social { margin-top: 12px; --pp-social-bg: rgba(255,255,255,0.85); --pp-social-border: rgba(61,44,74,0.12); --pp-social-color: #3d2c4a; }
+            .pastel-social .pp-social { justify-content: center; }
+            .pastel-contact { margin-top: 8px; }
+            .pastel-contact .cv-contact__form { display: flex; flex-direction: column; gap: 14px; position: relative; }
+            .pastel-contact .cv-contact__input { width: 100%; padding: 12px 16px; border: none; border-radius: 16px; background: rgba(255,255,255,0.9); font-family: inherit; }
+            .pastel-contact .cv-contact__submit { background: #3d2c4a; color: #fff; border: none; padding: 14px 28px; border-radius: 999px; font-weight: 700; cursor: pointer; align-self: flex-start; }
         </style>
     @endslot
 
@@ -37,6 +43,7 @@
             <div class="pills">
                 @foreach($d->contactParts as $part)<span class="pill">{{ $part }}</span>@endforeach
             </div>
+            <div class="pastel-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'pills'])</div>
         </header>
 
         @if($d->about)
@@ -96,6 +103,12 @@
                 @endforeach
             </section>
         @endif
+        @if($profile['enable_contact_form'] ?? false)
+            <section id="contact-form" class="band band-sky pastel-contact" aria-labelledby="pastel-contact-heading">
+                <h2 id="pastel-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                <p style="margin:0 0 16px;color:#7a6588">{{ __('messages.public_profile.contact.text') }}</p>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
+            </section>
+        @endif
     </div>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

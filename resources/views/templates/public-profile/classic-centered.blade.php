@@ -26,6 +26,13 @@
             .skills span { display: inline-block; margin: 4px 10px; }
             .footer-cta { margin-top: 16px; }
             .footer-cta a { display: inline-block; border: 1px solid #222; padding: 12px 28px; text-decoration: none; color: #222; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.8rem; }
+            .classic-social { margin-bottom: 32px; --pp-social-bg: #fff; --pp-social-border: #ddd; }
+            .classic-social .pp-social { justify-content: center; }
+            .classic-contact { text-align: left; margin-top: 48px; padding: 28px; border: 1px solid #eee; max-width: 560px; margin-inline: auto; }
+            .classic-contact h2 { font-family: "Libre Baskerville", serif; text-align: center; font-size: 1.35rem; margin: 0 0 8px; }
+            .classic-contact .cv-contact__form { display: flex; flex-direction: column; gap: 12px; position: relative; }
+            .classic-contact .cv-contact__input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; font-family: Lato, sans-serif; }
+            .classic-contact .cv-contact__submit { align-self: center; border: 1px solid #222; background: #222; color: #fff; padding: 12px 28px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.06em; cursor: pointer; }
         </style>
     @endslot
 
@@ -46,11 +53,8 @@
                     <span>{{ $part }}</span>
                 @endif
             @endforeach
-            @foreach($d->socialLinks as $key => $url)
-                @php $href = is_array($url) ? ($url['url'] ?? null) : $url; $label = is_array($url) ? ($url['platform'] ?? $key) : $key; @endphp
-                @if($href)<a href="{{ $href }}" target="_blank" rel="noopener">{{ ucfirst($label) }}</a>@endif
-            @endforeach
         </div>
+        <div class="classic-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'row'])</div>
 
         @if($d->experiences)
             <section class="section">
@@ -103,6 +107,12 @@
                 <a href="{{ $d->cta['url'] }}">{{ $d->cta['label'] ?? 'Contact' }}</a>
             </div>
         @endif
+        @if($profile['enable_contact_form'] ?? false)
+            <section id="contact-form" class="classic-contact" aria-labelledby="classic-contact-heading">
+                <h2 id="classic-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                <p style="text-align:center;color:#888;margin:0 0 20px">{{ __('messages.public_profile.contact.text') }}</p>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
+            </section>
+        @endif
     </div>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

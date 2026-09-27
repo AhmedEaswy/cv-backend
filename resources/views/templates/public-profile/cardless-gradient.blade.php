@@ -38,12 +38,18 @@
             .chips { display: flex; flex-wrap: wrap; gap: 8px; }
             .chip { background: rgba(255,255,255,0.7); padding: 8px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 500; }
             @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+            .grad-social { padding: 0 28px 16px; --pp-social-color: #fff; --pp-social-bg: rgba(255,255,255,0.15); --pp-social-border: rgba(255,255,255,0.35); }
+            .grad-contact.panel { margin-top: 0; }
+            .grad-contact .cv-contact__form { display: flex; flex-direction: column; gap: 12px; position: relative; }
+            .grad-contact .cv-contact__input { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.65); font-family: inherit; }
+            .grad-contact .cv-contact__submit { background: #0f172a; color: #fff; border: none; padding: 12px 22px; border-radius: 999px; font-weight: 600; cursor: pointer; align-self: flex-start; }
         </style>
     @endslot
 
     <section class="hero">
         <h1>{{ $d->fullName }}</h1>
         <p>{{ $d->headline ?? $d->jobTitle }}</p>
+        <div class="grad-social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'pills'])</div>
     </section>
 
     <div class="glass">
@@ -107,6 +113,12 @@
                 </div>
             </div>
         @endif
+        @if($profile['enable_contact_form'] ?? false)
+            <div id="contact-form" class="panel grad-contact" aria-labelledby="grad-contact-heading">
+                <h2 id="grad-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                <p style="margin:0 0 16px;color:#475569">{{ __('messages.public_profile.contact.text') }}</p>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
+            </div>
+        @endif
     </div>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>

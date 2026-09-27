@@ -24,6 +24,17 @@
             .contact { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.9rem; color: var(--muted); margin-bottom: 40px; }
             .contact a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
             .cta { display: inline-block; margin-top: 8px; color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; padding-bottom: 2px; font-weight: 500; }
+            .social { margin-bottom: 28px; --pp-social-bg: transparent; --pp-social-border: var(--line); }
+            .folio-contact { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); max-width: 640px; }
+            .folio-contact h2 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); font-weight: 500; margin: 0 0 16px; }
+            .folio-contact .cv-contact__form { display: flex; flex-direction: column; gap: 14px; position: relative; }
+            .folio-contact .cv-contact__row { display: grid; gap: 14px; grid-template-columns: 1fr; }
+            @media (min-width: 560px) { .folio-contact .cv-contact__row { grid-template-columns: 1fr 1fr; } }
+            .folio-contact .cv-contact__field { display: flex; flex-direction: column; gap: 6px; }
+            .folio-contact .cv-contact__label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+            .folio-contact .cv-contact__input { width: 100%; padding: 10px 0; border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 1rem; border-radius: 0; }
+            .folio-contact .cv-contact__input:focus { outline: none; border-bottom-color: var(--ink); }
+            .folio-contact .cv-contact__submit { margin-top: 8px; padding: 10px 0; border: none; background: none; color: var(--ink); font-weight: 500; cursor: pointer; align-self: flex-start; border-bottom: 1px solid var(--ink); border-radius: 0; }
         </style>
     @endslot
 
@@ -31,6 +42,7 @@
         @if($d->photo)<img class="photo" src="{{ $d->photo }}" alt="{{ $d->fullName }}">@endif
         <h1 class="name">{{ $d->fullName }}</h1>
         <p class="role">{{ $d->headline ?? $d->jobTitle }}</p>
+        <div class="social">@include('components.public-profile._social_links', ['links' => $d->socialLinks, 'variant' => 'row'])</div>
         @if($d->contactParts)
             <div class="contact">
                 @foreach($d->contactParts as $part)
@@ -91,6 +103,12 @@
         @if($d->cta && !empty($d->cta['url']))
             <a class="cta" href="{{ $d->cta['url'] }}">{{ $d->cta['label'] ?? 'Get in touch' }}</a>
         @endif
+        @if($profile['enable_contact_form'] ?? false)
+            <section id="contact-form" class="folio-contact" aria-labelledby="folio-contact-heading">
+                <h2 id="folio-contact-heading">{{ __('messages.public_profile.contact.title') }}</h2>
+                <p style="color:var(--muted);margin:0 0 20px;font-size:0.95rem">{{ __('messages.public_profile.contact.text') }}</p>
+                @include('components.public-profile._contact_fields', ['profile' => $profile])
+            </section>
+        @endif
     </main>
-    @include('components.public-profile._contact_form')
 </x-public-profile-layout>
