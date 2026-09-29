@@ -29,7 +29,7 @@ class ContactMessageController extends Controller
         $email = strtolower((string) $request->input('email'));
         $ip = $request->ip();
 
-        if (! empty($request->input('website'))) {
+        if (! empty($request->input('hp_check'))) {
             $this->spamService->recordHoneypot($email, $ip);
 
             return $this->fakeSuccess($slug);

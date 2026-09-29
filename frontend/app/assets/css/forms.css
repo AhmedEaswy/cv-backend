@@ -11,6 +11,10 @@
     @apply max-w-lg p-7;
 }
 
+.form-card--full {
+    @apply max-w-full;
+}
+
 .form-card--wide {
     @apply max-w-4xl;
 }

@@ -54,7 +54,8 @@ class ContactSpamService
 
     public function recordHoneypot(?string $email, ?string $ip, ?int $messageId = null): void
     {
-        $this->block($email, $ip, 'honeypot', $messageId);
+        // Honeypots can be tripped by browser autofill; blocking the IP would silence shared networks.
+        $this->block($email, null, 'honeypot', $messageId);
     }
 
     public function maybeAutoBlockCrossProfile(?string $email, ?string $ip): void

@@ -64,7 +64,7 @@ class PublicProfileContactFlowTest extends TestCase
                 'email' => 'recruiter@example.com',
                 'subject' => 'Hello',
                 'message' => 'We would like to talk about a role with you.',
-                'website' => '',
+                'hp_check' => '',
             ]);
 
         $response->assertRedirect();
@@ -310,7 +310,7 @@ class PublicProfileContactFlowTest extends TestCase
                 'name' => 'Bot',
                 'email' => 'bot@example.com',
                 'message' => 'This is a long enough spam honeypot payload.',
-                'website' => 'https://spam.example',
+                'hp_check' => 'https://spam.example',
             ])
             ->assertRedirect();
 

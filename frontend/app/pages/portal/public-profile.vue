@@ -314,7 +314,7 @@ const previewUrl = computed(() => {
 
     <form v-else class="cv-builder" @submit.prevent="onSave">
         <div class="cv-builder__main">
-            <div class="surface form-card">
+            <div class="surface form-card form-card--full">
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="name">{{ t('portal.public_profile.field.name') }}</label>
@@ -354,7 +354,7 @@ const previewUrl = computed(() => {
                 </div>
             </div>
 
-            <div class="surface form-card">
+            <div class="surface form-card form-card--full">
                 <h2 class="form-card__title">{{ t('portal.public_profile.contact.title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.public_profile.contact.subtitle') }}</p>
                 <div class="field">
@@ -382,7 +382,7 @@ const previewUrl = computed(() => {
                 </div>
             </div>
 
-            <div class="surface form-card">
+            <div class="surface form-card form-card--full">
                 <h2 class="form-card__title">{{ t('portal.public_profile.url.title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.public_profile.url.subtitle') }}</p>
                 <div class="field">
@@ -460,7 +460,7 @@ const previewUrl = computed(() => {
                 </div>
             </div>
 
-            <div class="surface form-card">
+            <div class="surface form-card form-card--full">
                 <h2 class="form-card__title">{{ t('portal.public_profile.seo.title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.public_profile.seo.subtitle') }}</p>
                 <div class="field">
@@ -483,7 +483,7 @@ const previewUrl = computed(() => {
                 </div>
             </div>
 
-            <div class="surface form-card">
+            <div class="surface form-card form-card--full">
                 <h2 class="form-card__title">{{ t('portal.public_profile.social.title') }}</h2>
                 <p class="form-card__sub">{{ t('portal.public_profile.social.subtitle') }}</p>
                 <p v-if="form.socialLinks.length === 0" class="field-hint">{{ t('portal.public_profile.social.empty') }}</p>
@@ -516,7 +516,7 @@ const previewUrl = computed(() => {
         </div>
 
         <aside class="cv-builder__side">
-            <div class="surface form-card cv-builder__meta">
+            <div class="surface form-card form-card--full cv-builder__meta">
                 <div class="field">
                     <span class="field-label">{{ t('portal.public_profile.field.template') }}</span>
                     <CvTemplateSlider v-model="form.template_id" :templates="templates" kind="public-profile" />

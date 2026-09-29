@@ -21,7 +21,7 @@ class PortalContactMessageRequest extends FormRequest
             'email' => ['required', 'string', 'email:rfc', 'max:191'],
             'subject' => ['nullable', 'string', 'max:180'],
             'message' => ['required', 'string', 'min:10', 'max:4000'],
-            'website' => ['nullable', 'string', 'max:255'], // honeypot (handled in controller)
+            'hp_check' => ['nullable', 'string', 'max:255'], // honeypot (handled in controller)
         ];
     }
 

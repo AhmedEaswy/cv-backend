@@ -36,6 +36,9 @@ const { dir } = useDirection();
 const { label, description } = useLocalizedTemplate();
 const modules = [Navigation];
 const swiper = ref<SwiperInstance | null>(null);
+const isRtl = computed(() => dir.value === 'rtl');
+const prevIcon = computed(() => (isRtl.value ? 'chevron-right' : 'chevron-left'));
+const nextIcon = computed(() => (isRtl.value ? 'chevron-left' : 'chevron-right'));
 
 function onSwiper(instance: SwiperInstance) {
     swiper.value = instance;
@@ -82,10 +85,10 @@ watch(dir, (value) => {
     <div class="tpl-slider">
         <div class="tpl-slider__nav">
             <button type="button" class="tpl-slider__arrow" :aria-label="t('portal.cvs.template_prev')" @click="slidePrev">
-                <Icon name="chevron-left" :size="16" />
+                <Icon :name="prevIcon" :size="16" />
             </button>
             <button type="button" class="tpl-slider__arrow" :aria-label="t('portal.cvs.template_next')" @click="slideNext">
-                <Icon name="chevron-right" :size="16" />
+                <Icon :name="nextIcon" :size="16" />
             </button>
         </div>
 

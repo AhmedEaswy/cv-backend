@@ -32,8 +32,8 @@
         @csrf
 
         <div style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
-            <label for="website-hp">Leave this empty</label>
-            <input type="text" name="website" id="website-hp" tabindex="-1" autocomplete="off">
+            <label for="cv-hp-check">{{ __('messages.public_profile.contact.honeypot') }}</label>
+            <input type="text" name="hp_check" id="cv-hp-check" tabindex="-1" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore>
         </div>
 
         <div class="cv-contact__row">
