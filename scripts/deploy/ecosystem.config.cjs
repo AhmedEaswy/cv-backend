@@ -1,5 +1,5 @@
 /**
- * PM2 process file for the Nuxt SSR server.
+ * PM2 process file: Nuxt SSR server, Laravel queue worker, Laravel scheduler.
  *
  * One-time on the VPS:
  *   npm i -g pm2
@@ -51,6 +51,15 @@ const merged = { ...rootEnv, ...frontEnv };
 
 const appUrl = (merged.APP_URL || 'https://cv.edgesgate.com').replace(/\/+$/, '');
 
+const phpBinary = merged.PM2_PHP_BINARY || 'php';
+
+// Laravel processes must run as the PHP-FPM pool user, otherwise files they
+// create in storage/ (logs, cache) become root-owned and break the website.
+// PM2 can only switch user when it runs as root.
+const laravelUser = merged.PM2_LARAVEL_USER || 'edgesgate_co_usr';
+const isPm2Root = typeof process.getuid === 'function' && process.getuid() === 0;
+const laravelUserOptions = isPm2Root && laravelUser ? { uid: laravelUser, gid: laravelUser } : {};
+
 module.exports = {
   apps: [
     {
@@ -80,6 +89,36 @@ module.exports = {
       },
       max_memory_restart: '512M',
       time: true,
+    },
+    {
+      name: 'cv-queue',
+      cwd: rootDir,
+      script: 'artisan',
+      interpreter: phpBinary,
+      // --timeout must stay below DB_QUEUE_RETRY_AFTER (90s) so a job is never run twice.
+      // --max-time recycles the worker hourly to release memory.
+      args: 'queue:work database --queue=default --sleep=3 --tries=3 --backoff=10 --timeout=75 --max-time=3600',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      // Lets the in-flight job finish on reload (SIGTERM is handled gracefully by the worker).
+      kill_timeout: 90000,
+      max_memory_restart: '256M',
+      time: true,
+      ...laravelUserOptions,
+    },
+    {
+      name: 'cv-scheduler',
+      cwd: rootDir,
+      script: 'artisan',
+      interpreter: phpBinary,
+      args: 'schedule:work',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      max_memory_restart: '128M',
+      time: true,
+      ...laravelUserOptions,
     },
   ],
 };

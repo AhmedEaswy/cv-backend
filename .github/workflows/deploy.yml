@@ -222,13 +222,25 @@ jobs:
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
 
-            echo "==> Restarting Nuxt (pm2)"
+            echo "==> Restarting Nuxt, queue worker and scheduler (pm2)"
             if ! command -v pm2 >/dev/null 2>&1; then
               echo "ERROR: pm2 not found — install with: npm i -g pm2"
               exit 1
             fi
+            # Tells any worker still running old code to exit after its current job.
+            php artisan queue:restart
             pm2 startOrReload scripts/deploy/ecosystem.config.cjs --update-env
             pm2 save
+
+            for process_name in cv-queue cv-scheduler; do
+              sleep 2
+              if ! pm2 describe "$process_name" | grep -q 'status.*online'; then
+                echo "ERROR: $process_name is not online"
+                pm2 logs "$process_name" --lines 60 --nostream || true
+                exit 1
+              fi
+              echo "$process_name online"
+            done
 
             echo "==> Smoke checks"
             # Cold start after reload can exceed a single short curl (exit 28).
@@ -262,4 +274,5 @@ jobs:
 
             echo "==> Deploy complete"
             php artisan about --only=environment
+            php artisan queue:failed | tail -n 5 || true
             pm2 status
