@@ -217,6 +217,10 @@ jobs:
               echo "WARN: $NGINX_CONF missing location ^~ /api/auth — sidebase Auth.js will hit Laravel and break Google login."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
             fi
+            if [ -f "$NGINX_CONF" ] && ! grep -Eq 'auth/\(google\|linkedin\|apple\)' "$NGINX_CONF"; then
+              echo "WARN: $NGINX_CONF does not route /auth/(google|linkedin|apple)/ to Laravel — LinkedIn/Apple login will 404 in Nuxt."
+              echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"
+            fi
             if [ -f "$NGINX_CONF" ] && ! grep -Eq 'livewire' "$NGINX_CONF"; then
               echo "WARN: $NGINX_CONF missing livewire in Laravel location — Filament admin login will 502."
               echo "Apply scripts/deploy/nginx.cv.edgesgate.com.conf.example then: nginx -t && systemctl reload nginx"

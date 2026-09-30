@@ -46,7 +46,7 @@ server {
         try_files $uri $uri/ /index.php$is_args$args;
     }
 
-    location ~ ^/auth/google/ {
+    location ~ ^/auth/(google|linkedin|apple)/ {
         try_files $uri $uri/ /index.php$is_args$args;
     }
 
