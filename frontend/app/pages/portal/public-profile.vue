@@ -1,12 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
-import type { PublicProfileSeo, PublicProfileSocialLink, SocialLinkPlatform } from '~/composables/usePortalApi';
-
-const SOCIAL_PLATFORMS: SocialLinkPlatform[] = [
-    'linkedin', 'github', 'x', 'instagram', 'youtube', 'facebook', 'tiktok', 'snapchat',
-    'calendly', 'behance', 'dribbble', 'medium', 'whatsapp', 'telegram', 'website', 'custom',
-];
+import type { PublicProfileSeo } from '~/composables/usePortalApi';
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -46,7 +41,7 @@ const form = reactive({
         og_image: '',
         robots: 'index,follow',
     } as PublicProfileSeo,
-    socialLinks: [] as PublicProfileSocialLink[],
+    socialLinks: [] as SocialLinkCard[],
 });
 
 const pathUrl = ref('');
@@ -56,13 +51,6 @@ const customDomainDnsHost = ref('');
 const customDomainDnsValue = ref('');
 const customDomainVerified = ref(false);
 const verifyingProfileDns = ref(false);
-
-const socialPlatformOptions = computed(() =>
-    SOCIAL_PLATFORMS.map((platform) => ({
-        value: platform,
-        label: t(`portal.public_profile.social.platform.${platform}`),
-    })),
-);
 
 const robotsOptions = computed(() => [
     { value: 'index,follow', label: t('portal.public_profile.seo.robots_default') },
@@ -111,11 +99,7 @@ function applyProfile(p: typeof profile.value) {
     form.seo.meta_description = seo.meta_description || '';
     form.seo.og_image = seo.og_image || '';
     form.seo.robots = seo.robots || 'index,follow';
-    form.socialLinks = (p?.user_data?.socialLinks || []).map((link) => ({
-        platform: link.platform || 'website',
-        url: link.url || '',
-        label: link.label || '',
-    }));
+    form.socialLinks = buildSocialLinkCards(p?.user_data?.socialLinks || []);
     pathUrl.value = p?.path_url || (p?.slug ? `/u/${p.slug}` : '');
     subdomainUrl.value = p?.subdomain_url || '';
     customDomainUrl.value = p?.custom_domain_url || '';
@@ -134,27 +118,13 @@ watch(() => form.profile_url_mode, (mode) => {
     form.enable_subdomain = mode === 'subdomain';
 });
 
-function addSocialLink() {
-    form.socialLinks.push({ platform: 'linkedin', url: '', label: '' });
-}
-
-function removeSocialLink(index: number) {
-    form.socialLinks.splice(index, 1);
-}
-
 function payload() {
     const parts = form.name.trim().split(/\s+/).filter(Boolean);
     const templateId = form.template_id
         && templates.value.some((tpl) => String(tpl.id) === String(form.template_id))
         ? form.template_id
         : null;
-    const socialLinks = form.socialLinks
-        .map((link) => ({
-            platform: link.platform,
-            url: link.url?.trim() || '',
-            ...(link.platform === 'custom' && link.label?.trim() ? { label: link.label.trim() } : {}),
-        }))
-        .filter((link) => link.url);
+    const socialLinks = socialLinksFromCards(form.socialLinks);
 
     return {
         headline: form.headline || null,
@@ -485,33 +455,8 @@ const previewUrl = computed(() => {
 
             <div class="surface form-card form-card--full">
                 <h2 class="form-card__title">{{ t('portal.public_profile.social.title') }}</h2>
-                <p class="form-card__sub">{{ t('portal.public_profile.social.subtitle') }}</p>
-                <p v-if="form.socialLinks.length === 0" class="field-hint">{{ t('portal.public_profile.social.empty') }}</p>
-                <article v-for="(link, index) in form.socialLinks" :key="index" class="cv-entry">
-                    <div class="cv-entry__head">
-                        <span class="field-label">{{ t('portal.public_profile.social.platform') }} #{{ index + 1 }}</span>
-                        <button type="button" class="btn btn--ghost btn--sm" @click="removeSocialLink(index)">
-                            <Icon name="trash" :size="14" /> {{ t('portal.public_profile.social.remove') }}
-                        </button>
-                    </div>
-                    <div class="field-grid">
-                        <div class="field" style="margin-bottom: 0">
-                            <label class="field-label">{{ t('portal.public_profile.social.platform') }}</label>
-                            <SelectInput v-model="link.platform" :options="socialPlatformOptions" />
-                        </div>
-                        <div class="field" style="margin-bottom: 0">
-                            <label class="field-label">{{ t('portal.public_profile.social.url') }}</label>
-                            <input v-model="link.url" type="url" class="input" dir="ltr" />
-                        </div>
-                    </div>
-                    <div v-if="link.platform === 'custom'" class="field" style="margin-top: 0.75rem; margin-bottom: 0">
-                        <label class="field-label">{{ t('portal.public_profile.social.label') }}</label>
-                        <input v-model="link.label" class="input" :placeholder="t('portal.public_profile.social.label_placeholder')" />
-                    </div>
-                </article>
-                <button type="button" class="btn btn--secondary btn--sm" @click="addSocialLink">
-                    <Icon name="plus" :size="14" /> {{ t('portal.public_profile.social.add') }}
-                </button>
+                <p class="form-card__sub">{{ t('portal.public_profile.social.hint') }}</p>
+                <SocialLinksEditor v-model="form.socialLinks" />
             </div>
         </div>
 
