@@ -241,6 +241,10 @@
 }
 .dash-tip__link:hover { text-decoration: underline; }
 
+html[dir="rtl"] :is(.recent-row__chevron, .quick-action > svg:last-child, .dash-tip__link > svg) {
+    transform: rotate(180deg);
+}
+
 .empty--soft {
     background: transparent;
     border-style: dashed;

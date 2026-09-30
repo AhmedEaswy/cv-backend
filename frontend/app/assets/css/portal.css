@@ -254,6 +254,7 @@ html[dir="rtl"] .portal-sidebar { transform: translateX(105%); }
 .portal-sidebar__site {
     color: var(--color-ink-soft);
 }
+html[dir="rtl"] .portal-sidebar__site > svg { transform: rotate(180deg); }
 
 .portal-content {
     padding: 1.5rem 1.1rem 3.5rem;
