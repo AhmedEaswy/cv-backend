@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\Auth\SocialAccountService;
+use App\Services\Auth\SocialLinkFlow;
 use App\Services\LinkedIn\LinkedInCvImporter;
 use App\Support\SocialProvider;
 use Illuminate\Http\RedirectResponse;
@@ -20,6 +21,7 @@ class LinkedInAuthController extends Controller
     public function __construct(
         private readonly SocialAccountService $socialAccounts,
         private readonly LinkedInCvImporter $importer,
+        private readonly SocialLinkFlow $linkFlow,
     ) {}
 
     public function redirect(Request $request): RedirectResponse
@@ -36,6 +38,7 @@ class LinkedInAuthController extends Controller
             'linkedin.intent',
             $request->query('intent') === 'import' ? 'import' : 'login'
         );
+        $this->linkFlow->rememberFromRequest($request);
 
         return $this->driver()->redirect();
     }
@@ -52,7 +55,13 @@ class LinkedInAuthController extends Controller
         } catch (Throwable $e) {
             Log::warning('LinkedIn social auth failed', ['error' => $e->getMessage()]);
 
-            return redirect()->to($this->frontendUrl('/auth/login?error=social'));
+            return $this->linkFlow->failureRedirect($request, SocialProvider::LINKEDIN)
+                ?? redirect()->to($this->frontendUrl('/auth/login?error=social'));
+        }
+
+        $linkRedirect = $this->linkFlow->completeIfLinking($request, SocialProvider::LINKEDIN, $socialUser);
+        if ($linkRedirect) {
+            return $linkRedirect;
         }
 
         $user = $this->socialAccounts->findOrCreateUser(SocialProvider::LINKEDIN, $socialUser);

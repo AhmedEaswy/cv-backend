@@ -250,6 +250,22 @@ html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
     @apply text-muted;
 }
 
+.connected-accounts {
+    @apply mt-5;
+}
+
+.social-icon {
+    @apply inline-block shrink-0;
+}
+
+.connected-accounts__info {
+    @apply flex min-w-0 items-center gap-3;
+}
+
+.connected-accounts__actions {
+    @apply flex shrink-0 items-center gap-2;
+}
+
 .tabs a,
 .tabs span {
     @apply inline-flex px-[0.9rem] py-[0.45rem];

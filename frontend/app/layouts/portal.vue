@@ -46,9 +46,13 @@ const primaryNav = computed<NavItem[]>(() => [
         match: (p) => p.startsWith('/portal/cover-letters'),
     },
     { to: '/portal/public-profile', label: t('portal.nav.public_profile'), icon: 'user', match: (p) => p.startsWith('/portal/public-profile') },
-    ...(stats.value?.inbox_enabled !== false
-        ? [{ to: '/portal/inbox', label: t('portal.nav.inbox'), icon: 'inbox', match: (p: string) => p.startsWith('/portal/inbox') }]
-        : []),
+    {
+        to: '/portal/inbox',
+        label: t('portal.nav.inbox'),
+        icon: 'inbox',
+        count: stats.value?.unread_messages || null,
+        match: (p) => p.startsWith('/portal/inbox'),
+    },
 ]);
 
 const settingsNavItems = computed<SettingsNavItem[]>(() => [

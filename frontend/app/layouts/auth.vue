@@ -52,7 +52,7 @@ const papersObjectsSrc = `${laravel}/images/papers-objects.png`;
         </aside>
 
         <section class="auth-form relative overflow-hidden">
-            <img :src="papersObjectsSrc" alt="Logo" class="absolute top-0 start-[50%] -translate-x-1/2 z-0 max-h-full max-w-full opacity-30 object-contain" />
+            <img :src="papersObjectsSrc" alt="" aria-hidden="true" class="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 z-0 max-h-full max-w-full opacity-30 object-contain" />
 
             <div class="auth-form__inner z-10">
                 <slot />

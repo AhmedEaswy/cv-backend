@@ -76,6 +76,69 @@ class SocialAccountService
         return $user;
     }
 
+    /**
+     * Attach a provider account to an already signed-in user.
+     *
+     * @throws SocialLinkException when the provider account belongs to someone
+     *                             else or the user already has that provider linked.
+     */
+    public function linkToUser(User $user, string $provider, SocialiteUserContract $socialUser): SocialAccount
+    {
+        $providerId = (string) $socialUser->getId();
+
+        $existingLink = SocialAccount::where('provider_name', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        if ($existingLink && $existingLink->user_id !== $user->id) {
+            throw new SocialLinkException(SocialLinkException::TAKEN);
+        }
+
+        if ($existingLink) {
+            $this->refreshToken($existingLink, $socialUser);
+
+            return $existingLink;
+        }
+
+        $hasOtherAccountForProvider = $user->socialAccounts()
+            ->where('provider_name', $provider)
+            ->exists();
+
+        if ($hasOtherAccountForProvider) {
+            throw new SocialLinkException(SocialLinkException::ALREADY_LINKED);
+        }
+
+        return SocialAccount::create([
+            'user_id' => $user->id,
+            'provider_name' => $provider,
+            'provider_id' => $providerId,
+            'provider_token' => $socialUser->token,
+            'provider_refresh_token' => $socialUser->refreshToken,
+        ]);
+    }
+
+    /**
+     * Users whose email is a provider placeholder can't reset a password,
+     * so their last linked provider is their only way to sign in.
+     */
+    public function canUnlink(User $user, string $provider): bool
+    {
+        $isLinked = $user->socialAccounts()->where('provider_name', $provider)->exists();
+        if (! $isLinked) {
+            return false;
+        }
+
+        $hasOtherProvider = $user->socialAccounts()->where('provider_name', '!=', $provider)->exists();
+        $hasRealEmail = ! str_ends_with((string) $user->email, '@users.local');
+
+        return $hasOtherProvider || $hasRealEmail;
+    }
+
+    public function unlink(User $user, string $provider): void
+    {
+        $user->socialAccounts()->where('provider_name', $provider)->delete();
+    }
+
     private function refreshToken(SocialAccount $account, SocialiteUserContract $socialUser): void
     {
         $account->forceFill([

@@ -15,10 +15,11 @@ function handleLinkedInLogin() {
     <button
         v-if="enabled"
         type="button"
-        class="btn btn--secondary btn--block"
+        class="auth-social__btn"
+        :aria-label="t('auth.login.continue_linkedin')"
+        :title="t('auth.login.continue_linkedin')"
         @click="handleLinkedInLogin"
     >
-        <Icon name="linkedin" :size="18" />
-        {{ t('auth.login.continue_linkedin') }}
+        <SocialIcon provider="linkedin" :size="44" />
     </button>
 </template>

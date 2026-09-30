@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\PortalStatsController;
 use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\PublicProfileInboxController;
 use App\Http\Controllers\Api\ShareController;
+use App\Http\Controllers\Api\SocialAccountController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Middleware\AnalyticsMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,11 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+
+        Route::get('/auth/social-accounts', [SocialAccountController::class, 'index']);
+        Route::post('/auth/social-accounts/{provider}/link', [SocialAccountController::class, 'link'])
+            ->middleware('throttle:10,1');
+        Route::delete('/auth/social-accounts/{provider}', [SocialAccountController::class, 'destroy']);
     });
 
     // Social auth routes
@@ -81,6 +87,7 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
     // Protected cover letter routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/cover-letters', [CoverLetterController::class, 'index']);
+        Route::post('/cover-letters/{id}/duplicate', [CoverLetterController::class, 'duplicate']);
         Route::get('/cover-letters/{id}', [CoverLetterController::class, 'show']);
         Route::delete('/cover-letters/{id}', [CoverLetterController::class, 'destroy']);
     });

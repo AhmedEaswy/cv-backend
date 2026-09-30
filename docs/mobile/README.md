@@ -6,6 +6,7 @@ Guides and Postman collection for integrating a native mobile client (iOS / Andr
 
 | Doc | Purpose |
 |-----|---------|
+| [Mobile app changes (handoff)](./mobile-app-changes.md) | What the mobile app is missing vs web, and what to build |
 | [Getting started](./getting-started.md) | Base URL, headers, auth, first requests |
 | [Authentication](./authentication.md) | Email/password, Google Sign-In, password reset, tokens |
 | [API reference](./api-reference.md) | Every `/api/v1` endpoint with auth, body, and response notes |

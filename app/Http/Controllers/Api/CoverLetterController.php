@@ -13,6 +13,7 @@ use App\Services\CoverLetterDataMapper;
 use App\Services\CoverLetterPDFService;
 use App\Services\TrackingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CoverLetterController extends BaseApiController
 {
@@ -136,6 +137,34 @@ class CoverLetterController extends BaseApiController
         $this->repository->delete($coverLetter);
 
         return $this->successResponse(null, __('messages.cover_letter_deleted'));
+    }
+
+    public function duplicate(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $original = $this->repository->findByIdForUser($id, $user->id);
+
+        if (! $original) {
+            return $this->errorResponse(__('messages.cover_letter_not_found'), 404);
+        }
+
+        $copy = $this->repository->create(array_merge([
+            'user_id' => $user->id,
+            'name' => $this->nextCopyName((string) $original->name),
+            'language' => $original->language,
+            'cover_letter_template_id' => $original->cover_letter_template_id,
+            'is_public' => false,
+            'sections_order' => $original->sections_order,
+            'info' => $original->info,
+            'experiences' => $original->experiences,
+        ], $this->trackingService->capture($request)));
+
+        return $this->successResponse(
+            $this->dataMapper->formatCoverLetterResponse($copy),
+            __('messages.cover_letter_duplicated'),
+            201
+        );
     }
 
     public function print(PrintCoverLetterRequest $request)
@@ -310,6 +339,16 @@ class CoverLetterController extends BaseApiController
             $this->dataMapper->formatCoverLetterResponse($updated),
             __('messages.cover_letter_updated')
         );
+    }
+
+    private function nextCopyName(string $original): string
+    {
+        if (Str::contains($original, ' (Copy')) {
+            return preg_replace('/\(Copy( \d+)?\)$/', '(Copy '.((int) (Str::afterLast($original, ' ')) + 1 ?: 2).')', $original)
+                ?: $original.' (Copy)';
+        }
+
+        return $original.' (Copy)';
     }
 
     private function resolveOwnedCoverLetter(Request $request, int $id, $user): ?CoverLetter

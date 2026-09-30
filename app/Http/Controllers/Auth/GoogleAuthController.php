@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\Auth\SocialAccountService;
+use App\Services\Auth\SocialLinkFlow;
+use App\Support\SocialProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +16,10 @@ use Throwable;
 
 class GoogleAuthController extends Controller
 {
-    public function __construct(private readonly SocialAccountService $socialAccounts)
-    {
-    }
+    public function __construct(
+        private readonly SocialAccountService $socialAccounts,
+        private readonly SocialLinkFlow $linkFlow,
+    ) {}
 
     public function redirect(Request $request): RedirectResponse
     {
@@ -24,6 +27,7 @@ class GoogleAuthController extends Controller
             'url.intended',
             $this->safeReturnTo($request->query('return_to'))
         );
+        $this->linkFlow->rememberFromRequest($request);
 
         return Socialite::driver('google')
             ->stateless()
@@ -47,7 +51,13 @@ class GoogleAuthController extends Controller
         } catch (Throwable $e) {
             Log::warning('Google social auth failed', ['error' => $e->getMessage()]);
 
-            return redirect()->to($this->frontendUrl('/auth/login?error=social'));
+            return $this->linkFlow->failureRedirect($request, SocialProvider::GOOGLE)
+                ?? redirect()->to($this->frontendUrl('/auth/login?error=social'));
+        }
+
+        $linkRedirect = $this->linkFlow->completeIfLinking($request, SocialProvider::GOOGLE, $socialUser);
+        if ($linkRedirect) {
+            return $linkRedirect;
         }
 
         $user = $this->socialAccounts->findOrCreateUser('google', $socialUser);

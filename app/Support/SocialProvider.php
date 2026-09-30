@@ -37,6 +37,20 @@ class SocialProvider
     }
 
     /**
+     * Enabled and has OAuth credentials, so the web redirect flow can run.
+     */
+    public static function isAvailable(string $provider): bool
+    {
+        if (! self::isSupported($provider) || ! self::isEnabled($provider)) {
+            return false;
+        }
+
+        $configKey = $provider === self::LINKEDIN ? 'linkedin-openid' : $provider;
+
+        return (bool) config("services.{$configKey}.client_id");
+    }
+
+    /**
      * Socialite driver name. LinkedIn Sign In uses OpenID Connect.
      */
     public static function socialiteDriver(string $provider): string

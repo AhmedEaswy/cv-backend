@@ -129,4 +129,6 @@ async function savePassword() {
             </Button>
         </div>
     </form>
+
+    <ConnectedAccounts v-if="tab === 'profile'" />
 </template>

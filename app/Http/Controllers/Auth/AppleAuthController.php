@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\Auth\SocialAccountService;
+use App\Services\Auth\SocialLinkFlow;
 use App\Support\SocialProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,10 @@ use Throwable;
 
 class AppleAuthController extends Controller
 {
-    public function __construct(private readonly SocialAccountService $socialAccounts) {}
+    public function __construct(
+        private readonly SocialAccountService $socialAccounts,
+        private readonly SocialLinkFlow $linkFlow,
+    ) {}
 
     public function redirect(Request $request): RedirectResponse
     {
@@ -29,6 +33,7 @@ class AppleAuthController extends Controller
             'url.intended',
             $this->safeReturnTo($request->query('return_to'))
         );
+        $this->linkFlow->rememberFromRequest($request);
 
         return $this->driver()->redirect();
     }
@@ -44,7 +49,13 @@ class AppleAuthController extends Controller
         } catch (Throwable $e) {
             Log::warning('Apple social auth failed', ['error' => $e->getMessage()]);
 
-            return redirect()->to($this->frontendUrl('/auth/login?error=social'));
+            return $this->linkFlow->failureRedirect($request, SocialProvider::APPLE)
+                ?? redirect()->to($this->frontendUrl('/auth/login?error=social'));
+        }
+
+        $linkRedirect = $this->linkFlow->completeIfLinking($request, SocialProvider::APPLE, $socialUser);
+        if ($linkRedirect) {
+            return $linkRedirect;
         }
 
         $user = $this->socialAccounts->findOrCreateUser(SocialProvider::APPLE, $socialUser);

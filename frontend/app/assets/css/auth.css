@@ -200,7 +200,24 @@
 }
 
 .auth-social {
-    @apply mb-1 flex flex-col gap-2;
+    @apply mb-1 flex items-center justify-center gap-4;
+}
+
+.auth-social__btn {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-xl border-0 bg-transparent p-0 transition-transform duration-150;
+}
+
+.auth-social__btn:hover:not(:disabled) {
+    @apply -translate-y-0.5;
+}
+
+.auth-social__btn:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 3px;
+}
+
+.auth-social__btn:disabled {
+    @apply cursor-not-allowed opacity-60;
 }
 
 .auth-divider {

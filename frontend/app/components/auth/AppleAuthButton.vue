@@ -15,10 +15,11 @@ function handleAppleLogin() {
     <button
         v-if="enabled"
         type="button"
-        class="btn btn--secondary btn--block"
+        class="auth-social__btn"
+        :aria-label="t('auth.login.continue_apple')"
+        :title="t('auth.login.continue_apple')"
         @click="handleAppleLogin"
     >
-        <Icon name="apple" :size="18" />
-        {{ t('auth.login.continue_apple') }}
+        <SocialIcon provider="apple" :size="44" />
     </button>
 </template>

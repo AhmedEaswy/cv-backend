@@ -24,11 +24,12 @@ async function handleGoogleLogin() {
 <template>
     <button
         type="button"
-        class="btn btn--secondary btn--block"
+        class="auth-social__btn"
         :disabled="loading"
+        :aria-label="t('auth.login.continue_google')"
+        :title="t('auth.login.continue_google')"
         @click="handleGoogleLogin"
     >
-        <Icon name="google" :size="18" />
-        {{ t('auth.login.continue_google') }}
+        <SocialIcon provider="google" :size="44" />
     </button>
 </template>
