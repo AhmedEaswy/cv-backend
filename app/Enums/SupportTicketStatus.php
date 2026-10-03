@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Enums;
+
+enum SupportTicketStatus: string
+{
+    case Open = 'open';
+    case InProgress = 'in_progress';
+    case Resolved = 'resolved';
+    case Closed = 'closed';
+
+    /** @return list<string> */
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+}
