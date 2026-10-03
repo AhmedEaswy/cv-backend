@@ -10,6 +10,22 @@ const cardStyle = ref<Record<string, string>>({});
 
 const tourRunning = computed(() => tour.isTourRunning());
 
+function offerTourForPath(path: string) {
+    if (!path.startsWith('/portal')) return;
+    if (path === '/portal') {
+        void tour.tryOfferTour(path, 'dashboard');
+        void tour.tryOfferTour(path, 'visit');
+        return;
+    }
+    void tour.tryOfferTour(path, 'visit');
+}
+
+watch(
+    () => route.path,
+    (path) => offerTourForPath(path),
+    { immediate: true },
+);
+
 function positionSpotlight() {
     if (!import.meta.client || !tourRunning.value || !tour.currentStep.value) return;
     const target = tour.stepTarget(tour.stepIndex.value);
