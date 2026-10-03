@@ -123,6 +123,8 @@ export default defineNuxtConfig({
             appleAuthEnabled: !['0', 'false', 'off', 'no'].includes(
                 String(process.env.NUXT_PUBLIC_APPLE_AUTH_ENABLED ?? 'true').toLowerCase(),
             ),
+            /** Default product tour key for Help → replay when offer is empty (matches Filament seed / tests). */
+            portalTourReplayKey: process.env.NUXT_PUBLIC_PORTAL_TOUR_REPLAY_KEY || 'portal_intro',
         },
     },
 

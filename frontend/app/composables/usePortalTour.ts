@@ -10,7 +10,6 @@ export function portalTourBlockedForRoute(path: string): boolean {
 }
 
 const PENDING_AFTER_CV_KEY = 'cv.portal.tour.pending_after_cv';
-const LAST_TOUR_KEY = 'cv.portal.tour.last_key';
 
 function readPendingAfterCv(): boolean {
     if (!import.meta.client) return false;
@@ -29,26 +28,11 @@ function writePendingAfterCv(value: boolean) {
     } catch { /* ignore */ }
 }
 
-function rememberTourKey(key: string) {
-    if (!import.meta.client || !key) return;
-    try {
-        window.sessionStorage.setItem(LAST_TOUR_KEY, key);
-    } catch { /* ignore */ }
-}
-
-function readLastTourKey(): string | null {
-    if (!import.meta.client) return null;
-    try {
-        return window.sessionStorage.getItem(LAST_TOUR_KEY);
-    } catch {
-        return null;
-    }
-}
-
 export const usePortalTour = () => {
     const api = useApi();
     const toast = useToast();
     const { t } = useI18n();
+    const config = useRuntimeConfig();
 
     const offerOpen = useState('portal.tour.offerOpen', () => false);
     const activeTour = useState<ProductTourOffer | null>('portal.tour.activeTour', () => null);
@@ -58,6 +42,10 @@ export const usePortalTour = () => {
 
     const steps = computed(() => activeTour.value?.steps ?? []);
     const currentStep = computed<ProductTourStep | null>(() => steps.value[stepIndex.value] ?? null);
+
+    const configuredReplayKey = computed(
+        () => String(config.public.portalTourReplayKey || 'portal_intro').trim(),
+    );
 
     function stepTarget(index: number): string {
         return PORTAL_TOUR_STEP_TARGETS[index] ?? PORTAL_TOUR_STEP_TARGETS[0]!;
@@ -71,6 +59,13 @@ export const usePortalTour = () => {
         } catch {
             return [];
         }
+    }
+
+    function resolveTourKey(tours: ProductTourOffer[]): string | null {
+        const fromOffer = tours.find((tour) => tour.key)?.key;
+        if (fromOffer) return fromOffer;
+        const fallback = configuredReplayKey.value;
+        return fallback || null;
     }
 
     async function completeTour(key: string) {
@@ -104,7 +99,6 @@ export const usePortalTour = () => {
     }
 
     function openOfferModal(tour: ProductTourOffer) {
-        rememberTourKey(tour.key);
         activeTour.value = tour;
         offerOpen.value = true;
     }
@@ -179,19 +173,13 @@ export const usePortalTour = () => {
     }
 
     /**
-     * Help → replay: clear server progress, then show the offer modal if the API returns a tour.
+     * Help → replay: always reset server progress for a known tour key, then open the offer.
      */
     async function replayTourFromHelp() {
         if (portalTourBlockedForRoute(useRoute().path)) return;
 
-        let key = readLastTourKey();
-        const existing = await fetchOffer();
-        if (existing[0]?.key) {
-            key = existing[0].key;
-            openOfferModal(existing[0]);
-            return;
-        }
-
+        const beforeReset = await fetchOffer();
+        const key = resolveTourKey(beforeReset);
         if (!key) {
             toast.error(t('portal.help.replay_tour_unavailable'));
             return;
@@ -201,7 +189,7 @@ export const usePortalTour = () => {
         if (!resetOk) return;
 
         const tours = await fetchOffer();
-        const tour = tours[0];
+        const tour = tours.find((item) => item.key === key) ?? tours[0];
         if (!tour?.steps?.length) {
             toast.error(t('portal.help.replay_tour_unavailable'));
             return;
