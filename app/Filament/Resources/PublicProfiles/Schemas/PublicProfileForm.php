@@ -37,8 +37,7 @@ class PublicProfileForm
                     ->unique(ignoreRecord: true)
                     ->maxLength(100),
                 Checkbox::make('is_public')
-                    ->label('Public')
-                    ->helperText('Visible at /u/{slug}')
+                    ->label(__('portal.public_profile.field.public'))
                     ->default(true),
                 Select::make('language')
                     ->options([

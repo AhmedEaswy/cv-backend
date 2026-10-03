@@ -6,7 +6,6 @@ import {
     AlignLeftIcon,
     AtIcon,
     Briefcase01Icon,
-    CallIcon,
     Globe02Icon,
     Image01Icon,
     Link01Icon,
@@ -31,7 +30,6 @@ const { refresh: refreshStats } = usePortalStats();
 const templates = ref<TemplateOption[]>([]);
 const loading = ref(true);
 const saving = ref(false);
-const toggling = ref(false);
 
 const form = reactive({
     name: '',
@@ -215,23 +213,6 @@ async function onSave() {
     saving.value = false;
 }
 
-async function onTogglePublic(value: boolean | number | string | null) {
-    const next = !!value;
-    form.is_public = next;
-    if (!profile.value?.id) return;
-    toggling.value = true;
-    const updated = await portal.update<NonNullable<typeof profile.value>>('/public-profiles', {
-        is_public: next,
-    }, next ? t('portal.public_profile.published') : t('portal.public_profile.unpublished'));
-    if (updated?.id) {
-        setProfile(updated);
-        form.is_public = !!updated.is_public;
-    } else {
-        form.is_public = !!profile.value.is_public;
-    }
-    toggling.value = false;
-}
-
 function profileShareUrl() {
     return profile.value?.public_url || pathUrl.value || (profile.value?.slug ? `/u/${profile.value.slug}` : '');
 }
@@ -301,14 +282,6 @@ const previewUrl = computed(() => {
                 <Icon :name="copiedTarget === profileShareUrl() ? 'check' : 'copy'" :size="14" />
                 {{ copiedTarget === profileShareUrl() ? t('portal.public_profile.link_copied') : t('portal.public_profile.copy_link') }}
             </Button>
-            <Switch
-                :model-value="form.is_public"
-                size="sm"
-                :disabled="toggling || saving"
-                @update:model-value="onTogglePublic"
-            >
-                <span>{{ t('portal.public_profile.field.public') }}</span>
-            </Switch>
         </div>
     </header>
 
@@ -348,9 +321,11 @@ const previewUrl = computed(() => {
                     </div>
                     <div class="field">
                         <label class="field-label" for="phone">{{ t('portal.public_profile.field.phone') }}</label>
-                        <FieldIcon :icon="CallIcon">
-                            <input id="phone" v-model="form.phone" type="tel" class="input" :placeholder="t('portal.public_profile.field.phone_placeholder')" />
-                        </FieldIcon>
+                        <PhoneInput
+                            id="phone"
+                            v-model="form.phone"
+                            :placeholder="t('portal.public_profile.field.phone_placeholder')"
+                        />
                     </div>
                 </div>
 
@@ -523,6 +498,12 @@ const previewUrl = computed(() => {
 
         <aside class="cv-builder__side">
             <div class="surface form-card form-card--full cv-builder__meta">
+                <div class="field">
+                    <Switch v-model="form.is_public" :disabled="saving">
+                        <span>{{ t('portal.public_profile.field.public') }}</span>
+                    </Switch>
+                </div>
+
                 <div class="field">
                     <span class="field-label">{{ t('portal.public_profile.field.template') }}</span>
                     <CvTemplateSlider v-model="form.template_id" :templates="templates" kind="public-profile" />

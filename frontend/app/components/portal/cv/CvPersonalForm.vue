@@ -3,7 +3,6 @@ import type { CvUserData } from '~/composables/usePortalApi';
 import {
     AlignLeftIcon,
     Briefcase01Icon,
-    CallIcon,
     Link01Icon,
     Location01Icon,
     Mail01Icon,
@@ -41,9 +40,11 @@ const userData = defineModel<CvUserData>({ required: true });
         </div>
         <div class="field">
             <label class="field-label" for="cv-phone">{{ $t('portal.cvs.field.phone') }}</label>
-            <FieldIcon :icon="CallIcon">
-                <input id="cv-phone" v-model="userData.phone" type="tel" class="input" maxlength="50" autocomplete="tel" :placeholder="$t('portal.cvs.field.phone_placeholder')" />
-            </FieldIcon>
+            <PhoneInput
+                id="cv-phone"
+                v-model="userData.phone"
+                :placeholder="$t('portal.cvs.field.phone_placeholder')"
+            />
         </div>
         <div class="field">
             <label class="field-label" for="cv-birthdate">{{ $t('portal.cvs.field.birthdate') }}</label>

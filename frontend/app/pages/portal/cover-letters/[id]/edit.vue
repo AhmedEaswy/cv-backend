@@ -5,7 +5,7 @@
 import { watchDebounced } from '@vueuse/core';
 import type { CoverLetterSummary } from '~/composables/usePortalApi';
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
-import { AlignLeftIcon, Briefcase01Icon, Building01Icon, File01Icon } from '@hugeicons/core-free-icons';
+import { AlignLeftIcon, Briefcase01Icon, Building01Icon } from '@hugeicons/core-free-icons';
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
@@ -31,6 +31,7 @@ const form = reactive({
     role: '',
     template_id: '' as string | number,
     body: '',
+    is_public: false,
 });
 
 function applyLetter(l: CoverLetterSummary) {
@@ -45,6 +46,7 @@ function applyLetter(l: CoverLetterSummary) {
     );
     form.role = String(userData.jobTitle || l.role || '');
     form.body = String(userData.body || l.body || '');
+    form.is_public = !!l.is_public;
     const defaultTpl = templates.value.find((tpl) => tpl.is_default);
     form.template_id = l.cover_letter_template_id
         ?? l.template_id
@@ -59,6 +61,7 @@ function payload() {
     return {
         name: form.name,
         cover_letter_template_id: form.template_id || null,
+        is_public: form.is_public,
         user_data: {
             companyName: form.company || null,
             recipientCompany: form.company || null,
@@ -124,7 +127,7 @@ async function onSave() {
 }
 
 watchDebounced(
-    [() => form.name, () => form.company, () => form.role, () => form.body, () => form.template_id],
+    [() => form.name, () => form.company, () => form.role, () => form.body, () => form.template_id, () => form.is_public],
     async () => {
         if (!previewReady.value || !letter.value || saving.value || autosaving.value || syncingForm.value) return;
         autosaving.value = true;
@@ -159,7 +162,10 @@ async function onDelete() {
             <NuxtLink to="/portal/cover-letters" class="back-link">
                 <Icon name="arrow-left" :size="13" /> {{ t('portal.cover_letters.back') }}
             </NuxtLink>
-            <h1 class="page-header__title">{{ letter.name }}</h1>
+            <EditableTitle
+                v-model="form.name"
+                :placeholder="t('portal.cover_letters.field.name_placeholder')"
+            />
             <p class="page-header__subtitle">
                 {{ t('portal.cover_letters.edit_subtitle', { date: letter.updated_at ? new Date(letter.updated_at).toLocaleString() : '—' }) }}
             </p>
@@ -173,13 +179,7 @@ async function onDelete() {
 
     <form class="cv-builder" @submit.prevent="onSave">
         <div class="cv-builder__main">
-            <div class="surface form-card">
-                <div class="field">
-                    <label class="field-label" for="name">{{ t('portal.cover_letters.field.name') }}</label>
-                    <FieldIcon :icon="File01Icon">
-                        <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cover_letters.field.name_placeholder')" />
-                    </FieldIcon>
-                </div>
+            <div class="surface form-card form-card--full">
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="company">{{ t('portal.cover_letters.field.company') }}</label>
@@ -209,6 +209,10 @@ async function onDelete() {
                     <span class="field-label">{{ t('portal.cover_letters.field.template') }}</span>
                     <CvTemplateSlider v-model="form.template_id" :templates="templates" kind="cover-letter" />
                 </div>
+
+                <Switch v-model="form.is_public">
+                    <span>{{ t('portal.cover_letters.field.public') }}</span>
+                </Switch>
             </div>
 
             <TemplateLivePreview

@@ -63,27 +63,31 @@
     @apply px-7 py-[0.95rem] text-[0.95rem];
 }
 
+/* Square icon buttons: same height as text buttons of the same size. */
 .btn.btn--icon {
+    --btn-icon-size: calc(1em + 1.5rem + 2px); /* font + py-3*2 + border */
     box-sizing: border-box;
     flex: none;
-    width: 2.5rem;
-    height: 2.5rem;
-    min-width: 2.5rem;
-    min-height: 2.5rem;
-    max-width: 2.5rem;
-    max-height: 2.5rem;
+    width: var(--btn-icon-size);
+    height: var(--btn-icon-size);
+    min-width: var(--btn-icon-size);
+    min-height: var(--btn-icon-size);
+    max-width: var(--btn-icon-size);
+    max-height: var(--btn-icon-size);
     padding: 0 !important;
     aspect-ratio: 1;
     gap: 0;
+    font-size: 0.9rem;
 }
 
 .btn.btn--sm.btn--icon {
-    width: 2.125rem;
-    height: 2.125rem;
-    min-width: 2.125rem;
-    min-height: 2.125rem;
-    max-width: 2.125rem;
-    max-height: 2.125rem;
+    --btn-icon-size: calc(1em + 1rem + 2px); /* font + py-2*2 + border */
+    font-size: 0.825rem;
+}
+
+.btn.btn--lg.btn--icon {
+    --btn-icon-size: calc(1em + 1.9rem + 2px); /* font + py-lg*2 + border */
+    font-size: 0.95rem;
 }
 
 .btn--block {

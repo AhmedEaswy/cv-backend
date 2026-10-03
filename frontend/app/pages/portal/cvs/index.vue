@@ -164,6 +164,7 @@ function timeAgo(iso?: string) {
                 <Tag v-if="cv.is_public" variant="success">{{ t('portal.cvs.status_published') }}</Tag>
                 <Tag v-else variant="soft">{{ t('portal.cvs.status_draft') }}</Tag>
                 <DropdownMenu
+                    size="sm"
                     :items="menuItems(cv)"
                     :label="t('portal.cvs.actions')"
                     @select="(key) => onAction(cv, key)"

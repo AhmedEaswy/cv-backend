@@ -30,8 +30,7 @@ class CoverLetterForm
                     ->searchable()
                     ->preload(),
                 Checkbox::make('is_public')
-                    ->label('Public')
-                    ->helperText('Make this cover letter publicly accessible')
+                    ->label(__('portal.cover_letters.field.public'))
                     ->default(false),
                 TextInput::make('name')
                     ->label('Cover Letter Name')

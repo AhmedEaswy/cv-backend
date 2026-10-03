@@ -323,6 +323,9 @@ class CoverLetterController extends BaseApiController
         if (isset($validated['cover_letter_template_id'])) {
             $updateData['cover_letter_template_id'] = $validated['cover_letter_template_id'];
         }
+        if (array_key_exists('is_public', $validated)) {
+            $updateData['is_public'] = $validated['is_public'];
+        }
         if (isset($validated['user_data'])) {
             $mappedData = $this->dataMapper->mapUserDataToCoverLetter($validated['user_data']);
             if (isset($mappedData['info'])) {

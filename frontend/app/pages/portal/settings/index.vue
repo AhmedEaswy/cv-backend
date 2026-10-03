@@ -3,7 +3,7 @@
  * /portal/settings — Profile and Password tabs.
  */
 definePageMeta({ middleware: 'auth', layout: 'portal' });
-import { CallIcon, LockIcon, Mail01Icon, UserIcon } from '@hugeicons/core-free-icons';
+import { LockIcon, Mail01Icon, UserIcon } from '@hugeicons/core-free-icons';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -102,9 +102,11 @@ async function savePassword() {
             </div>
             <div class="field">
                 <label class="field-label" for="phone">{{ t('portal.settings.profile.field.phone') }}</label>
-                <FieldIcon :icon="CallIcon">
-                    <input id="phone" v-model="profileForm.phone" type="tel" class="input" :placeholder="t('portal.settings.profile.field.phone_placeholder')" />
-                </FieldIcon>
+                <PhoneInput
+                    id="phone"
+                    v-model="profileForm.phone"
+                    :placeholder="t('portal.settings.profile.field.phone_placeholder')"
+                />
             </div>
         </div>
         <div class="form-actions">

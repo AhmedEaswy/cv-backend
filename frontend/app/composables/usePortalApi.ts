@@ -96,6 +96,7 @@ export interface CoverLetterSummary {
     company?: string;
     role?: string;
     template_id?: number | null;
+    is_public?: boolean;
     updated_at?: string;
     [k: string]: any;
 }

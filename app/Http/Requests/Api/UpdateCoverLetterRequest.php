@@ -17,6 +17,7 @@ class UpdateCoverLetterRequest extends BaseFormRequest
             'sections_order' => 'sometimes|array',
             'sections_order.*' => 'string',
             'cover_letter_template_id' => 'sometimes|nullable|exists:cover_letter_templates,id',
+            'is_public' => 'sometimes|boolean',
             'user_data' => 'sometimes|array',
             'user_data.firstName' => 'sometimes|string|max:255',
             'user_data.lastName' => 'sometimes|string|max:255',

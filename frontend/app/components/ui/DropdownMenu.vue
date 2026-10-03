@@ -16,9 +16,12 @@ const props = withDefaults(defineProps<{
     label?: string;
     align?: 'start' | 'end';
     variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link';
+    /** Match sibling text buttons: md with default headers, sm in compact list rows. */
+    size?: 'sm' | 'md' | 'lg';
 }>(), {
     align: 'end',
     variant: 'ghost',
+    size: 'md',
 });
 
 const emit = defineEmits<{ select: [key: string] }>();
@@ -65,7 +68,7 @@ onBeforeUnmount(() => {
         <Button
             type="button"
             :variant="variant"
-            size="sm"
+            :size="size"
             icon
             :aria-label="label || 'Actions'"
             :aria-expanded="open"

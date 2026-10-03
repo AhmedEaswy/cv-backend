@@ -29,8 +29,7 @@ class ProfileForm
                     ->searchable()
                     ->preload(),
                 Checkbox::make('is_public')
-                    ->label('Public')
-                    ->helperText('Make this profile publicly accessible')
+                    ->label(__('portal.cvs.field.public'))
                     ->default(false),
                 TextInput::make('name')
                     ->label('CV Name')

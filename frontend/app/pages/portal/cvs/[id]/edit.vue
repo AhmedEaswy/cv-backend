@@ -13,7 +13,7 @@ import {
 } from '~/composables/usePortalApi';
 import type { CvTemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
 import type { DropdownMenuItem } from '~/components/ui/DropdownMenu.vue';
-import { File01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
+import { TranslateIcon } from '@hugeicons/core-free-icons';
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
@@ -248,7 +248,10 @@ function onAction(key: string) {
             <NuxtLink to="/portal/cvs" class="back-link">
                 <Icon name="arrow-left" :size="13" /> {{ t('portal.cvs.back_to_cvs') }}
             </NuxtLink>
-            <h1 class="page-header__title">{{ cv.name }}</h1>
+            <EditableTitle
+                v-model="form.name"
+                :placeholder="t('portal.cvs.field.name_placeholder')"
+            />
             <p class="page-header__subtitle">
                 {{ t('portal.cvs.edit_subtitle', { date: cv.updated_at ? new Date(cv.updated_at).toLocaleString() : '—' }) }}
             </p>
@@ -274,14 +277,6 @@ function onAction(key: string) {
         <aside class="cv-builder__side">
             <div class="surface form-card cv-builder__meta">
                 <div class="field">
-                    <label class="field-label" for="name">{{ t('portal.cvs.field.name') }}</label>
-                    <FieldIcon :icon="File01Icon">
-                        <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cvs.field.name_placeholder')" />
-                    </FieldIcon>
-                    <span class="field-hint">{{ t('portal.cvs.field.name_help') }}</span>
-                </div>
-
-                <div class="field">
                     <label class="field-label" for="language">{{ t('portal.cvs.field.language') }}</label>
                     <SelectInput
                         id="language"
@@ -298,7 +293,6 @@ function onAction(key: string) {
 
                 <Switch v-model="form.is_public">
                     <span>{{ t('portal.cvs.field.public') }}</span>
-                    <span class="field-hint">{{ t('portal.cvs.field.public_help') }}</span>
                 </Switch>
             </div>
 
