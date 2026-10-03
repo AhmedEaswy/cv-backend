@@ -22,6 +22,7 @@ class PortalContactMessageRequest extends FormRequest
             'subject' => ['nullable', 'string', 'max:180'],
             'message' => ['required', 'string', 'min:10', 'max:4000'],
             'hp_check' => ['nullable', 'string', 'max:255'], // honeypot (handled in controller)
+            'cf_turnstile_response' => ['nullable', 'string', 'max:2048'],
         ];
     }
 

@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Portal\PortalContactMessageRequest;
-use App\Jobs\SendContactPushNotificationJob;
-use App\Mail\ContactMessageReceivedMail;
 use App\Models\ContactMessage;
-use App\Notifications\ContactMessageReceivedNotification;
 use App\Repositories\PublicProfileRepository;
+use App\Services\Contact\ContactMessageDeliveryService;
+use App\Services\Contact\ContactModerationService;
 use App\Services\Contact\ContactSpamService;
+use App\Services\Contact\TurnstileVerifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Throwable;
 
@@ -21,6 +20,9 @@ class ContactMessageController extends Controller
     public function __construct(
         private readonly PublicProfileRepository $repository,
         private readonly ContactSpamService $spamService,
+        private readonly ContactModerationService $moderationService,
+        private readonly ContactMessageDeliveryService $deliveryService,
+        private readonly TurnstileVerifier $turnstile,
     ) {
     }
 
@@ -39,9 +41,24 @@ class ContactMessageController extends Controller
             return $this->fakeSuccess($slug);
         }
 
-        $throttleKey = 'contact:'.$ip.':'.$email;
+        $turnstileToken = $request->input('cf_turnstile_response')
+            ?? $request->input('cf-turnstile-response');
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+        if (! $this->turnstile->verify(
+            is_string($turnstileToken) ? $turnstileToken : null,
+            $ip,
+        )) {
+            return back()->withErrors([
+                'message' => __('messages.contact_turnstile_failed'),
+            ])->withInput();
+        }
+
+        $throttleKey = 'contact-sender:'.sha1($email);
+
+        $maxAttempts = (int) config('contact.sender_rate_limit.max_attempts', 3);
+        $decaySeconds = (int) config('contact.sender_rate_limit.decay_seconds', 300);
+
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($throttleKey);
 
             return back()->withErrors([
@@ -65,6 +82,7 @@ class ContactMessageController extends Controller
         }
 
         $data = $request->validated();
+        $moderationStatus = $this->moderationService->initialStatus($data['message'], $profile->id);
 
         $message = ContactMessage::create([
             'public_profile_id' => $profile->id,
@@ -75,29 +93,23 @@ class ContactMessageController extends Controller
             'message' => $data['message'],
             'ip_address' => $ip,
             'user_agent' => substr((string) $request->userAgent(), 0, 1000),
+            'moderation_status' => $moderationStatus,
         ]);
 
-        $owner->notify(new ContactMessageReceivedNotification($message, $profile));
-
-        if ($owner->notify_contact_email) {
+        if ($moderationStatus->value === 'approved') {
             try {
-                Mail::to($recipient)->send(new ContactMessageReceivedMail($profile, $message));
+                $this->deliveryService->deliver($message, $profile);
             } catch (Throwable $e) {
-                Log::error('Contact form email failed', [
-                    'profile_id' => $profile->id,
+                Log::error('Contact message delivery failed', [
                     'message_id' => $message->id,
                     'error' => $e->getMessage(),
                 ]);
             }
         }
 
-        if ($owner->notify_contact_push) {
-            SendContactPushNotificationJob::dispatch($message->id, $owner->id);
-        }
-
         $this->spamService->maybeAutoBlockCrossProfile($email, $ip);
 
-        RateLimiter::hit($throttleKey, 300);
+        RateLimiter::hit($throttleKey, $decaySeconds);
 
         return redirect()->to($profile->preferredPublicUrl().'#contact-form')
             ->with('status', __('messages.contact_message_sent'));
