@@ -82,7 +82,7 @@ class ContactMessageController extends Controller
         }
 
         $data = $request->validated();
-        $moderationStatus = $this->moderationService->initialStatus($data['message'], $profile->id);
+        $moderationStatus = $this->moderationService->initialStatus($data['message'], $profile->id, $email);
 
         $message = ContactMessage::create([
             'public_profile_id' => $profile->id,

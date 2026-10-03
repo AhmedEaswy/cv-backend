@@ -133,6 +133,81 @@ class SupportPlatformTest extends TestCase
         $this->getJson('/api/v1/portal/tours/offer')
             ->assertOk()
             ->assertJsonPath('result.tours', []);
+
+        $this->postJson('/api/v1/portal/tours/portal_intro/reset')
+            ->assertOk()
+            ->assertJsonPath('result.reset', true);
+
+        $this->getJson('/api/v1/portal/tours/offer')
+            ->assertOk()
+            ->assertJsonPath('result.tours.0.key', 'portal_intro');
+    }
+
+    public function test_distinct_senders_are_delivered_during_profile_traffic(): void
+    {
+        Mail::fake();
+        Notification::fake();
+
+        config([
+            'contact.moderation.max_links_before_review' => 10,
+            'contact.moderation.profile_burst_threshold' => 5,
+            'contact.moderation.profile_burst_window_minutes' => 15,
+        ]);
+
+        $user = User::factory()->create(['active' => true, 'notify_contact_email' => true]);
+        $profile = $this->makeProfile($user);
+
+        for ($i = 1; $i <= 5; $i++) {
+            $this->from('/u/'.$profile->slug)
+                ->post('/u/'.$profile->slug.'/contact', [
+                    'name' => 'Visitor '.$i,
+                    'email' => "visitor{$i}@example.com",
+                    'message' => 'Hello, I saw your profile and would like to connect about work.',
+                ])
+                ->assertRedirect();
+        }
+
+        $this->assertDatabaseCount('contact_messages', 5);
+        $this->assertEquals(
+            5,
+            \App\Models\ContactMessage::query()
+                ->where('moderation_status', ContactMessageModerationStatus::Approved->value)
+                ->count()
+        );
+        Notification::assertCount(5);
+    }
+
+    public function test_repeated_sender_hits_rate_limit(): void
+    {
+        Mail::fake();
+        Notification::fake();
+
+        config([
+            'contact.moderation.max_links_before_review' => 10,
+            'contact.sender_rate_limit.max_attempts' => 3,
+            'contact.sender_rate_limit.decay_seconds' => 300,
+        ]);
+
+        $user = User::factory()->create(['active' => true]);
+        $profile = $this->makeProfile($user);
+
+        $payload = [
+            'name' => 'Repeat',
+            'email' => 'repeat@example.com',
+            'message' => 'Hello again, still interested in talking about opportunities.',
+        ];
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->from('/u/'.$profile->slug)
+                ->post('/u/'.$profile->slug.'/contact', $payload)
+                ->assertRedirect();
+        }
+
+        $this->from('/u/'.$profile->slug)
+            ->post('/u/'.$profile->slug.'/contact', $payload)
+            ->assertSessionHasErrors('email');
+
+        $this->assertDatabaseCount('contact_messages', 3);
     }
 
     public function test_contact_message_with_many_links_held_for_review(): void

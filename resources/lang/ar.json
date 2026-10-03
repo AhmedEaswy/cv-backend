@@ -1676,6 +1676,7 @@
     "messages.portal_view_all": "عرض الكل",
     "messages.product_tour_not_found": "الجولة غير موجودة.",
     "messages.product_tour_offer_retrieved": "تم استرجاع عرض الجولة.",
+    "messages.product_tour_progress_reset": "تم إعادة تعيين تقدم الجولة.",
     "messages.product_tour_progress_saved": "تم حفظ تقدم الجولة.",
     "messages.profile.updated": "تم تحديث الملف.",
     "messages.profile_created_": "تم إنشاء الملف العام.",

@@ -1676,6 +1676,7 @@
     "messages.portal_view_all": "Tümünü gör",
     "messages.product_tour_not_found": "Ürün turu bulunamadı.",
     "messages.product_tour_offer_retrieved": "Ürün turu teklifi alındı.",
+    "messages.product_tour_progress_reset": "Tur ilerlemesi sıfırlandı.",
     "messages.product_tour_progress_saved": "Tur ilerlemesi kaydedildi.",
     "messages.profile.updated": "Profil güncellendi.",
     "messages.profile_created_": "Herkese açık profil oluşturuldu.",

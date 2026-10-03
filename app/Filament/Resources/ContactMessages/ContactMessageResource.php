@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\ContactMessages;
 
 use App\Filament\Resources\ContactMessages\Pages\ListContactMessages;
+use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
+use App\Filament\Resources\ContactMessages\Schemas\ContactMessageInfolist;
 use App\Filament\Resources\ContactMessages\Tables\ContactMessagesTable;
 use App\Models\ContactMessage;
 use BackedEnum;
@@ -45,6 +47,11 @@ class ContactMessageResource extends Resource
         return $schema;
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return ContactMessageInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return ContactMessagesTable::configure($table);
@@ -54,6 +61,7 @@ class ContactMessageResource extends Resource
     {
         return [
             'index' => ListContactMessages::route('/'),
+            'view' => ViewContactMessage::route('/{record}'),
         ];
     }
 }

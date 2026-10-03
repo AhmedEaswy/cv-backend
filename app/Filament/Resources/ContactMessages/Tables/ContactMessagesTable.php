@@ -8,6 +8,7 @@ use App\Services\Contact\ContactMessageDeliveryService;
 use App\Services\Contact\ContactSpamService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -24,6 +25,11 @@ class ContactMessagesTable
                 TextColumn::make('name'),
                 TextColumn::make('email')->searchable(),
                 TextColumn::make('subject')->limit(40),
+                TextColumn::make('message')
+                    ->label(__('Message'))
+                    ->wrap()
+                    ->limit(80)
+                    ->searchable(),
                 TextColumn::make('moderation_status')->badge(),
                 TextColumn::make('created_at')->dateTime()->sortable(),
             ])
@@ -36,6 +42,7 @@ class ContactMessagesTable
                     ]),
             ])
             ->recordActions([
+                ViewAction::make(),
                 Action::make('approve')
                     ->label(__('Mark OK'))
                     ->visible(fn (ContactMessage $record) => $record->moderation_status === ContactMessageModerationStatus::PendingReview)

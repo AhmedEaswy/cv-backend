@@ -1670,6 +1670,7 @@
     "messages.portal_view_all": "View all",
     "messages.product_tour_not_found": "Product tour not found.",
     "messages.product_tour_offer_retrieved": "Product tour offer retrieved.",
+    "messages.product_tour_progress_reset": "Tour progress reset.",
     "messages.product_tour_progress_saved": "Tour progress saved.",
     "messages.profile.updated": "Profile updated.",
     "messages.profile_created_": "Public profile created.",

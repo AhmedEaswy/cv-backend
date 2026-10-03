@@ -154,5 +154,6 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
         Route::get('/portal/tours/offer', [ProductTourController::class, 'offer']);
         Route::post('/portal/tours/{key}/complete', [ProductTourController::class, 'complete']);
         Route::post('/portal/tours/{key}/dismiss', [ProductTourController::class, 'dismiss']);
+        Route::post('/portal/tours/{key}/reset', [ProductTourController::class, 'reset']);
     });
 });

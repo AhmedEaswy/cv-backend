@@ -32,6 +32,26 @@ class ProductTourController extends BaseApiController
         return $this->record($request, $key, UserTourProgressStatus::Dismissed);
     }
 
+    public function reset(Request $request, string $key)
+    {
+        $validator = Validator::make(['key' => $key], [
+            'key' => ['required', 'string', 'max:64'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse(__('messages.validation_failed'), 422, $validator->errors());
+        }
+
+        if (! $this->tours->resetProgress($request->user(), $key)) {
+            return $this->errorResponse(__('messages.product_tour_not_found'), 404);
+        }
+
+        return $this->successResponse([
+            'key' => $key,
+            'reset' => true,
+        ], __('messages.product_tour_progress_reset'));
+    }
+
     private function record(Request $request, string $key, UserTourProgressStatus $status)
     {
         $validator = Validator::make(['key' => $key], [

@@ -71,4 +71,19 @@ class ProductTourOfferService
             ],
         );
     }
+
+    public function resetProgress(User $user, string $tourKey): bool
+    {
+        $tour = ProductTour::query()->where('key', $tourKey)->first();
+        if (! $tour) {
+            return false;
+        }
+
+        UserTourProgress::query()
+            ->where('user_id', $user->id)
+            ->where('product_tour_id', $tour->id)
+            ->delete();
+
+        return true;
+    }
 }

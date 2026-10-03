@@ -1674,6 +1674,7 @@
     "messages.portal_view_all": "Tout voir",
     "messages.product_tour_not_found": "Visite guidée introuvable.",
     "messages.product_tour_offer_retrieved": "Offre de visite guidée récupérée.",
+    "messages.product_tour_progress_reset": "Progression de la visite réinitialisée.",
     "messages.product_tour_progress_saved": "Progression de la visite enregistrée.",
     "messages.profile.updated": "Profil mis à jour.",
     "messages.profile_created_": "Profil public créé.",

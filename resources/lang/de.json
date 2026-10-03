@@ -1674,6 +1674,7 @@
     "messages.portal_view_all": "Alle anzeigen",
     "messages.product_tour_not_found": "Produkt-Tour nicht gefunden.",
     "messages.product_tour_offer_retrieved": "Produkt-Tour-Angebot abgerufen.",
+    "messages.product_tour_progress_reset": "Tour-Fortschritt zurückgesetzt.",
     "messages.product_tour_progress_saved": "Tour-Fortschritt gespeichert.",
     "messages.profile.updated": "Profil aktualisiert.",
     "messages.profile_created_": "Öffentliches Profil erstellt.",
