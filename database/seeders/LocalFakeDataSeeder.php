@@ -48,6 +48,7 @@ class LocalFakeDataSeeder extends Seeder
             ProfileSeeder::class,
             CoverLetterSeeder::class,
             PublicProfileSeeder::class,
+            LocalSupportContentSeeder::class,
         ]);
     }
 }
