@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContactMessageModerationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,8 @@ class ContactMessage extends Model
         'read_at',
         'hidden_at',
         'is_spam',
+        'moderation_status',
+        'delivered_at',
     ];
 
     protected function casts(): array
@@ -32,6 +35,8 @@ class ContactMessage extends Model
             'read_at' => 'datetime',
             'hidden_at' => 'datetime',
             'is_spam' => 'boolean',
+            'moderation_status' => ContactMessageModerationStatus::class,
+            'delivered_at' => 'datetime',
         ];
     }
 
@@ -56,7 +61,19 @@ class ContactMessage extends Model
      */
     public function scopeVisible(Builder $query): Builder
     {
-        return $query->whereNull('hidden_at');
+        return $query
+            ->whereNull('hidden_at')
+            ->where('moderation_status', ContactMessageModerationStatus::Approved->value);
+    }
+
+    public function isDelivered(): bool
+    {
+        return $this->delivered_at !== null;
+    }
+
+    public function awaitsModeration(): bool
+    {
+        return $this->moderation_status === ContactMessageModerationStatus::PendingReview;
     }
 
     public function isRead(): bool

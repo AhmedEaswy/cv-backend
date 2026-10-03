@@ -46,6 +46,7 @@ const primaryNav = computed<NavItem[]>(() => [
         match: (p) => p.startsWith('/portal/cover-letters'),
     },
     { to: '/portal/public-profile', label: t('portal.nav.public_profile'), icon: 'user', match: (p) => p.startsWith('/portal/public-profile') },
+    { to: '/portal/help', label: t('portal.nav.help'), icon: 'help', match: (p) => p.startsWith('/portal/help') },
     ...(stats.value?.inbox_enabled !== false
         ? [{ to: '/portal/inbox', label: t('portal.nav.inbox'), icon: 'inbox', match: (p: string) => p.startsWith('/portal/inbox') }]
         : []),
@@ -233,6 +234,7 @@ onBeforeUnmount(() => {
                         :to="item.to"
                         class="portal-sidebar__link"
                         :aria-current="isActive(item) ? 'page' : undefined"
+                        :data-portal-tour="item.icon === 'dashboard' ? 'dashboard' : item.icon === 'file' ? 'cvs' : item.icon === 'mail' ? 'cover-letters' : item.icon === 'user' ? 'public-profile' : item.icon === 'help' ? 'help' : undefined"
                         @click="closeSidebar"
                     >
                         <Icon :name="item.icon" :size="16" />
@@ -297,5 +299,7 @@ onBeforeUnmount(() => {
         <main class="portal-content">
             <slot />
         </main>
+
+        <PortalTourHost />
     </div>
 </template>

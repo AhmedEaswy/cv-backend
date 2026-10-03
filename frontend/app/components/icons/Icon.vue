@@ -67,6 +67,11 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
             <rect x="3" y="11" width="18" height="11" rx="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </template>
+        <template v-else-if="name === 'help'">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+        </template>
         <!-- Layout / nav -->
         <template v-else-if="name === 'dashboard'">
             <rect x="3" y="3" width="7" height="7" rx="1.5" />

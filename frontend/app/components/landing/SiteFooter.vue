@@ -50,6 +50,13 @@ const section = (id: string) => (onHome.value ? `#${id}` : `/#${id}`);
                 </div>
 
                 <div class="site-footer__col">
+                    <h4>{{ t('landing.footer_resources') }}</h4>
+                    <ul>
+                        <li><NuxtLink to="/support">{{ t('landing.footer_help') }}</NuxtLink></li>
+                    </ul>
+                </div>
+
+                <div class="site-footer__col">
                     <h4>{{ t('landing.footer_legal') }}</h4>
                     <ul>
                         <li><NuxtLink to="/privacy">{{ t('landing.footer_privacy') }}</NuxtLink></li>

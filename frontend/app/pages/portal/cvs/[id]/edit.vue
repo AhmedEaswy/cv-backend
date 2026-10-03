@@ -21,6 +21,7 @@ const route = useRoute();
 const router = useRouter();
 const portal = usePortalApi();
 const toast = useToast();
+const { noteFirstCvSaved } = usePortalTour();
 
 const id = computed(() => Number(route.params.id));
 const cv = ref<CVSummary | null>(null);
@@ -34,6 +35,8 @@ const previewReady = ref(false);
 const autosaving = ref(false);
 /** Suppress autosave while hydrating from the server. */
 const syncingForm = ref(false);
+/** True after the user edits content (not initial server hydrate). */
+const cvTouched = ref(false);
 
 const langs = [
     { code: 'en', name: 'English' },
@@ -134,6 +137,9 @@ async function persist(opts?: { silent?: boolean }) {
     );
     if (updated) {
         cv.value = { ...cv.value, ...updated };
+        if (cvTouched.value) {
+            noteFirstCvSaved();
+        }
         if (!opts?.silent) {
             syncingForm.value = true;
             if (updated.user_data) userData.value = normalizeCvUserData(updated.user_data);
@@ -148,6 +154,7 @@ async function persist(opts?: { silent?: boolean }) {
 
 async function onSave() {
     if (!cv.value) return;
+    cvTouched.value = true;
     saving.value = true;
     await persist();
     saving.value = false;
@@ -157,6 +164,7 @@ watchDebounced(
     [userData, sectionsOrder, () => form.name, () => form.language, () => form.template_id, () => form.is_public],
     async () => {
         if (!previewReady.value || !cv.value || saving.value || autosaving.value || syncingForm.value) return;
+        cvTouched.value = true;
         autosaving.value = true;
         await persist({ silent: true });
         autosaving.value = false;

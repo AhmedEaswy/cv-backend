@@ -55,6 +55,31 @@
             <textarea id="cf-message" name="message" required minlength="10" maxlength="4000" rows="5" class="cv-contact__input cv-contact__input--textarea">{{ old('message') }}</textarea>
         </div>
 
+        @php
+            $turnstile = app(\App\Services\Contact\TurnstileVerifier::class);
+        @endphp
+        @if($turnstile->isRequired() && $turnstile->siteKey())
+            <div class="cv-contact__field cv-contact__turnstile">
+                <div
+                    class="cf-turnstile"
+                    data-sitekey="{{ $turnstile->siteKey() }}"
+                    data-callback="cvContactTurnstileOk"
+                ></div>
+                <input type="hidden" name="cf_turnstile_response" id="cf-turnstile-response" value="">
+            </div>
+            @once
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                <script>
+                    function cvContactTurnstileOk(token) {
+                        var input = document.getElementById('cf-turnstile-response');
+                        if (input) {
+                            input.value = token;
+                        }
+                    }
+                </script>
+            @endonce
+        @endif
+
         <button type="submit" class="cv-contact__submit">{{ __('messages.public_profile.contact.send') }}</button>
     </form>
 @endif

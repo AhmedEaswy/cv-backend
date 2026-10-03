@@ -22,6 +22,7 @@ const logoSrc = `${laravel}/images/logo-horizontal.png`;
                     />
                 </NuxtLink>
                 <nav class="legal-header__nav" aria-label="Legal">
+                    <NuxtLink to="/support">{{ t('landing.footer_help') }}</NuxtLink>
                     <NuxtLink to="/privacy">{{ t('landing.footer_privacy') }}</NuxtLink>
                     <NuxtLink to="/terms">{{ t('landing.footer_terms') }}</NuxtLink>
                     <NuxtLink to="/" class="legal-header__home">{{ t('legal.back_home') }}</NuxtLink>

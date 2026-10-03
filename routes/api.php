@@ -15,8 +15,14 @@ use App\Http\Controllers\Api\OutboundMailSettingsController;
 use App\Http\Controllers\Api\PortalStatsController;
 use App\Http\Controllers\Api\PublicProfileController;
 use App\Http\Controllers\Api\PublicProfileInboxController;
+use App\Http\Controllers\Api\Portal\ProductTourController;
+use App\Http\Controllers\Api\Portal\PortalHelpArticleController;
 use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\SocialAuthController;
+use App\Http\Controllers\Api\Support\FeatureRequestController;
+use App\Http\Controllers\Api\Support\HelpArticleController;
+use App\Http\Controllers\Api\Support\SupportMetaController;
+use App\Http\Controllers\Api\Support\SupportTicketController;
 use App\Http\Middleware\AnalyticsMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +74,20 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
 
     // Public profile template list
     Route::get('/public-profiles/templates', [PublicProfileController::class, 'templates']);
+
+    // Public support / help (for /support and public profile contact)
+    Route::prefix('support')->group(function () {
+        Route::get('/meta/contact-form', [SupportMetaController::class, 'contactForm']);
+        Route::get('/help-articles', [HelpArticleController::class, 'index']);
+        Route::get('/help-articles/{slug}', [HelpArticleController::class, 'show']);
+        Route::get('/feature-requests', [FeatureRequestController::class, 'index']);
+        Route::post('/tickets', [SupportTicketController::class, 'store'])->middleware('throttle:5,1');
+    });
+
+    Route::middleware('auth:sanctum')->prefix('support')->group(function () {
+        Route::post('/feature-requests', [FeatureRequestController::class, 'store'])->middleware('throttle:10,1');
+        Route::post('/feature-requests/{id}/vote', [FeatureRequestController::class, 'vote'])->middleware('throttle:30,1');
+    });
 
     // Protected CV routes (authenticated users only)
     Route::middleware('auth:sanctum')->group(function () {
@@ -127,5 +147,13 @@ Route::prefix('v1')->middleware([AnalyticsMiddleware::class])->group(function ()
 
         Route::post('/devices/push-token', [DevicePushTokenController::class, 'store']);
         Route::delete('/devices/push-token', [DevicePushTokenController::class, 'destroy']);
+
+        Route::get('/portal/help-articles', [PortalHelpArticleController::class, 'index']);
+        Route::get('/portal/help-articles/{slug}', [PortalHelpArticleController::class, 'show']);
+
+        Route::get('/portal/tours/offer', [ProductTourController::class, 'offer']);
+        Route::post('/portal/tours/{key}/complete', [ProductTourController::class, 'complete']);
+        Route::post('/portal/tours/{key}/dismiss', [ProductTourController::class, 'dismiss']);
+        Route::post('/portal/tours/{key}/reset', [ProductTourController::class, 'reset']);
     });
 });
