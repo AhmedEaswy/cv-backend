@@ -54,6 +54,8 @@ class CVDataMapper
                     'position' => $exp['position'] ?? null,
                     'name' => $exp['company'] ?? null, // API: company -> Profile: name
                     'location' => $exp['location'] ?? null,
+                    'locationType' => !empty($exp['locationType']) ? $exp['locationType'] : null,
+                    'employmentType' => !empty($exp['employmentType']) ? $exp['employmentType'] : null,
                     'description' => $exp['description'] ?? null,
                     'from' => $exp['from'] ?? null,
                     'to' => $exp['to'] ?? null,
@@ -145,6 +147,8 @@ class CVDataMapper
                     'position' => $exp['position'] ?? null,
                     'company' => $exp['name'] ?? null, // Profile: name -> API: company
                     'location' => $exp['location'] ?? null,
+                    'locationType' => !empty($exp['locationType']) ? $exp['locationType'] : null,
+                    'employmentType' => !empty($exp['employmentType']) ? $exp['employmentType'] : null,
                     'description' => $exp['description'] ?? null,
                     'from' => $exp['from'] ?? null,
                     'to' => $exp['to'] ?? null,

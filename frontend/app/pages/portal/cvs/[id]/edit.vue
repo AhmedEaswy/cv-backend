@@ -13,6 +13,7 @@ import {
 } from '~/composables/usePortalApi';
 import type { CvTemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
 import type { DropdownMenuItem } from '~/components/ui/DropdownMenu.vue';
+import { File01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
@@ -274,7 +275,9 @@ function onAction(key: string) {
             <div class="surface form-card cv-builder__meta">
                 <div class="field">
                     <label class="field-label" for="name">{{ t('portal.cvs.field.name') }}</label>
-                    <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cvs.field.name_placeholder')" />
+                    <FieldIcon :icon="File01Icon">
+                        <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cvs.field.name_placeholder')" />
+                    </FieldIcon>
                     <span class="field-hint">{{ t('portal.cvs.field.name_help') }}</span>
                 </div>
 
@@ -283,6 +286,7 @@ function onAction(key: string) {
                     <SelectInput
                         id="language"
                         v-model="form.language"
+                        :icon="TranslateIcon"
                         :options="langs.map((l) => ({ value: l.code, label: l.name }))"
                     />
                 </div>

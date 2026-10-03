@@ -92,6 +92,8 @@ class CVDataMapperTest extends TestCase
                     'position' => 'Senior Developer',
                     'company' => 'Acme Corp',
                     'location' => 'New York',
+                    'locationType' => 'hybrid',
+                    'employmentType' => 'full_time',
                     'description' => 'Led team of 5',
                     'from' => '2020-01',
                     'to' => '2023-12',
@@ -107,6 +109,8 @@ class CVDataMapperTest extends TestCase
         // "company" in API maps to "name" in Profile
         $this->assertEquals('Acme Corp', $result['experiences'][0]['name']);
         $this->assertEquals('Senior Developer', $result['experiences'][0]['position']);
+        $this->assertEquals('hybrid', $result['experiences'][0]['locationType']);
+        $this->assertEquals('full_time', $result['experiences'][0]['employmentType']);
         // "current" in API maps to "currentlyWorkingHere" in Profile
         $this->assertFalse($result['experiences'][0]['currentlyWorkingHere']);
     }
@@ -224,7 +228,13 @@ class CVDataMapperTest extends TestCase
                 ['institution' => 'UCLA', 'degree' => 'BA', 'fieldOfStudy' => 'Design'],
             ],
             'experiences' => [
-                ['position' => 'UX Lead', 'company' => 'DesignCo', 'current' => true],
+                [
+                    'position' => 'UX Lead',
+                    'company' => 'DesignCo',
+                    'locationType' => 'remote',
+                    'employmentType' => 'contract',
+                    'current' => true,
+                ],
             ],
             'projects' => [
                 ['title' => 'Redesign', 'description' => 'Full redesign'],
@@ -251,6 +261,8 @@ class CVDataMapperTest extends TestCase
         $this->assertEquals('Designer', $result['jobTitle']);
         $this->assertEquals('UX Lead', $result['experiences'][0]['position']);
         $this->assertEquals('DesignCo', $result['experiences'][0]['company']);
+        $this->assertEquals('remote', $result['experiences'][0]['locationType']);
+        $this->assertEquals('contract', $result['experiences'][0]['employmentType']);
         $this->assertTrue($result['experiences'][0]['current']);
         $this->assertEquals('Redesign', $result['projects'][0]['title']);
         $this->assertEquals('English', $result['languages'][0]['name']);

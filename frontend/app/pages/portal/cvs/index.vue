@@ -116,7 +116,7 @@ function timeAgo(iso?: string) {
                 class="btn btn--secondary"
                 @click="importFromLinkedIn"
             >
-                <Icon name="linkedin" :size="15" />
+                <Icon name="linkedin" :size="16" />
                 {{ t('portal.cvs.import_linkedin') }}
             </button>
             <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">
@@ -140,7 +140,7 @@ function timeAgo(iso?: string) {
                 :disabled="creating"
                 @click="importFromLinkedIn"
             >
-                <Icon name="linkedin" :size="15" />
+                <Icon name="linkedin" :size="16" />
                 {{ t('portal.cvs.import_linkedin') }}
             </button>
             <button type="button" class="btn btn--primary" :disabled="creating" @click="openCreate">

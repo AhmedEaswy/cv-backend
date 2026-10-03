@@ -66,7 +66,7 @@
                 @foreach($experiences as $exp)
                     <div class="entry">
                         <h3 class="entry-title">{{ $exp['position'] ?? '' }}</h3>
-                        <p class="meta">{{ collect([$exp['company'] ?? null, $exp['location'] ?? null])->filter()->implode(' · ') }}</p>
+                        <p class="meta">{{ \App\Support\ExperienceDisplay::metaLine($exp) }}</p>
                         <p class="dates">{{ $exp['from'] ?? '' }}@if(!empty($exp['to']) || !empty($exp['current'])) – {{ !empty($exp['current']) ? __('Present') : ($exp['to'] ?? '') }}@endif</p>
                         @if(!empty($exp['description']))<p>{{ $exp['description'] }}</p>@endif
                     </div>

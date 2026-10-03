@@ -3,6 +3,7 @@
  * /portal/settings — Profile and Password tabs.
  */
 definePageMeta({ middleware: 'auth', layout: 'portal' });
+import { CallIcon, LockIcon, Mail01Icon, UserIcon } from '@hugeicons/core-free-icons';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -68,8 +69,6 @@ async function savePassword() {
         </div>
     </header>
 
-    <SettingsTabs />
-
     <form v-if="tab === 'profile'" class="surface form-card form-card--xl" @submit.prevent="saveProfile">
         <h2 class="form-card__title">{{ t('portal.settings.profile.title') }}</h2>
         <p class="form-card__sub">{{ t('portal.settings.profile.subtitle') }}</p>
@@ -77,25 +76,35 @@ async function savePassword() {
         <div class="field-grid">
             <div class="field">
                 <label class="field-label" for="first_name">{{ t('portal.settings.profile.field.first_name') }}</label>
-                <input id="first_name" v-model="profileForm.first_name" class="input" :placeholder="t('portal.settings.profile.field.first_name_placeholder')" />
+                <FieldIcon :icon="UserIcon">
+                    <input id="first_name" v-model="profileForm.first_name" class="input" :placeholder="t('portal.settings.profile.field.first_name_placeholder')" />
+                </FieldIcon>
             </div>
             <div class="field">
                 <label class="field-label" for="last_name">{{ t('portal.settings.profile.field.last_name') }}</label>
-                <input id="last_name" v-model="profileForm.last_name" class="input" :placeholder="t('portal.settings.profile.field.last_name_placeholder')" />
+                <FieldIcon :icon="UserIcon">
+                    <input id="last_name" v-model="profileForm.last_name" class="input" :placeholder="t('portal.settings.profile.field.last_name_placeholder')" />
+                </FieldIcon>
             </div>
         </div>
         <div class="field">
             <label class="field-label" for="name">{{ t('portal.settings.profile.field.name') }}</label>
-            <input id="name" v-model="profileForm.name" class="input" required :placeholder="t('portal.settings.profile.field.name_placeholder')" />
+            <FieldIcon :icon="UserIcon">
+                <input id="name" v-model="profileForm.name" class="input" required :placeholder="t('portal.settings.profile.field.name_placeholder')" />
+            </FieldIcon>
         </div>
         <div class="field-grid">
             <div class="field">
                 <label class="field-label" for="email">{{ t('portal.settings.profile.field.email') }}</label>
-                <input id="email" v-model="profileForm.email" type="email" class="input" required :placeholder="t('portal.settings.profile.field.email_placeholder')" />
+                <FieldIcon :icon="Mail01Icon">
+                    <input id="email" v-model="profileForm.email" type="email" class="input" required :placeholder="t('portal.settings.profile.field.email_placeholder')" />
+                </FieldIcon>
             </div>
             <div class="field">
                 <label class="field-label" for="phone">{{ t('portal.settings.profile.field.phone') }}</label>
-                <input id="phone" v-model="profileForm.phone" type="tel" class="input" :placeholder="t('portal.settings.profile.field.phone_placeholder')" />
+                <FieldIcon :icon="CallIcon">
+                    <input id="phone" v-model="profileForm.phone" type="tel" class="input" :placeholder="t('portal.settings.profile.field.phone_placeholder')" />
+                </FieldIcon>
             </div>
         </div>
         <div class="form-actions">
@@ -111,16 +120,22 @@ async function savePassword() {
 
         <div class="field">
             <label class="field-label" for="current">{{ t('portal.settings.password.current') }}</label>
-            <input id="current" v-model="pwdForm.current_password" type="password" class="input" autocomplete="current-password" required :placeholder="t('portal.settings.password.current_placeholder')" />
+            <FieldIcon :icon="LockIcon">
+                <input id="current" v-model="pwdForm.current_password" type="password" class="input" autocomplete="current-password" required :placeholder="t('portal.settings.password.current_placeholder')" />
+            </FieldIcon>
         </div>
         <div class="field-grid">
             <div class="field">
                 <label class="field-label" for="new">{{ t('portal.settings.password.new') }}</label>
-                <input id="new" v-model="pwdForm.password" type="password" class="input" autocomplete="new-password" required :placeholder="t('portal.settings.password.new_placeholder')" />
+                <FieldIcon :icon="LockIcon">
+                    <input id="new" v-model="pwdForm.password" type="password" class="input" autocomplete="new-password" required :placeholder="t('portal.settings.password.new_placeholder')" />
+                </FieldIcon>
             </div>
             <div class="field">
                 <label class="field-label" for="confirm">{{ t('portal.settings.password.confirm') }}</label>
-                <input id="confirm" v-model="pwdForm.password_confirmation" type="password" class="input" autocomplete="new-password" required :placeholder="t('portal.settings.password.confirm_placeholder')" />
+                <FieldIcon :icon="LockIcon">
+                    <input id="confirm" v-model="pwdForm.password_confirmation" type="password" class="input" autocomplete="new-password" required :placeholder="t('portal.settings.password.confirm_placeholder')" />
+                </FieldIcon>
             </div>
         </div>
         <div class="form-actions">

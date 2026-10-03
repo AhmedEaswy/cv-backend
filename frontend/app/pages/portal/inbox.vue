@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { InboxMessage, InboxMessageReply } from '~/composables/usePortalApi';
+import { Mail01Icon } from '@hugeicons/core-free-icons';
 
 const { t } = useI18n();
 const api = useApi();
@@ -181,7 +182,7 @@ const filtered = computed(() => {
     <div v-else class="portal-banner portal-banner--info">
         <Icon name="alert" :size="16" />
         <p>{{ t('portal.inbox.smtp_banner') }}</p>
-        <NuxtLink to="/portal/settings/sending-email" class="portal-banner__link">
+        <NuxtLink to="/portal/settings/sending-domain" class="portal-banner__link">
             {{ t('portal.inbox.smtp_banner_action') }}
         </NuxtLink>
     </div>
@@ -252,13 +253,15 @@ const filtered = computed(() => {
 
             <form class="inbox-compose" @submit.prevent="sendReply">
                 <label class="field-label" for="inbox-reply">{{ t('portal.inbox.reply_body') }}</label>
-                <textarea
-                    id="inbox-reply"
-                    v-model="replyBody"
-                    class="textarea"
-                    rows="4"
-                    :placeholder="t('portal.inbox.reply_placeholder')"
-                />
+                <FieldIcon :icon="Mail01Icon">
+                    <textarea
+                        id="inbox-reply"
+                        v-model="replyBody"
+                        class="textarea"
+                        rows="4"
+                        :placeholder="t('portal.inbox.reply_placeholder')"
+                    />
+                </FieldIcon>
                 <div class="inbox-detail__actions">
                     <Button type="submit" variant="primary" :loading="sendingReply" :disabled="!replyBody.trim()">
                         <Icon name="mail" :size="14" /> {{ sendingReply ? t('portal.inbox.sending') : t('portal.inbox.send_reply') }}

@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type { SelectIcon } from '~/components/ui/SelectInput.vue';
+
 export interface CvEntryField {
     key: string;
     label: string;
-    type: 'text' | 'textarea' | 'month' | 'url' | 'checkbox';
+    type: 'text' | 'textarea' | 'month' | 'url' | 'checkbox' | 'select';
     required?: boolean;
     span?: 'half' | 'full';
     placeholder?: string;
+    options?: { value: string; label: string }[];
+    icon?: SelectIcon;
 }
 
 const items = defineModel<Record<string, any>[]>({ required: true });
@@ -61,8 +65,16 @@ function showField(field: CvEntryField, item: Record<string, any>) {
                         :class="{ 'field--full': field.type === 'textarea' || field.type === 'checkbox' || field.span === 'full' }"
                     >
                         <label v-if="field.type !== 'checkbox'" class="field-label">{{ field.label }}</label>
+                        <FieldIcon v-if="field.type === 'textarea' && field.icon" :icon="field.icon">
+                            <textarea
+                                v-model="item[field.key]"
+                                class="textarea"
+                                rows="4"
+                                :placeholder="field.placeholder"
+                            />
+                        </FieldIcon>
                         <textarea
-                            v-if="field.type === 'textarea'"
+                            v-else-if="field.type === 'textarea'"
                             v-model="item[field.key]"
                             class="textarea"
                             rows="4"
@@ -80,6 +92,22 @@ function showField(field: CvEntryField, item: Record<string, any>) {
                             mode="month"
                             :placeholder="field.placeholder"
                         />
+                        <SelectInput
+                            v-else-if="field.type === 'select'"
+                            v-model="item[field.key]"
+                            :icon="field.icon"
+                            :options="field.options || []"
+                            :placeholder="field.placeholder"
+                        />
+                        <FieldIcon v-else-if="field.icon" :icon="field.icon">
+                            <input
+                                v-model="item[field.key]"
+                                :type="field.type === 'url' ? 'url' : 'text'"
+                                class="input"
+                                :placeholder="field.placeholder"
+                                :required="field.required"
+                            />
+                        </FieldIcon>
                         <input
                             v-else
                             v-model="item[field.key]"

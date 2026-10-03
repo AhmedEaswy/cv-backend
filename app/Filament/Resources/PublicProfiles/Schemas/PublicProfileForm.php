@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PublicProfiles\Schemas;
 
+use App\Enums\EmploymentType;
+use App\Enums\LocationType;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
@@ -82,6 +84,14 @@ class PublicProfileForm
                     ->schema([
                         TextInput::make('position')->required(),
                         TextInput::make('company')->required(),
+                        Select::make('locationType')
+                            ->label('Location Type')
+                            ->options(LocationType::options())
+                            ->placeholder('Please select'),
+                        Select::make('employmentType')
+                            ->label('Employment Type')
+                            ->options(EmploymentType::options())
+                            ->placeholder('Please select'),
                         TextInput::make('from')->placeholder('YYYY-MM'),
                         TextInput::make('to')->placeholder('YYYY-MM'),
                         Checkbox::make('current'),

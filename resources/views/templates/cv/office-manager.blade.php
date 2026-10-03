@@ -194,8 +194,9 @@
                             <h3 class="text-xl font-bold font-display text-gray-900">
                                 {{ $exp['position'] ?? '' }}{{ !empty($exp['company']) ? ', ' : '' }}<span class="font-normal italic text-gray-600 font-body">{{ $exp['company'] ?? '' }}</span>
                             </h3>
-                            @if(!empty($exp['location']))
-                                <p class="text-sm text-gray-500 mt-1">{{ $exp['location'] }}</p>
+                            @php $expMeta = collect([$exp['location'] ?? null, ...\App\Support\ExperienceDisplay::typeLabels($exp)])->filter()->implode(' · '); @endphp
+                            @if($expMeta !== '')
+                                <p class="text-sm text-gray-500 mt-1">{{ $expMeta }}</p>
                             @endif
                         </div>
                         @if(!empty($exp['description']))

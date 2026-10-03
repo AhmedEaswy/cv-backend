@@ -30,6 +30,8 @@ class Profile extends Model
         'ip_address',
         'country',
         'device',
+        'pdf_path',
+        'pdf_fingerprint',
     ];
 
     protected function casts(): array

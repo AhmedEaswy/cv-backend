@@ -20,7 +20,11 @@
 }
 
 .form-card--xl {
-    @apply max-w-3xl;
+    @apply mx-auto w-full max-w-3xl;
+}
+
+.settings-cards {
+    @apply grid gap-5;
 }
 
 .form-card__title {
@@ -32,7 +36,7 @@
 }
 
 .form-actions {
-    @apply flex justify-end gap-2;
+    @apply flex justify-center gap-2;
 }
 
 .back-link {
@@ -108,10 +112,14 @@
 }
 
 .input:focus,
+.input:focus-visible,
 .textarea:focus,
-.select:focus {
+.textarea:focus-visible,
+.select:focus,
+.select:focus-visible {
     @apply border-ink outline-none;
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md);
 }
 
 .input[aria-invalid="true"],
@@ -184,7 +192,7 @@ html[dir="rtl"] .select {
     --switch-h: 1.05rem;
 }
 .ui-switch[data-state="checked"] {
-    background: var(--color-ink);
+    background: var(--color-success);
 }
 .ui-switch:focus-visible {
     outline: 2px solid var(--color-ink);
@@ -218,12 +226,8 @@ html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
 }
 
 /* AI access token UI */
-.token-form {
-    @apply flex flex-wrap items-end gap-3;
-}
-
 .token-form .field {
-    @apply mb-0 min-w-48 flex-1;
+    @apply mb-4;
 }
 
 .token-once {
@@ -271,9 +275,11 @@ html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
     @apply inline-flex px-[0.9rem] py-[0.45rem];
 }
 
-/* Flatpickr + Tom Select — same radius as .input */
+/* Flatpickr + Tom Select — same radius as .input, including while focused */
 .flatpickr-input.input,
-.flatpickr-input {
+.flatpickr-input,
+.flatpickr-input:focus,
+.flatpickr-input:focus-visible {
     border-radius: var(--radius-md) !important;
 }
 .flatpickr-calendar {
@@ -301,56 +307,156 @@ html[dir="rtl"] .ui-switch[data-state="checked"] .ui-switch__thumb {
     box-shadow: none !important;
     border-radius: 0;
 }
+.ui-select,
+.ui-date,
+.ui-adorn {
+    position: relative;
+    width: 100%;
+}
+.ui-date .input,
+.ui-adorn .input,
+.ui-adorn .textarea {
+    padding-inline-start: 2.5rem;
+}
+.ui-date:focus-within .ui-date__icon,
+.ui-adorn:focus-within .ui-adorn__icon {
+    color: var(--color-ink);
+}
+.ui-adorn:has(.textarea) .ui-adorn__icon {
+    top: 0.95rem;
+    transform: none;
+}
+.ui-select__icon,
+.ui-date__icon,
+.ui-adorn__icon,
+.ui-select__caret {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+.ui-select__icon,
+.ui-date__icon,
+.ui-adorn__icon {
+    inset-inline-start: 0.85rem;
+    color: var(--color-ink-soft);
+}
+.ui-select__caret {
+    inset-inline-end: 0.8rem;
+    transition: transform 160ms ease;
+}
+.ui-select:has(.ts-wrapper.dropdown-active) .ui-select__caret {
+    transform: translateY(-50%) rotate(180deg);
+}
+.ui-select:has(.ts-wrapper.focus) .ui-select__icon,
+.ui-select:has(.ts-wrapper.dropdown-active) .ui-select__icon {
+    color: var(--color-ink);
+}
+
 .ts-wrapper.single .ts-control,
-.ts-wrapper .ts-control {
+.ts-wrapper .ts-control,
+.ts-wrapper.focus .ts-control,
+.ts-wrapper.dropdown-active .ts-control,
+.ts-wrapper.single.input-active .ts-control,
+.ts-wrapper .ts-control:focus,
+.ts-wrapper .ts-control:focus-visible {
     width: 100%;
     min-height: 2.75rem;
+    display: flex;
+    align-items: center;
     border: 1px solid var(--color-line);
     background: var(--color-white);
-    padding: 0.45rem 0.95rem;
-    padding-inline-end: 2.5rem !important;
+    padding: 0.7rem 0.95rem;
     border-radius: var(--radius-md) !important;
     box-shadow: none;
     font-size: 0.9rem;
     line-height: 1.4;
     color: var(--color-ink);
-    --ts-pr-caret: 2.25rem;
+    outline: none;
+    --ts-pr-min: 2.45rem;
+    --ts-pr-caret: 0px;
+    --ts-pr-clear-button: 0px;
 }
-.ts-wrapper.single .ts-control::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    inset-inline-end: 0.85rem;
-    width: 14px;
-    height: 14px;
-    pointer-events: none;
-    transform: translateY(-50%);
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat center / 14px;
+.ui-select .ts-wrapper .ts-control {
+    padding-inline-end: 2.45rem !important;
 }
+.ui-select--icon .ts-wrapper .ts-control {
+    padding-inline-start: 2.5rem !important;
+}
+.ts-wrapper.single:not(.focus):not(.dropdown-active):hover .ts-control {
+    border-color: var(--color-line-2);
+}
+.ts-wrapper.single .ts-control::after,
 .ts-wrapper.single.dropdown-active .ts-control::after {
-    transform: translateY(-50%) rotate(180deg);
+    content: none;
 }
 .ts-wrapper.focus .ts-control,
-.ts-wrapper.single.input-active .ts-control {
+.ts-wrapper.single.input-active .ts-control,
+.ts-wrapper.dropdown-active .ts-control {
     border-color: var(--color-ink);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md) !important;
 }
-.ts-wrapper .ts-control > input {
+.ts-wrapper .ts-control > input,
+.ts-wrapper .ts-control > input:focus,
+.ts-wrapper .ts-control > input:focus-visible {
     font-size: 0.9rem;
+    border-radius: 0 !important;
+    outline: none !important;
+}
+.ts-wrapper .ts-control > input::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+}
+.ts-wrapper.single .ts-control .item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .ts-dropdown {
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-3);
-    z-index: 80;
+    border: 1px solid var(--color-line) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-3) !important;
+    background: var(--color-white) !important;
+    margin: 6px 0 0 !important;
+    padding: 0.3rem;
+    z-index: 80 !important;
+    overflow: hidden;
+    font-family: inherit !important;
+    font-size: 0.9rem !important;
 }
 .ts-dropdown .option {
-    padding: 0.5rem 0.85rem;
+    margin: 0;
+    padding: 0.5rem 0.7rem !important;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--color-ink);
 }
 .ts-dropdown .option.active,
 .ts-dropdown .option.selected {
     background: var(--color-paper-2);
     color: var(--color-ink);
+}
+.ts-dropdown .option.selected {
+    font-weight: 500;
+}
+.ts-dropdown-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-2) transparent;
+}
+.ts-dropdown-content::-webkit-scrollbar {
+    width: 8px;
+}
+.ts-dropdown-content::-webkit-scrollbar-thumb {
+    background: var(--color-line-2);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 
 /* Shadcn-style OTP slots (see UiInputOtp) */

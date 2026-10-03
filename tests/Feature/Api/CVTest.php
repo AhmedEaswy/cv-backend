@@ -59,6 +59,8 @@ class CVTest extends TestCase
                     [
                         'position' => 'Senior Developer',
                         'company' => 'Acme Corp',
+                        'locationType' => 'on_site',
+                        'employmentType' => 'full_time',
                         'from' => '2020-01',
                         'to' => '2024-01',
                         'description' => 'Led backend team',
@@ -358,12 +360,30 @@ class CVTest extends TestCase
         $this->assertCount(2, $userData['skills']);
         $this->assertNotEmpty($userData['experiences']);
         $this->assertCount(1, $userData['experiences']);
+        $this->assertEquals('on_site', $userData['experiences'][0]['locationType']);
+        $this->assertEquals('full_time', $userData['experiences'][0]['employmentType']);
         $this->assertNotEmpty($userData['educations']);
         $this->assertCount(1, $userData['educations']);
         $this->assertNotEmpty($userData['languages']);
         $this->assertCount(1, $userData['languages']);
         $this->assertNotEmpty($userData['interests']);
         $this->assertCount(1, $userData['interests']);
+    }
+
+    public function test_create_cv_rejects_invalid_experience_enums(): void
+    {
+        $payload = $this->validCVData();
+        $payload['user_data']['experiences'][0]['locationType'] = 'somewhere';
+        $payload['user_data']['experiences'][0]['employmentType'] = 'gig_work';
+
+        $response = $this->withHeaders($this->getAuthHeader())
+            ->postJson('/api/v1/cvs', $payload);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'user_data.experiences.0.locationType',
+            'user_data.experiences.0.employmentType',
+        ]);
     }
 
     public function test_authenticated_create_seeds_user_identity_when_user_data_empty(): void

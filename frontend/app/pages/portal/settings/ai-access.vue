@@ -3,6 +3,7 @@
  * /portal/settings/ai-access — AI provider keys + MCP agent tokens.
  */
 definePageMeta({ middleware: 'auth', layout: 'portal' });
+import { AiBrain01Icon, AiSparklesIcon, Key01Icon, Link01Icon } from '@hugeicons/core-free-icons';
 
 const { t } = useI18n();
 const api = useApi();
@@ -208,8 +209,6 @@ const revoke = async (id: number) => {
         </div>
     </header>
 
-    <SettingsTabs />
-
     <AiAccessSkeleton v-if="initialLoading" />
 
     <template v-else>
@@ -220,15 +219,17 @@ const revoke = async (id: number) => {
         <form class="ai-settings-form" @submit.prevent="saveSettings">
             <div class="field">
                 <label class="field-label" for="ai-api-key">{{ t('portal.settings.ai.api_key') }}</label>
-                <input
-                    id="ai-api-key"
-                    v-model="apiKeyInput"
-                    type="password"
-                    class="input"
-                    dir="ltr"
-                    autocomplete="off"
-                    :placeholder="hasApiKey ? t('portal.settings.ai.api_key_placeholder_set') : t('portal.settings.ai.api_key_placeholder')"
-                />
+                <FieldIcon :icon="Key01Icon">
+                    <input
+                        id="ai-api-key"
+                        v-model="apiKeyInput"
+                        type="password"
+                        class="input"
+                        dir="ltr"
+                        autocomplete="off"
+                        :placeholder="hasApiKey ? t('portal.settings.ai.api_key_placeholder_set') : t('portal.settings.ai.api_key_placeholder')"
+                    />
+                </FieldIcon>
                 <span class="field-hint">
                     {{ hasApiKey ? t('portal.settings.ai.api_key_hint_set') : t('portal.settings.ai.api_key_hint') }}
                 </span>
@@ -248,20 +249,23 @@ const revoke = async (id: number) => {
                 <SelectInput
                     id="ai-provider"
                     v-model="form.provider"
+                    :icon="AiSparklesIcon"
                     :options="providers.map((p) => ({ value: p.value, label: p.label }))"
                 />
             </div>
 
             <div v-if="form.provider === 'custom'" class="field">
                 <label class="field-label" for="ai-custom-url">{{ t('portal.settings.ai.custom_url') }}</label>
-                <input
-                    id="ai-custom-url"
-                    v-model="form.custom_url"
-                    type="url"
-                    class="input"
-                    dir="ltr"
-                    :placeholder="t('portal.settings.ai.custom_url_placeholder')"
-                />
+                <FieldIcon :icon="Link01Icon">
+                    <input
+                        id="ai-custom-url"
+                        v-model="form.custom_url"
+                        type="url"
+                        class="input"
+                        dir="ltr"
+                        :placeholder="t('portal.settings.ai.custom_url_placeholder')"
+                    />
+                </FieldIcon>
             </div>
 
             <div v-if="form.provider !== 'custom'" class="field">
@@ -269,20 +273,23 @@ const revoke = async (id: number) => {
                 <SelectInput
                     id="ai-model"
                     v-model="form.model"
+                    :icon="AiBrain01Icon"
                     :options="modelOptions.map((opt) => ({ value: opt.value, label: opt.name }))"
                 />
             </div>
 
             <div v-else class="field">
                 <label class="field-label" for="ai-model-custom">{{ t('portal.settings.ai.model') }}</label>
-                <input
-                    id="ai-model-custom"
-                    v-model="form.model"
-                    type="text"
-                    class="input"
-                    dir="ltr"
-                    :placeholder="t('portal.settings.ai.model_placeholder')"
-                />
+                <FieldIcon :icon="AiBrain01Icon">
+                    <input
+                        id="ai-model-custom"
+                        v-model="form.model"
+                        type="text"
+                        class="input"
+                        dir="ltr"
+                        :placeholder="t('portal.settings.ai.model_placeholder')"
+                    />
+                </FieldIcon>
             </div>
 
             <div class="form-actions">
@@ -305,17 +312,21 @@ const revoke = async (id: number) => {
         <form class="token-form" @submit.prevent="createToken">
             <div class="field">
                 <label class="field-label" for="token-name">{{ t('portal.settings.ai.name') }}</label>
-                <input
-                    id="token-name"
-                    v-model="label"
-                    class="input"
-                    :placeholder="t('portal.settings.ai.name_placeholder')"
-                    required
-                />
+                <FieldIcon :icon="Key01Icon">
+                    <input
+                        id="token-name"
+                        v-model="label"
+                        class="input"
+                        :placeholder="t('portal.settings.ai.name_placeholder')"
+                        required
+                    />
+                </FieldIcon>
             </div>
-            <Button type="submit" variant="primary" :loading="creating">
-                {{ t('portal.settings.ai.create') }}
-            </Button>
+            <div class="form-actions">
+                <Button type="submit" variant="primary" :loading="creating">
+                    {{ t('portal.settings.ai.create') }}
+                </Button>
+            </div>
         </form>
 
         <div v-if="tokensLoading" class="skeleton-stack" style="margin-top: 1rem">

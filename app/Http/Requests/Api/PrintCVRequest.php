@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Enums\EmploymentType;
+use App\Enums\LocationType;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 
 class PrintCVRequest extends BaseFormRequest
 {
@@ -53,6 +56,8 @@ class PrintCVRequest extends BaseFormRequest
             'user_data.experiences.*.position' => 'required_with:user_data.experiences|string|max:255',
             'user_data.experiences.*.company' => 'sometimes|nullable|string|max:255',
             'user_data.experiences.*.location' => 'sometimes|nullable|string|max:255',
+            'user_data.experiences.*.locationType' => ['sometimes', 'nullable', Rule::enum(LocationType::class)],
+            'user_data.experiences.*.employmentType' => ['sometimes', 'nullable', Rule::enum(EmploymentType::class)],
             'user_data.experiences.*.description' => 'sometimes|nullable|string',
             'user_data.experiences.*.from' => 'sometimes|nullable|date_format:Y-m',
             'user_data.experiences.*.to' => 'sometimes|nullable|date_format:Y-m',
@@ -149,4 +154,3 @@ class PrintCVRequest extends BaseFormRequest
         });
     }
 }
-

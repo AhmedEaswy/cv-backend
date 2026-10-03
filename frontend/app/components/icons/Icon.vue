@@ -10,14 +10,14 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
     <svg
         :width="size ?? 18"
         :height="size ?? 18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"
+        :viewBox="name === 'linkedin' ? '0 0 16 16' : '0 0 24 24'"
+        :fill="name === 'linkedin' ? 'currentColor' : 'none'"
+        :stroke="name === 'linkedin' ? 'none' : 'currentColor'"
+        :stroke-width="name === 'linkedin' ? 0 : 1.7"
         stroke-linecap="round"
         stroke-linejoin="round"
         aria-hidden="true"
-        :class="$props.class"
+        :class="[name === 'arrow-left' ? 'icon-arrow-back' : null, $props.class]"
     >
         <!-- Documents -->
         <template v-if="name === 'file'">
@@ -214,11 +214,7 @@ defineProps<{ name: string; size?: number | string; class?: string }>();
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
         </template>
         <template v-else-if="name === 'linkedin'">
-            <rect x="2" y="2" width="20" height="20" rx="4" fill="#0A66C2" stroke="none" />
-            <path d="M7.2 9.2V16.5" stroke="#fff" stroke-width="1.8" />
-            <circle cx="7.2" cy="7.05" r="1.15" fill="#fff" stroke="none" />
-            <path d="M10.6 16.5V12.1c0-1.55.85-2.55 2.2-2.55 1.25 0 1.85.75 1.85 2.55V16.5" stroke="#fff" stroke-width="1.8" />
-            <path d="M10.6 9.2V16.5" stroke="#fff" stroke-width="1.8" />
+            <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z" />
         </template>
         <template v-else-if="name === 'apple'">
             <path

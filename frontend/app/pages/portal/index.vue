@@ -265,7 +265,7 @@ async function startPublicProfile() {
                         role="menuitem"
                         @click="importFromLinkedIn"
                     >
-                        <Icon name="linkedin" :size="15" />
+                        <Icon name="linkedin" :size="16" />
                         <span>{{ t('portal.dashboard.import_linkedin') }}</span>
                     </button>
                     <button type="button" class="create-menu__item" role="menuitem" :disabled="creatingCoverLetter" @click="startNewCoverLetter">

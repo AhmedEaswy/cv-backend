@@ -9,7 +9,7 @@
                 <Skeleton width="5.5rem" height="0.7rem" />
                 <Skeleton width="100%" height="2.6rem" radius="10px" />
             </div>
-            <div style="display: flex; justify-content: flex-end">
+            <div style="display: flex; justify-content: center">
                 <Skeleton width="7.5rem" height="2.4rem" radius="9999px" />
             </div>
         </div>
@@ -23,7 +23,9 @@
                 <Skeleton width="4rem" height="0.7rem" />
                 <Skeleton width="100%" height="2.6rem" radius="10px" />
             </div>
-            <Skeleton width="8rem" height="2.4rem" radius="9999px" />
+            <div style="display: flex; justify-content: center">
+                <Skeleton width="8rem" height="2.4rem" radius="9999px" />
+            </div>
             <div class="skeleton-stack" style="margin-top: 0.5rem">
                 <div v-for="n in 2" :key="`t-${n}`" class="skeleton-list-card" style="padding: 0.85rem 1rem">
                     <div class="skeleton-stack" style="flex: 1">

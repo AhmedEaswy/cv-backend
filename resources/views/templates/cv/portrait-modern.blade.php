@@ -68,7 +68,7 @@
                         <h3 class="entry-title">{{ $exp['position'] ?? '' }}</h3>
                         <span class="dates">{{ $exp['from'] ?? '' }}@if(!empty($exp['to']) || !empty($exp['current'])) – {{ !empty($exp['current']) ? __('Present') : ($exp['to'] ?? '') }}@endif</span>
                     </div>
-                    <p class="entry-meta">{{ collect([$exp['company'] ?? null, $exp['location'] ?? null])->filter()->implode(' · ') }}</p>
+                    <p class="entry-meta">{{ \App\Support\ExperienceDisplay::metaLine($exp) }}</p>
                     @if(!empty($exp['description']))<p>{{ $exp['description'] }}</p>@endif
                 </div>
             @endforeach

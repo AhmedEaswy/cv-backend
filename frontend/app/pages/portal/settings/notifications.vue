@@ -55,8 +55,6 @@ async function save() {
         </div>
     </header>
 
-    <SettingsTabs />
-
     <FormSkeleton v-if="loading" :fields="2" />
 
     <section v-else class="surface form-card form-card--xl">
@@ -73,9 +71,11 @@ async function save() {
                 </Switch>
                 <span class="field-hint">{{ t('portal.settings.notifications.push_help') }}</span>
             </div>
-            <Button type="submit" variant="primary" :loading="saving">
-                {{ t('portal.settings.notifications.save') }}
-            </Button>
+            <div class="form-actions">
+                <Button type="submit" variant="primary" :loading="saving">
+                    {{ t('portal.settings.notifications.save') }}
+                </Button>
+            </div>
         </form>
     </section>
 </template>

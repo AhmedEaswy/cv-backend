@@ -7,7 +7,7 @@
     --btn-spot-x: 50%;
     --btn-spot-y: 50%;
     --btn-spot-color: color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
-    transition-property: background, color, border-color, transform;
+    transition-property: background, color, border-color, box-shadow, transform;
 }
 
 .btn::before {
@@ -46,7 +46,8 @@
 }
 
 .btn:focus-visible {
-    @apply outline-2 outline-offset-2 outline-ink;
+    outline: 2px solid color-mix(in srgb, var(--color-brand-primary) 55%, var(--color-ink));
+    outline-offset: 3px;
 }
 
 .btn:disabled,
@@ -102,11 +103,13 @@
 }
 
 .btn--primary:hover {
-    @apply -translate-y-px border-ink-2;
+    transform: translateY(-1px);
+    border-color: var(--color-ink-2);
+    box-shadow: var(--shadow-1);
     background:
         linear-gradient(
             to top,
-            color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+            color-mix(in srgb, var(--color-brand-primary) 16%, transparent),
             transparent
         ),
         var(--color-ink-2);
@@ -125,7 +128,7 @@
 }
 
 .btn--secondary:hover {
-    @apply border-ink;
+    border-color: color-mix(in srgb, var(--color-ink) 16%, var(--color-line-2));
     background:
         linear-gradient(
             to top,
@@ -141,16 +144,20 @@
 }
 
 .btn--ghost:hover {
-    @apply bg-paper-2 text-ink;
+    border-color: transparent;
+    background: var(--color-paper-2);
+    color: var(--color-ink);
 }
 
 .btn--danger {
     @apply border-danger bg-transparent text-danger;
-    --btn-spot-color: color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    --btn-spot-color: color-mix(in srgb, var(--color-danger) 28%, transparent);
 }
 
 .btn--danger:hover {
-    @apply border-danger bg-danger-soft;
+    border-color: var(--color-danger);
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
 }
 
 .btn--link {

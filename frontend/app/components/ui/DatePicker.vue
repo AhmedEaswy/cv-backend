@@ -4,6 +4,8 @@
  */
 import flatpickr from 'flatpickr';
 import type { Instance } from 'flatpickr/dist/types/instance';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { Calendar03Icon } from '@hugeicons/core-free-icons';
 
 const model = defineModel<string | null | undefined>({ default: '' });
 
@@ -50,13 +52,18 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <input
-        :id="id"
-        ref="input"
-        type="text"
-        class="input"
-        :placeholder="placeholder || (mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD')"
-        autocomplete="off"
-        readonly
-    />
+    <div class="ui-date">
+        <span class="ui-date__icon" aria-hidden="true">
+            <HugeiconsIcon :icon="Calendar03Icon" :size="16" :stroke-width="1.75" />
+        </span>
+        <input
+            :id="id"
+            ref="input"
+            type="text"
+            class="input"
+            :placeholder="placeholder || (mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD')"
+            autocomplete="off"
+            readonly
+        />
+    </div>
 </template>

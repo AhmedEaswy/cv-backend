@@ -3,6 +3,8 @@
  * /auth/reset-password?email=…
  * Enter the emailed OTP and a new password.
  */
+import { LockIcon, Mail01Icon } from '@hugeicons/core-free-icons';
+
 const { t } = useI18n();
 const route = useRoute();
 const { reset, loading, fieldError, generalError } = useAuthSession();
@@ -38,7 +40,9 @@ async function onSubmit() {
         <form v-if="!success && form.email" @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.email') }}</label>
-                <input id="email" v-model="form.email" type="email" class="input" required :placeholder="t('auth.email_placeholder')" />
+                <FieldIcon :icon="Mail01Icon">
+                    <input id="email" v-model="form.email" type="email" class="input" required :placeholder="t('auth.email_placeholder')" />
+                </FieldIcon>
             </div>
             <div class="field">
                 <label class="field-label" for="code">{{ t('auth.reset.code') }}</label>
@@ -54,12 +58,16 @@ async function onSubmit() {
             </div>
             <div class="field">
                 <label class="field-label" for="password">{{ t('auth.reset.password') }}</label>
-                <input id="password" v-model="form.password" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_new_placeholder')" :aria-invalid="!!fieldError('password')" />
+                <FieldIcon :icon="LockIcon">
+                    <input id="password" v-model="form.password" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_new_placeholder')" :aria-invalid="!!fieldError('password')" />
+                </FieldIcon>
                 <span v-if="fieldError('password')" class="field-error">{{ fieldError('password') }}</span>
             </div>
             <div class="field">
                 <label class="field-label" for="password_confirmation">{{ t('auth.reset.password_confirm') }}</label>
-                <input id="password_confirmation" v-model="form.password_confirmation" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_confirm_placeholder')" />
+                <FieldIcon :icon="LockIcon">
+                    <input id="password_confirmation" v-model="form.password_confirmation" type="password" class="input" autocomplete="new-password" required :placeholder="t('auth.password_confirm_placeholder')" />
+                </FieldIcon>
             </div>
             <Button type="submit" variant="primary" :loading="loading" block>
                 {{ loading ? t('auth.reset.submitting') : t('auth.reset.action') }}

@@ -139,8 +139,9 @@
                                     @if(!empty($exp['company']))
                                         <p class="text-gray-700 font-medium">{{ $exp['company'] }}</p>
                                     @endif
-                                    @if(!empty($exp['location']))
-                                        <p class="text-sm text-gray-600">{{ $exp['location'] }}</p>
+                                    @php $expMeta = collect([$exp['location'] ?? null, ...\App\Support\ExperienceDisplay::typeLabels($exp)])->filter()->implode(' · '); @endphp
+                                    @if($expMeta !== '')
+                                        <p class="text-sm text-gray-600">{{ $expMeta }}</p>
                                     @endif
                                 </div>
                                 <div class="text-end text-sm text-gray-600 shrink-0">

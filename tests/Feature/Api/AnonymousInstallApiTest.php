@@ -3,7 +3,6 @@
 namespace Tests\Feature\Api;
 
 use App\Models\AnonymousUser;
-use App\Models\CoverLetter;
 use App\Models\CoverLetterTemplate;
 use App\Models\Profile;
 use App\Models\Template;
@@ -12,6 +11,7 @@ use App\Services\CoverLetterPDFService;
 use App\Services\CVDataMapper;
 use App\Services\CVPDFService;
 use App\Services\CvPhotoService;
+use App\Services\GeneratedPdfStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Mockery;
@@ -49,12 +49,14 @@ class AnonymousInstallApiTest extends TestCase
         $cvPdf = Mockery::mock(CVPDFService::class, [
             app(CVDataMapper::class),
             app(CvPhotoService::class),
+            app(GeneratedPdfStore::class),
         ])->makePartial();
         $cvPdf->shouldReceive('generatePdf')->andReturn('https://example.com/cv.pdf');
         $this->app->instance(CVPDFService::class, $cvPdf);
 
         $clPdf = Mockery::mock(CoverLetterPDFService::class, [
             app(CoverLetterDataMapper::class),
+            app(GeneratedPdfStore::class),
         ])->makePartial();
         $clPdf->shouldReceive('generatePdf')->andReturn('https://example.com/cover.pdf');
         $this->app->instance(CoverLetterPDFService::class, $clPdf);

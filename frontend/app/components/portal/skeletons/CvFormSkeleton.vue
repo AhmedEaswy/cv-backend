@@ -34,7 +34,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-for="n in 7" :key="n" class="cv-hub__section">
+                    <div v-for="n in 6" :key="n" class="cv-hub__section">
                         <div class="cv-hub__toggle" style="cursor: default">
                             <div class="skeleton-stack" style="flex: 1; gap: 0.4rem">
                                 <Skeleton width="8rem" height="0.95rem" />

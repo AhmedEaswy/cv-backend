@@ -2,6 +2,8 @@
 /**
  * /auth/forgot-password — request a password-reset OTP by email.
  */
+import { Mail01Icon } from '@hugeicons/core-free-icons';
+
 const { t } = useI18n();
 const { forgot, loading, fieldError, generalError } = useAuthSession();
 
@@ -27,16 +29,18 @@ async function onSubmit() {
         <form @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.email') }}</label>
-                <input
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="input"
-                    autocomplete="email"
-                    required
-                    :placeholder="t('auth.email_placeholder')"
-                    :aria-invalid="!!fieldError('email')"
-                />
+                <FieldIcon :icon="Mail01Icon">
+                    <input
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        class="input"
+                        autocomplete="email"
+                        required
+                        :placeholder="t('auth.email_placeholder')"
+                        :aria-invalid="!!fieldError('email')"
+                    />
+                </FieldIcon>
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>
             </div>
             <Button type="submit" variant="primary" :loading="loading" block>

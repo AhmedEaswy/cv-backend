@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { UserIcon } from '@hugeicons/core-free-icons';
+
 const items = defineModel<Array<{ name: string }>>({ required: true });
 
 defineProps<{
     addLabel: string;
     emptyText: string;
     placeholder?: string;
+    icon?: typeof UserIcon;
 }>();
 
 const draft = ref('');
@@ -33,7 +36,18 @@ function removeItem(index: number) {
             </li>
         </ul>
         <div class="cv-simple-list__add">
+            <FieldIcon v-if="icon" :icon="icon">
+                <input
+                    v-model="draft"
+                    type="text"
+                    class="input"
+                    :placeholder="placeholder"
+                    maxlength="255"
+                    @keydown.enter.prevent="addItem"
+                />
+            </FieldIcon>
             <input
+                v-else
                 v-model="draft"
                 type="text"
                 class="input"

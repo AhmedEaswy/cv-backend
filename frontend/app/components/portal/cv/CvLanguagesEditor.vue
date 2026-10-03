@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CvLanguage } from '~/composables/usePortalApi';
+import { LanguageCircleIcon, LanguageSkillIcon } from '@hugeicons/core-free-icons';
 
 const items = defineModel<CvLanguage[]>({ required: true });
 
@@ -45,12 +46,15 @@ function removeItem(index: number) {
             <div class="field-grid">
                 <div class="field" style="margin-bottom: 0">
                     <label class="field-label">{{ $t('portal.cvs.field.language_name') }}</label>
-                    <input v-model="item.name" type="text" class="input" maxlength="255" :placeholder="$t('portal.cvs.field.language_name_placeholder')" />
+                    <FieldIcon :icon="LanguageCircleIcon">
+                        <input v-model="item.name" type="text" class="input" maxlength="255" :placeholder="$t('portal.cvs.field.language_name_placeholder')" />
+                    </FieldIcon>
                 </div>
                 <div class="field" style="margin-bottom: 0">
                     <label class="field-label">{{ $t('portal.cvs.field.proficiency') }}</label>
                     <SelectInput
                         v-model="item.proficiencyLevel"
+                        :icon="LanguageSkillIcon"
                         :placeholder="$t('portal.cvs.field.proficiency_placeholder')"
                         :options="levels.map((level) => ({ value: level.value, label: $t(level.key) }))"
                     />

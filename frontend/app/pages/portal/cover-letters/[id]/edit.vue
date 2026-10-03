@@ -5,6 +5,7 @@
 import { watchDebounced } from '@vueuse/core';
 import type { CoverLetterSummary } from '~/composables/usePortalApi';
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
+import { AlignLeftIcon, Briefcase01Icon, Building01Icon, File01Icon } from '@hugeicons/core-free-icons';
 
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 
@@ -175,21 +176,29 @@ async function onDelete() {
             <div class="surface form-card">
                 <div class="field">
                     <label class="field-label" for="name">{{ t('portal.cover_letters.field.name') }}</label>
-                    <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cover_letters.field.name_placeholder')" />
+                    <FieldIcon :icon="File01Icon">
+                        <input id="name" v-model="form.name" type="text" class="input" required maxlength="120" :placeholder="t('portal.cover_letters.field.name_placeholder')" />
+                    </FieldIcon>
                 </div>
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="company">{{ t('portal.cover_letters.field.company') }}</label>
-                        <input id="company" v-model="form.company" type="text" class="input" :placeholder="t('portal.cover_letters.field.company_placeholder')" />
+                        <FieldIcon :icon="Building01Icon">
+                            <input id="company" v-model="form.company" type="text" class="input" :placeholder="t('portal.cover_letters.field.company_placeholder')" />
+                        </FieldIcon>
                     </div>
                     <div class="field">
                         <label class="field-label" for="role">{{ t('portal.cover_letters.field.role') }}</label>
-                        <input id="role" v-model="form.role" type="text" class="input" :placeholder="t('portal.cover_letters.field.role_placeholder')" />
+                        <FieldIcon :icon="Briefcase01Icon">
+                            <input id="role" v-model="form.role" type="text" class="input" :placeholder="t('portal.cover_letters.field.role_placeholder')" />
+                        </FieldIcon>
                     </div>
                 </div>
                 <div class="field">
                     <label class="field-label" for="body">{{ t('portal.cover_letters.field.body') }}</label>
-                    <textarea id="body" v-model="form.body" class="textarea" rows="14" :placeholder="t('portal.cover_letters.field.body_placeholder')" />
+                    <FieldIcon :icon="AlignLeftIcon">
+                        <textarea id="body" v-model="form.body" class="textarea" rows="14" :placeholder="t('portal.cover_letters.field.body_placeholder')" />
+                    </FieldIcon>
                 </div>
             </div>
         </div>

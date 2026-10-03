@@ -6,7 +6,6 @@ use App\Models\Profile;
 use App\Models\Template;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\ViewException;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\Pdf\Exceptions\InvalidFormat;
@@ -17,17 +16,15 @@ class CVPDFService
 {
     public function __construct(
         private CVDataMapper $dataMapper,
-        private CvPhotoService $photoService
-    ) {
-    }
+        private CvPhotoService $photoService,
+        private GeneratedPdfStore $pdfStore,
+    ) {}
 
     /**
      * Generate PDF from Profile and Template.
      *
      * When $returnUrl is false (default): returns a download Response.
      * When $returnUrl is true: saves to storage and returns a public URL string.
-     *
-     * @return Response|string
      *
      * @throws \Exception
      */
@@ -38,7 +35,7 @@ class CVPDFService
         $viewPath = "templates.cv.{$viewName}";
 
         // Check if view exists
-        if (!view()->exists($viewPath)) {
+        if (! view()->exists($viewPath)) {
             Log::error('PDF Generation: View not found', [
                 'view_path' => $viewPath,
                 'template_id' => $template->id,
@@ -53,38 +50,23 @@ class CVPDFService
         App::setLocale($cvData['language'] ?? 'en');
 
         try {
-            $pdf = Pdf::view($viewPath, ['cv' => $cvData])
-                ->format('a4')
-                ->margins(10, 10, 10, 10)
-                ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
-                    // --no-sandbox is automatically added by LARAVEL_PDF_NO_SANDBOX config
-                    $browsershot->setOption('args', [
-                        '--disable-dev-shm-usage',
-                        '--disable-gpu',
-                        '--disable-setuid-sandbox',
-                        '--disable-software-rasterizer',
-                    ]);
-                });
-
-            $filenameBase = ($cvData['user_data']['firstName'] ?? 'CV') . '_' . ($cvData['user_data']['lastName'] ?? 'Resume');
-            $downloadFilename = $filenameBase . '.pdf';
+            $filenameBase = ($cvData['user_data']['firstName'] ?? 'CV').'_'.($cvData['user_data']['lastName'] ?? 'Resume');
+            $downloadFilename = $filenameBase.'.pdf';
 
             if (! $returnUrl) {
-                return $pdf->download($downloadFilename);
+                return $this->makePdf($viewPath, $cvData)->download($downloadFilename);
             }
 
-            // Save to public disk and return URL
-            $storedFilename = uniqid('cv_') . '.pdf';
-            $relativePath = 'cvs/' . $storedFilename;
-            $fullPath = storage_path('app/public/' . $relativePath);
-
-            if (! is_dir(dirname($fullPath))) {
-                mkdir(dirname($fullPath), 0775, true);
-            }
-
-            $pdf->save($fullPath);
-
-            return Storage::disk('public')->url($relativePath);
+            return $this->pdfStore->put(
+                $profile,
+                'cvs',
+                'cv',
+                $this->pdfStore->renderContext($template, $viewPath),
+                $cvData,
+                function (string $absolutePath) use ($viewPath, $cvData): void {
+                    $this->makePdf($viewPath, $cvData)->save($absolutePath);
+                },
+            );
         } catch (ViewException $e) {
             Log::error('PDF Generation (URL): View Exception', [
                 'message' => $e->getMessage(),
@@ -92,18 +74,18 @@ class CVPDFService
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            throw new \RuntimeException(__('messages.pdf_generation_failed') . ' - ' . $e->getMessage(), 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed').' - '.$e->getMessage(), 0, $e);
         } catch (InvalidFormat $e) {
             Log::error('PDF Generation (URL): Invalid Format', [
                 'message' => $e->getMessage(),
             ]);
-            throw new \RuntimeException(__('messages.pdf_generation_failed') . ' - ' . $e->getMessage(), 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed').' - '.$e->getMessage(), 0, $e);
         } catch (ProcessFailedException $e) {
             Log::error('PDF Generation (URL): Process Failed', [
                 'message' => $e->getMessage(),
                 'command' => method_exists($e->getProcess(), 'getCommandLine') ? $e->getProcess()->getCommandLine() : 'N/A',
             ]);
-            throw new \RuntimeException(__('messages.pdf_generation_failed') . '. Please ensure Chrome/Chromium and Node.js are installed on the server.', 0, $e);
+            throw new \RuntimeException(__('messages.pdf_generation_failed').'. Please ensure Chrome/Chromium and Node.js are installed on the server.', 0, $e);
         } catch (\Exception $e) {
             Log::error('PDF Generation (URL): General Exception', [
                 'message' => $e->getMessage(),
@@ -114,6 +96,25 @@ class CVPDFService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $cvData
+     */
+    private function makePdf(string $viewPath, array $cvData): \Spatie\LaravelPdf\PdfBuilder
+    {
+        return Pdf::view($viewPath, ['cv' => $cvData])
+            ->format('a4')
+            ->margins(10, 10, 10, 10)
+            ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
+                // --no-sandbox is automatically added by LARAVEL_PDF_NO_SANDBOX config
+                $browsershot->setOption('args', [
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--disable-setuid-sandbox',
+                    '--disable-software-rasterizer',
+                ]);
+            });
     }
 
     /**
@@ -138,5 +139,3 @@ class CVPDFService
         ]);
     }
 }
-
-

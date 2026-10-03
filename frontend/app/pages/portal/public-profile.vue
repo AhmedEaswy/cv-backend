@@ -2,6 +2,21 @@
 definePageMeta({ middleware: 'auth', layout: 'portal' });
 import type { TemplateOption } from '~/components/portal/cv/CvTemplateSlider.vue';
 import type { PublicProfileSeo } from '~/composables/usePortalApi';
+import {
+    AlignLeftIcon,
+    AtIcon,
+    Briefcase01Icon,
+    CallIcon,
+    Globe02Icon,
+    Image01Icon,
+    Link01Icon,
+    Location01Icon,
+    Mail01Icon,
+    Robot01Icon,
+    Search01Icon,
+    UserIcon,
+} from '@hugeicons/core-free-icons';
+import { copyToClipboard } from '~/utils/clipboard';
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -51,6 +66,8 @@ const customDomainDnsHost = ref('');
 const customDomainDnsValue = ref('');
 const customDomainVerified = ref(false);
 const verifyingProfileDns = ref(false);
+const copiedTarget = ref('');
+let copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
 const robotsOptions = computed(() => [
     { value: 'index,follow', label: t('portal.public_profile.seo.robots_default') },
@@ -215,18 +232,32 @@ async function onTogglePublic(value: boolean | number | string | null) {
     toggling.value = false;
 }
 
+function profileShareUrl() {
+    return profile.value?.public_url || pathUrl.value || (profile.value?.slug ? `/u/${profile.value.slug}` : '');
+}
+
+function markCopied(target: string) {
+    copiedTarget.value = target;
+    if (copiedTimer) clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => {
+        if (copiedTarget.value === target) copiedTarget.value = '';
+    }, 2500);
+}
+
 async function copyAbsoluteUrl(url: string) {
     if (!url) return;
     const absolute = /^https?:\/\//i.test(url) ? url : `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
     try {
-        await navigator.clipboard.writeText(absolute);
+        await copyToClipboard(absolute);
+        markCopied(url);
         toast.success(t('portal.public_profile.link_copied'));
-    } catch { /* ignore */ }
+    } catch {
+        toast.error(t('portal.public_profile.link_copy_failed'));
+    }
 }
 
 async function onCopyLink() {
-    const url = profile.value?.public_url || pathUrl.value || (profile.value?.slug ? `/u/${profile.value.slug}` : '');
-    await copyAbsoluteUrl(url);
+    await copyAbsoluteUrl(profileShareUrl());
 }
 
 async function verifyCustomDomainDns() {
@@ -267,7 +298,8 @@ const previewUrl = computed(() => {
                 <Icon name="eye" :size="14" /> {{ t('portal.public_profile.preview') }}
             </a>
             <Button v-if="profile.slug" variant="secondary" @click="onCopyLink">
-                <Icon name="copy" :size="14" /> {{ t('portal.public_profile.copy_link') }}
+                <Icon :name="copiedTarget === profileShareUrl() ? 'check' : 'copy'" :size="14" />
+                {{ copiedTarget === profileShareUrl() ? t('portal.public_profile.link_copied') : t('portal.public_profile.copy_link') }}
             </Button>
             <Switch
                 :model-value="form.is_public"
@@ -288,38 +320,52 @@ const previewUrl = computed(() => {
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="name">{{ t('portal.public_profile.field.name') }}</label>
-                        <input id="name" v-model="form.name" class="input" :placeholder="t('portal.public_profile.field.name_placeholder')" />
+                        <FieldIcon :icon="UserIcon">
+                            <input id="name" v-model="form.name" class="input" :placeholder="t('portal.public_profile.field.name_placeholder')" />
+                        </FieldIcon>
                     </div>
                     <div class="field">
                         <label class="field-label" for="headline">{{ t('portal.public_profile.field.headline') }}</label>
-                        <input id="headline" v-model="form.headline" class="input" :placeholder="t('portal.public_profile.field.headline_placeholder')" />
+                        <FieldIcon :icon="Briefcase01Icon">
+                            <input id="headline" v-model="form.headline" class="input" :placeholder="t('portal.public_profile.field.headline_placeholder')" />
+                        </FieldIcon>
                     </div>
                 </div>
 
                 <div class="field">
                     <label class="field-label" for="bio">{{ t('portal.public_profile.field.about') }}</label>
-                    <textarea id="bio" v-model="form.bio" class="textarea" rows="4" :placeholder="t('portal.public_profile.field.about_placeholder')" />
+                    <FieldIcon :icon="AlignLeftIcon">
+                        <textarea id="bio" v-model="form.bio" class="textarea" rows="4" :placeholder="t('portal.public_profile.field.about_placeholder')" />
+                    </FieldIcon>
                 </div>
 
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="email">{{ t('portal.public_profile.field.email') }}</label>
-                        <input id="email" v-model="form.email" type="email" class="input" :placeholder="t('portal.public_profile.field.email_placeholder')" />
+                        <FieldIcon :icon="Mail01Icon">
+                            <input id="email" v-model="form.email" type="email" class="input" :placeholder="t('portal.public_profile.field.email_placeholder')" />
+                        </FieldIcon>
                     </div>
                     <div class="field">
                         <label class="field-label" for="phone">{{ t('portal.public_profile.field.phone') }}</label>
-                        <input id="phone" v-model="form.phone" type="tel" class="input" :placeholder="t('portal.public_profile.field.phone_placeholder')" />
+                        <FieldIcon :icon="CallIcon">
+                            <input id="phone" v-model="form.phone" type="tel" class="input" :placeholder="t('portal.public_profile.field.phone_placeholder')" />
+                        </FieldIcon>
                     </div>
                 </div>
 
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="website">{{ t('portal.public_profile.field.website') }}</label>
-                        <input id="website" v-model="form.website" type="url" class="input" :placeholder="t('portal.public_profile.field.website_placeholder')" />
+                        <FieldIcon :icon="Globe02Icon">
+                            <input id="website" v-model="form.website" type="url" class="input" :placeholder="t('portal.public_profile.field.website_placeholder')" />
+                        </FieldIcon>
                     </div>
                     <div class="field">
                         <label class="field-label" for="location">{{ t('portal.public_profile.field.location') }}</label>
-                        <input id="location" v-model="form.location" class="input" :placeholder="t('portal.public_profile.field.location_placeholder')" />
+                        <FieldIcon :icon="Location01Icon">
+                            <input id="location" v-model="form.location" class="input" :placeholder="t('portal.public_profile.field.location_placeholder')" />
+                        </FieldIcon>
                     </div>
                 </div>
             </div>
@@ -341,13 +387,15 @@ const previewUrl = computed(() => {
                 </div>
                 <div class="field">
                     <label class="field-label" for="contact-recipient">{{ t('portal.public_profile.contact.recipient') }}</label>
-                    <input
-                        id="contact-recipient"
-                        v-model="form.contact_form_recipient"
-                        type="email"
-                        class="input"
-                        :placeholder="t('portal.public_profile.field.email_placeholder')"
-                    />
+                    <FieldIcon :icon="Mail01Icon">
+                        <input
+                            id="contact-recipient"
+                            v-model="form.contact_form_recipient"
+                            type="email"
+                            class="input"
+                            :placeholder="t('portal.public_profile.field.email_placeholder')"
+                        />
+                    </FieldIcon>
                     <span class="field-hint">{{ t('portal.public_profile.contact.recipient_help') }}</span>
                 </div>
             </div>
@@ -357,22 +405,26 @@ const previewUrl = computed(() => {
                 <p class="form-card__sub">{{ t('portal.public_profile.url.subtitle') }}</p>
                 <div class="field">
                     <label class="field-label" for="slug">{{ t('portal.public_profile.field.slug') }}</label>
-                    <input id="slug" v-model="form.slug" class="input" dir="ltr" :placeholder="t('portal.public_profile.field.slug_help')" />
+                    <FieldIcon :icon="AtIcon">
+                        <input id="slug" v-model="form.slug" class="input" dir="ltr" :placeholder="t('portal.public_profile.field.slug_help')" />
+                    </FieldIcon>
                     <span class="field-hint">{{ t('portal.public_profile.field.slug_help') }}</span>
                 </div>
                 <div class="field">
                     <span class="field-label">{{ t('portal.public_profile.url.mode_label') }}</span>
-                    <SelectInput v-model="form.profile_url_mode" :options="urlModeOptions" />
+                    <SelectInput v-model="form.profile_url_mode" :icon="Link01Icon" :options="urlModeOptions" />
                 </div>
                 <div v-if="form.profile_url_mode === 'custom_domain'" class="field">
                     <label class="field-label" for="custom-domain">{{ t('portal.public_profile.url.custom_domain_field') }}</label>
-                    <input
-                        id="custom-domain"
-                        v-model="form.custom_domain"
-                        class="input"
-                        dir="ltr"
-                        :placeholder="t('portal.public_profile.url.custom_domain_placeholder')"
-                    />
+                    <FieldIcon :icon="Globe02Icon">
+                        <input
+                            id="custom-domain"
+                            v-model="form.custom_domain"
+                            class="input"
+                            dir="ltr"
+                            :placeholder="t('portal.public_profile.url.custom_domain_placeholder')"
+                        />
+                    </FieldIcon>
                 </div>
                 <div
                     v-if="form.profile_url_mode === 'custom_domain' && customDomainDnsHost && customDomainDnsValue"
@@ -382,14 +434,14 @@ const previewUrl = computed(() => {
                     <p class="form-card__sub">{{ t('portal.public_profile.url.custom_dns_subtitle') }}</p>
                     <div class="dns-instructions__row">
                         <code class="dns-instructions__code">{{ customDomainDnsHost }}</code>
-                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainDnsHost)">
-                            <Icon name="copy" :size="14" />
+                        <Button type="button" variant="secondary" size="sm" :aria-label="t('portal.public_profile.url.copy')" @click="copyAbsoluteUrl(customDomainDnsHost)">
+                            <Icon :name="copiedTarget === customDomainDnsHost ? 'check' : 'copy'" :size="14" />
                         </Button>
                     </div>
                     <div class="dns-instructions__row">
                         <code class="dns-instructions__code">{{ customDomainDnsValue }}</code>
-                        <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainDnsValue)">
-                            <Icon name="copy" :size="14" />
+                        <Button type="button" variant="secondary" size="sm" :aria-label="t('portal.public_profile.url.copy')" @click="copyAbsoluteUrl(customDomainDnsValue)">
+                            <Icon :name="copiedTarget === customDomainDnsValue ? 'check' : 'copy'" :size="14" />
                         </Button>
                     </div>
                     <div class="dns-instructions__actions">
@@ -406,7 +458,8 @@ const previewUrl = computed(() => {
                     <div class="url-copy-row">
                         <code class="url-copy-row__text">{{ pathUrl }}</code>
                         <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(pathUrl)">
-                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                            <Icon :name="copiedTarget === pathUrl ? 'check' : 'copy'" :size="14" />
+                            {{ copiedTarget === pathUrl ? t('portal.public_profile.link_copied') : t('portal.public_profile.url.copy') }}
                         </Button>
                     </div>
                 </div>
@@ -415,7 +468,8 @@ const previewUrl = computed(() => {
                     <div class="url-copy-row">
                         <code class="url-copy-row__text">{{ subdomainUrl }}</code>
                         <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(subdomainUrl)">
-                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                            <Icon :name="copiedTarget === subdomainUrl ? 'check' : 'copy'" :size="14" />
+                            {{ copiedTarget === subdomainUrl ? t('portal.public_profile.link_copied') : t('portal.public_profile.url.copy') }}
                         </Button>
                     </div>
                 </div>
@@ -424,7 +478,8 @@ const previewUrl = computed(() => {
                     <div class="url-copy-row">
                         <code class="url-copy-row__text">{{ customDomainUrl }}</code>
                         <Button type="button" variant="secondary" size="sm" @click="copyAbsoluteUrl(customDomainUrl)">
-                            <Icon name="copy" :size="14" /> {{ t('portal.public_profile.url.copy') }}
+                            <Icon :name="copiedTarget === customDomainUrl ? 'check' : 'copy'" :size="14" />
+                            {{ copiedTarget === customDomainUrl ? t('portal.public_profile.link_copied') : t('portal.public_profile.url.copy') }}
                         </Button>
                     </div>
                 </div>
@@ -435,20 +490,26 @@ const previewUrl = computed(() => {
                 <p class="form-card__sub">{{ t('portal.public_profile.seo.subtitle') }}</p>
                 <div class="field">
                     <label class="field-label" for="seo-title">{{ t('portal.public_profile.seo.meta_title') }}</label>
-                    <input id="seo-title" v-model="form.seo.meta_title" class="input" :placeholder="t('portal.public_profile.seo.meta_title_placeholder')" />
+                    <FieldIcon :icon="Search01Icon">
+                        <input id="seo-title" v-model="form.seo.meta_title" class="input" :placeholder="t('portal.public_profile.seo.meta_title_placeholder')" />
+                    </FieldIcon>
                 </div>
                 <div class="field">
                     <label class="field-label" for="seo-desc">{{ t('portal.public_profile.seo.meta_description') }}</label>
-                    <textarea id="seo-desc" v-model="form.seo.meta_description" class="textarea" rows="3" :placeholder="t('portal.public_profile.seo.meta_description_placeholder')" />
+                    <FieldIcon :icon="AlignLeftIcon">
+                        <textarea id="seo-desc" v-model="form.seo.meta_description" class="textarea" rows="3" :placeholder="t('portal.public_profile.seo.meta_description_placeholder')" />
+                    </FieldIcon>
                 </div>
                 <div class="field-grid">
                     <div class="field">
                         <label class="field-label" for="seo-og">{{ t('portal.public_profile.seo.og_image') }}</label>
-                        <input id="seo-og" v-model="form.seo.og_image" class="input" dir="ltr" :placeholder="t('portal.public_profile.seo.og_image_placeholder')" />
+                        <FieldIcon :icon="Image01Icon">
+                            <input id="seo-og" v-model="form.seo.og_image" class="input" dir="ltr" :placeholder="t('portal.public_profile.seo.og_image_placeholder')" />
+                        </FieldIcon>
                     </div>
                     <div class="field">
                         <label class="field-label" for="seo-robots">{{ t('portal.public_profile.seo.robots') }}</label>
-                        <SelectInput id="seo-robots" v-model="form.seo.robots" :options="robotsOptions" />
+                        <SelectInput id="seo-robots" v-model="form.seo.robots" :icon="Robot01Icon" :options="robotsOptions" />
                     </div>
                 </div>
             </div>

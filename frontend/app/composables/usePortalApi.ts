@@ -19,6 +19,8 @@ export interface CvExperience {
     position: string;
     company?: string | null;
     location?: string | null;
+    locationType?: string | null;
+    employmentType?: string | null;
     description?: string | null;
     from?: string | null;
     to?: string | null;
@@ -320,6 +322,8 @@ export function compactCvUserData(data: CvUserData): CvUserData {
             position: e.position?.trim() || '',
             company: blankToNull(e.company),
             location: blankToNull(e.location),
+            locationType: blankToNull(e.locationType),
+            employmentType: blankToNull(e.employmentType),
             description: blankToNull(e.description),
             from: blankToNull(e.from),
             to: e.current ? null : blankToNull(e.to),

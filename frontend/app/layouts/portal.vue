@@ -59,7 +59,8 @@ const settingsNavItems = computed<SettingsNavItem[]>(() => [
     { id: 'profile', to: '/portal/settings', label: t('portal.settings.profile.title') },
     { id: 'password', to: '/portal/settings?tab=password', label: t('portal.settings.password.title') },
     { id: 'notifications', to: '/portal/settings/notifications', label: t('portal.settings.notifications.title') },
-    { id: 'sending', to: '/portal/settings/sending-email', label: t('portal.settings.sending_email.smtp_title') },
+    { id: 'sending', to: '/portal/settings/sending-email', label: t('portal.settings.sending_email.title') },
+    { id: 'domain', to: '/portal/settings/sending-domain', label: t('portal.settings.sending_domain.nav') },
     { id: 'ai', to: '/portal/settings/ai-access', label: t('portal.settings.ai.title') },
 ]);
 
@@ -79,6 +80,8 @@ function isSettingsSubActive(item: SettingsNavItem): boolean {
             return path.startsWith('/portal/settings/notifications');
         case 'sending':
             return path.startsWith('/portal/settings/sending-email');
+        case 'domain':
+            return path.startsWith('/portal/settings/sending-domain');
         case 'ai':
             return path.startsWith('/portal/settings/ai-access');
         default:

@@ -2,6 +2,8 @@
 /**
  * /auth/register
  */
+import { LockIcon, Mail01Icon, UserIcon } from '@hugeicons/core-free-icons';
+
 const { t } = useI18n();
 const { register, loading, fieldError, generalError } = useAuthSession();
 
@@ -57,47 +59,53 @@ const onSubmit = () => register({ ...form });
         <form @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="name">{{ t('auth.register.name') }}</label>
-                <input
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    class="input"
-                    autocomplete="name"
-                    required
-                    :placeholder="t('auth.name_placeholder')"
-                    :aria-invalid="!!fieldError('name')"
-                />
+                <FieldIcon :icon="UserIcon">
+                    <input
+                        id="name"
+                        v-model="form.name"
+                        type="text"
+                        class="input"
+                        autocomplete="name"
+                        required
+                        :placeholder="t('auth.name_placeholder')"
+                        :aria-invalid="!!fieldError('name')"
+                    />
+                </FieldIcon>
                 <span v-if="fieldError('name')" class="field-error">{{ fieldError('name') }}</span>
             </div>
 
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.register.email') }}</label>
-                <input
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="input"
-                    autocomplete="email"
-                    inputmode="email"
-                    required
-                    :placeholder="t('auth.email_placeholder')"
-                    :aria-invalid="!!fieldError('email')"
-                />
+                <FieldIcon :icon="Mail01Icon">
+                    <input
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        class="input"
+                        autocomplete="email"
+                        inputmode="email"
+                        required
+                        :placeholder="t('auth.email_placeholder')"
+                        :aria-invalid="!!fieldError('email')"
+                    />
+                </FieldIcon>
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>
             </div>
 
             <div class="field">
                 <label class="field-label" for="password">{{ t('auth.register.password') }}</label>
-                <input
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="input"
-                    autocomplete="new-password"
-                    required
-                    :placeholder="t('auth.password_new_placeholder')"
-                    :aria-invalid="!!fieldError('password')"
-                />
+                <FieldIcon :icon="LockIcon">
+                    <input
+                        id="password"
+                        v-model="form.password"
+                        type="password"
+                        class="input"
+                        autocomplete="new-password"
+                        required
+                        :placeholder="t('auth.password_new_placeholder')"
+                        :aria-invalid="!!fieldError('password')"
+                    />
+                </FieldIcon>
                 <span class="field-hint">
                     {{ t('auth.register.terms_prefix') }}
                     <NuxtLink to="/terms">{{ t('landing.footer_terms') }}</NuxtLink>
@@ -109,15 +117,17 @@ const onSubmit = () => register({ ...form });
 
             <div class="field">
                 <label class="field-label" for="password_confirmation">{{ t('auth.register.password_confirm') }}</label>
-                <input
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="input"
-                    autocomplete="new-password"
-                    required
-                    :placeholder="t('auth.password_confirm_placeholder')"
-                />
+                <FieldIcon :icon="LockIcon">
+                    <input
+                        id="password_confirmation"
+                        v-model="form.password_confirmation"
+                        type="password"
+                        class="input"
+                        autocomplete="new-password"
+                        required
+                        :placeholder="t('auth.password_confirm_placeholder')"
+                    />
+                </FieldIcon>
             </div>
 
             <Button type="submit" variant="primary" :loading="loading" block>

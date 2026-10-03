@@ -1,13 +1,17 @@
 <script setup lang="ts">
 /**
- * Tom Select single-select, styled to match .input radius.
+ * Single-select field. Same radius and focus ring as .input, with an optional leading icon.
  */
 import TomSelect from 'tom-select';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { ChevronDownIcon } from '@hugeicons/core-free-icons';
 
 export interface SelectOption {
     value: string | number;
     label: string;
 }
+
+export type SelectIcon = typeof ChevronDownIcon;
 
 const model = defineModel<string | number | null | undefined>({ default: '' });
 
@@ -15,6 +19,7 @@ const props = defineProps<{
     id?: string;
     options: SelectOption[];
     placeholder?: string;
+    icon?: SelectIcon;
 }>();
 
 const selectEl = ref<HTMLSelectElement | null>(null);
@@ -72,8 +77,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <select :id="id" ref="selectEl" class="ts-select">
-        <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
-        <option v-for="opt in options" :key="String(opt.value)" :value="opt.value">{{ opt.label }}</option>
-    </select>
+    <div class="ui-select" :class="{ 'ui-select--icon': !!icon }">
+        <span v-if="icon" class="ui-select__icon" aria-hidden="true">
+            <HugeiconsIcon :icon="icon" :size="16" :stroke-width="1.75" />
+        </span>
+        <select :id="id" ref="selectEl" class="ts-select">
+            <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
+            <option v-for="opt in options" :key="String(opt.value)" :value="opt.value">{{ opt.label }}</option>
+        </select>
+        <span class="ui-select__caret" aria-hidden="true">
+            <HugeiconsIcon :icon="ChevronDownIcon" :size="16" :stroke-width="1.75" />
+        </span>
+    </div>
 </template>

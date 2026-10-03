@@ -153,16 +153,12 @@ html[dir="rtl"] :is(.display-1, .display-2, .display-3, h1, h2, h3, h4, h5, h6) 
 /* =========================================================================
    Focus state
    ========================================================================= */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
-[role="tab"]:focus-visible,
-[tabindex]:focus-visible {
+a:focus-visible:not(.btn),
+button:focus-visible:not(.btn),
+[role="tab"]:focus-visible:not(.btn),
+[tabindex]:focus-visible:not(input):not(textarea):not(select):not(.ts-control):not(.ts-wrapper):not(.btn) {
     outline: 2px solid var(--color-ink);
     outline-offset: 2px;
-    border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

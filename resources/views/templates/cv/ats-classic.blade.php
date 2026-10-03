@@ -158,8 +158,9 @@
                     <div class="entry-header">
                         <div>
                             <h3>{{ $exp['position'] ?? '' }}</h3>
-                            @if(!empty($exp['company']))
-                                <p class="entry-subtitle">{{ $exp['company'] }}@if(!empty($exp['location'])), {{ $exp['location'] }}@endif</p>
+                            @php $expSubtitle = \App\Support\ExperienceDisplay::metaLine($exp, ', '); @endphp
+                            @if($expSubtitle !== '')
+                                <p class="entry-subtitle">{{ $expSubtitle }}</p>
                             @endif
                         </div>
                         <p class="entry-dates">

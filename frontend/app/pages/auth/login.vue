@@ -2,6 +2,8 @@
 /**
  * /auth/login
  */
+import { LockIcon, Mail01Icon } from '@hugeicons/core-free-icons';
+
 const { t } = useI18n();
 const route = useRoute();
 const { login, loading, fieldError, generalError } = useAuthSession();
@@ -63,33 +65,37 @@ const socialError = computed(() =>
         <form @submit.prevent="onSubmit" novalidate>
             <div class="field">
                 <label class="field-label" for="email">{{ t('auth.login.email') }}</label>
-                <input
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="input"
-                    autocomplete="email"
-                    inputmode="email"
-                    required
-                    :placeholder="t('auth.email_placeholder')"
-                    :aria-invalid="!!fieldError('email')"
-                />
+                <FieldIcon :icon="Mail01Icon">
+                    <input
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        class="input"
+                        autocomplete="email"
+                        inputmode="email"
+                        required
+                        :placeholder="t('auth.email_placeholder')"
+                        :aria-invalid="!!fieldError('email')"
+                    />
+                </FieldIcon>
                 <span v-if="fieldError('email')" class="field-error">{{ fieldError('email') }}</span>
             </div>
 
             <div class="field">
                 <label class="field-label" for="password">{{ t('auth.login.password') }}</label>
                 <div class="pwd-wrap">
-                    <input
-                        id="password"
-                        v-model="form.password"
-                        :type="showPwd ? 'text' : 'password'"
-                        class="input"
-                        autocomplete="current-password"
-                        required
-                        :placeholder="t('auth.password_placeholder')"
-                        :aria-invalid="!!fieldError('password')"
-                    />
+                    <FieldIcon :icon="LockIcon">
+                        <input
+                            id="password"
+                            v-model="form.password"
+                            :type="showPwd ? 'text' : 'password'"
+                            class="input"
+                            autocomplete="current-password"
+                            required
+                            :placeholder="t('auth.password_placeholder')"
+                            :aria-invalid="!!fieldError('password')"
+                        />
+                    </FieldIcon>
                     <button type="button" class="pwd-toggle" @click="showPwd = !showPwd" :aria-label="showPwd ? 'Hide password' : 'Show password'">
                         <Icon :name="showPwd ? 'x' : 'eye'" :size="16" />
                     </button>

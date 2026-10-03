@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Profiles\Schemas;
 
+use App\Enums\EmploymentType;
+use App\Enums\LocationType;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
@@ -99,6 +101,14 @@ class ProfileForm
                         TextInput::make('location')
                             ->label('Location')
                             ->placeholder('City, Country'),
+                        Select::make('locationType')
+                            ->label('Location Type')
+                            ->options(LocationType::options())
+                            ->placeholder('Please select'),
+                        Select::make('employmentType')
+                            ->label('Employment Type')
+                            ->options(EmploymentType::options())
+                            ->placeholder('Please select'),
                         TextInput::make('position')
                             ->label('Position')
                             ->required(),
