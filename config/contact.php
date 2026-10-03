@@ -2,6 +2,7 @@
 
 return [
     'moderation' => [
+        // Same sender email flooding one profile (not total traffic from many visitors).
         'profile_burst_window_minutes' => (int) env('CONTACT_BURST_WINDOW_MINUTES', 15),
         'profile_burst_threshold' => (int) env('CONTACT_BURST_THRESHOLD', 5),
         'max_links_before_review' => (int) env('CONTACT_MAX_LINKS_BEFORE_REVIEW', 3),
