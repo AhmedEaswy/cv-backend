@@ -2504,6 +2504,7 @@
     "portal.help.open_public": "Open public support page",
     "portal.help.replay_guide": "Open getting started guide",
     "portal.help.replay_tour": "Replay portal tour",
+    "portal.help.replay_tour_unavailable": "No portal tour is available to replay right now.",
     "portal.help.title": "Help center",
     "portal.inbox.anonymous": "Anonymous",
     "portal.inbox.date": "Received",

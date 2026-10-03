@@ -2508,6 +2508,7 @@
     "portal.help.open_public": "Abrir soporte p\u00fablico",
     "portal.help.replay_guide": "Abrir gu\u00eda de inicio",
     "portal.help.replay_tour": "Repetir tour del portal",
+    "portal.help.replay_tour_unavailable": "No hay un tour del portal disponible para repetir ahora.",
     "portal.help.title": "Centro de ayuda",
     "portal.inbox.anonymous": "An\u00f3nimo",
     "portal.inbox.date": "Recibido",

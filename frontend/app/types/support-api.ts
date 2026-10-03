@@ -59,6 +59,11 @@ export interface ProductTourProgressResult {
     completed_at: string | null;
 }
 
+export interface ProductTourResetResult {
+    key: string;
+    reset: boolean;
+}
+
 export const FEATURE_REQUEST_STATUSES: FeatureRequestStatus[] = [
     'under_review',
     'planned',

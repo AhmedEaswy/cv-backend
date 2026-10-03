@@ -2508,6 +2508,7 @@
     "portal.help.open_public": "Ouvrir le support public",
     "portal.help.replay_guide": "Ouvrir le guide de démarrage",
     "portal.help.replay_tour": "Rejouer la visite du portail",
+    "portal.help.replay_tour_unavailable": "Aucune visite du portail n’est disponible pour une relecture pour le moment.",
     "portal.help.title": "Centre d’aide",
     "portal.inbox.anonymous": "Anonyme",
     "portal.inbox.date": "Reçu",

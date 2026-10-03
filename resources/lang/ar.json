@@ -2517,6 +2517,7 @@
     "portal.help.open_public": "فتح صفحة الدعم العامة",
     "portal.help.replay_guide": "فتح دليل البداية",
     "portal.help.replay_tour": "إعادة جولة البوابة",
+    "portal.help.replay_tour_unavailable": "لا يوجد جولة في البوابة لإعادة تشغيلها الآن.",
     "portal.help.title": "مركز المساعدة",
     "portal.inbox.anonymous": "مجهول",
     "portal.inbox.date": "تاريخ الاستلام",

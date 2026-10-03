@@ -2508,6 +2508,7 @@
     "portal.help.open_public": "عوامی سپورٹ صفحہ کھولیں",
     "portal.help.replay_guide": "شروعاتی گائیڈ کھولیں",
     "portal.help.replay_tour": "پورٹل ٹور دوبارہ چلائیں",
+    "portal.help.replay_tour_unavailable": "ابھی دوبارہ چلانے کے لیے کوئی پورٹل ٹور دستیاب نہیں۔",
     "portal.help.title": "ہیلپ سینٹر",
     "portal.inbox.anonymous": "گمنام",
     "portal.inbox.date": "موصول",

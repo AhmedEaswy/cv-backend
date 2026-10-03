@@ -7,18 +7,16 @@ definePageMeta({ middleware: 'auth', layout: 'portal' });
 const { t } = useI18n();
 const config = useRuntimeConfig();
 const appName = config.public.appName as string;
-const support = useSupportApi('portal');
+const tour = usePortalTour();
+const replaying = ref(false);
 
-const replaySlug = ref<string | null>(null);
-
-async function replayFirstGuide() {
-    const guides = await support.listHelpArticles('guide');
-    const first = guides[0];
-    if (!first) return;
-    replaySlug.value = first.slug;
-    await nextTick();
-    const el = document.getElementById('support-guides');
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+async function onReplayTour() {
+    replaying.value = true;
+    try {
+        await tour.replayTourFromHelp();
+    } finally {
+        replaying.value = false;
+    }
 }
 
 useHead({
@@ -35,8 +33,8 @@ useHead({
                 <p class="portal-page__lede">{{ t('portal.help.lede') }}</p>
             </div>
             <div class="portal-help__actions">
-                <Button variant="secondary" @click="replayFirstGuide">
-                    {{ t('portal.help.replay_guide') }}
+                <Button variant="secondary" :loading="replaying" @click="onReplayTour">
+                    {{ t('portal.help.replay_tour') }}
                 </Button>
                 <Button to="/support" variant="ghost">
                     {{ t('portal.help.open_public') }}
@@ -44,6 +42,6 @@ useHead({
             </div>
         </header>
 
-        <SupportHub scope="portal" :show-contact="false" :guide-replay-slug="replaySlug" />
+        <SupportHub scope="portal" :show-contact="false" />
     </div>
 </template>
